@@ -26,8 +26,15 @@ export class KapitalbedarfComponent {
 
   form = this.fb.nonNullable.group({
     monthlyGap: [0, [Validators.required, Validators.min(1)]],
+    otherMonthlyIncome: [0, [Validators.required, Validators.min(0)]],
     existingCapital: [0, [Validators.required, Validators.min(0)]],
   });
+
+  get effectiveGap(): number {
+    const gap = this.form.get('monthlyGap')?.value ?? 0;
+    const other = this.form.get('otherMonthlyIncome')?.value ?? 0;
+    return Math.max(0, gap - other);
+  }
 
   existingCapitalGrown(targetCapital: number): number {
     const ec = this.form.get('existingCapital')?.value ?? 0;
@@ -57,9 +64,9 @@ export class KapitalbedarfComponent {
       this.form.markAllAsTouched();
       return;
     }
-    const { monthlyGap } = this.form.getRawValue();
-    this.entnahmeResult.set(this.kapitalCalculator.calculateEntnahmeplan(monthlyGap));
-    this.vierProzentResult.set(this.kapitalCalculator.calculateVierProzent(monthlyGap));
+    const effectiveGap = this.effectiveGap;
+    this.entnahmeResult.set(this.kapitalCalculator.calculateEntnahmeplan(effectiveGap));
+    this.vierProzentResult.set(this.kapitalCalculator.calculateVierProzent(effectiveGap));
     this.appState.markKapitalDone();
   }
 

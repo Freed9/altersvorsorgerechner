@@ -30,6 +30,37 @@
       }
 
       <div class="form__group">
+        <label class="form__label" for="otherMonthlyIncome">
+          Sonstige monatliche Einnahmen (nach heutiger Kaufkraft)
+          <span class="info-tip">
+            <i class="info-tip__icon">i</i>
+            <span class="info-tip__content">
+              Weitere regelmäßige Einnahmen im Rentenalter, z.&thinsp;B. aus Vermietung &amp; Verpachtung,
+              Betriebsrente oder privaten Leibrenten. Werden von der Rentenlücke abgezogen.
+            </span>
+          </span>
+        </label>
+        <div class="form__input-wrapper">
+          <input
+            class="form__input form__input--with-suffix"
+            id="otherMonthlyIncome"
+            type="number"
+            formControlName="otherMonthlyIncome"
+            min="0"
+          />
+          <span class="form__suffix">€</span>
+        </div>
+      </div>
+
+      @if ((form.get('otherMonthlyIncome')?.value ?? 0) > 0) {
+        <p class="kapital__effective-gap">
+          Effektive Lücke:
+          <strong>{{ effectiveGap | number:'1.0-0' }} €/Monat</strong>
+          ({{ form.get('monthlyGap')?.value | number:'1.0-0' }} € − {{ form.get('otherMonthlyIncome')?.value | number:'1.0-0' }} € sonstige Einnahmen)
+        </p>
+      }
+
+      <div class="form__group">
         <label class="form__label" for="existingCapital">
           Bereits vorhandenes Kapital (K₀)
           <span class="info-tip">
