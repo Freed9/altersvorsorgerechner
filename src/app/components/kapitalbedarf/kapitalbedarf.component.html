@@ -1,0 +1,279 @@
+<div class="kapital">
+  <header class="calculator__header">
+    <h1 class="calculator__title">Kapitalbedarf</h1>
+    <p class="calculator__subtitle">
+      Berechne, wie viel Kapital du benötigst, um deine monatliche Rentenlücke zu schließen.
+    </p>
+  </header>
+
+  <div class="kapital__input-card">
+    <form [formGroup]="form" (ngSubmit)="calculate()" class="form">
+      <div class="form__group">
+        <label class="form__label" for="monthlyGap">Monatliche Rentenlücke (netto)</label>
+        <div class="form__input-wrapper">
+          <input
+            class="form__input form__input--with-suffix"
+            id="monthlyGap"
+            type="number"
+            formControlName="monthlyGap"
+            min="1"
+          />
+          <span class="form__suffix">€</span>
+        </div>
+        @if (form.get('monthlyGap')?.invalid && form.get('monthlyGap')?.touched) {
+          <span class="form__error">Bitte eine Rentenlücke von mindestens 1 € eingeben</span>
+        }
+      </div>
+
+      @if (appState.monthlyGap() !== null) {
+        <p class="kapital__hint">← Übernommen aus der Rentenlückenberechnung</p>
+      }
+
+      <div class="form__group">
+        <label class="form__label" for="existingCapital">
+          Bereits vorhandenes Kapital (K₀)
+          <span class="info-tip">
+            <i class="info-tip__icon">i</i>
+            <span class="info-tip__content">
+              Bereits angespartes Kapital (ETF-Depot, Tagesgeld etc.).
+              Wird im Sparrechner als Startkapital vorausgefüllt und wächst bis zur Rente weiter.
+            </span>
+          </span>
+        </label>
+        <div class="form__input-wrapper">
+          <input
+            class="form__input form__input--with-suffix"
+            id="existingCapital"
+            type="number"
+            formControlName="existingCapital"
+            min="0"
+          />
+          <span class="form__suffix">€</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn--primary">Berechnen</button>
+    </form>
+  </div>
+
+  @if (entnahmeResult(); as ep) {
+    @if (vierProzentResult(); as vp) {
+      <div class="kapital__variants">
+
+        <!-- Entnahmeplan -->
+        <div class="variant-card variant-card--blue">
+          <div class="variant-card__header">
+            <div class="variant-card__title">Entnahmeplan</div>
+            <div class="variant-card__sub">
+              4 % p.a. · 28 Jahre · Kapital aufgezehrt
+              <span class="tooltip">
+                <span class="tooltip__trigger">?</span>
+                <span class="tooltip__content">
+                  <strong>Kaufkraft sinkt über die Zeit</strong><br>
+                  Die Entnahme bleibt nominal gleich. Bei {{ constants.INFLATION_RATE * 100 | number:'1.0-0' }} % Inflation p.a. hat die Entnahme in Jahr {{ constants.ENTNAHMEPLAN_YEARS }} nur noch ca. <strong>{{ purchasingPowerPct }}&nbsp;%</strong> der heutigen Kaufkraft. Die reale Kaufkraft ist zu Beginn am höchsten und nimmt jährlich ab.
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="variant-card__capital">
+            <div class="variant-card__capital-label">Benötigtes Startkapital</div>
+            <div class="variant-card__capital-value">
+              {{ ep.requiredCapital | number:'1.0-0' }} €
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>K = PMT_brutto × (1 − (1+r)^−n) / r</strong><br>
+                  r = {{ constants.ENTNAHMEPLAN_RATE * 100 }} %/12 mtl.<br>
+                  n = {{ constants.ENTNAHMEPLAN_YEARS }} × 12 = {{ constants.ENTNAHMEPLAN_YEARS * 12 }} Monate<br>
+                  Barwertformel (Rentenbarwert)
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="variant-card__detail">
+            <span class="variant-card__detail-label">Monatl. Entnahme brutto</span>
+            <span class="variant-card__detail-value">
+              {{ ep.monthlyGross | number:'1.2-2' }} €
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>PMT_brutto = Lücke_netto / (1 − Steuersatz_eff)</strong><br>
+                  Renditeanteil = {{ ep.gainFraction | number:'1.2-2' }}<br>
+                  Effektiver Steuersatz = Renditeanteil × {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }} %
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="variant-card__detail variant-card__detail--muted">
+            <span class="variant-card__detail-label">Ø Steuer mtl. <span class="variant-card__detail-hint">(Teilfr. 30&nbsp;%)</span></span>
+            <span class="variant-card__detail-value">
+              − {{ ep.monthlyTax | number:'1.2-2' }} €
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>Steuer = PMT_brutto × Renditeanteil × KESt_eff</strong><br>
+                  KESt_eff = {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }} % (mit 30 % Teilfreistellung)<br>
+                  Steuerbetrag sinkt mit abnehmendem Kapital – hier Durchschnitt
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="variant-card__detail variant-card__detail--highlight">
+            <span class="variant-card__detail-label">Monatl. Entnahme netto</span>
+            <span class="variant-card__detail-value">{{ ep.monthlyNet | number:'1.2-2' }} €</span>
+          </div>
+          <div class="variant-card__detail">
+            <span class="variant-card__detail-label">Gesamtentnahme (28 J.)</span>
+            <span class="variant-card__detail-value">
+              {{ ep.totalWithdrawn | number:'1.0-0' }} €
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>Gesamt = PMT_brutto × n</strong><br>
+                  = {{ ep.monthlyGross | number:'1.2-2' }} € × {{ constants.ENTNAHMEPLAN_YEARS * 12 }} Monate
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="variant-card__detail">
+            <span class="variant-card__detail-label">Davon aus Rendite</span>
+            <span class="variant-card__detail-value">
+              {{ ep.gainFromReturns | number:'1.0-0' }} €
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>Renditegewinn = Gesamt − K</strong><br>
+                  Kapital wird vollständig aufgezehrt, die Rendite „verlängert" das Kapital über 28 Jahre
+                </span>
+              </span>
+            </span>
+          </div>
+
+          <div class="variant-card__info variant-card__info--blue">
+            4 % p.a. Brutto-Rendite. Steuer nur auf Renditeanteil mit 30&nbsp;% Teilfreistellung
+            (effektiv {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }}&nbsp;%).
+            Steuerbetrag sinkt mit abnehmendem Kapital — hier als Durchschnitt angegeben.
+            Nach 28 Jahren ist das Kapital vollständig verbraucht.
+          </div>
+
+          @if ((form.get('existingCapital')?.value ?? 0) > 0) {
+            <div class="variant-card__existing">
+              <span class="variant-card__existing-label">Vorhandenes Kapital (K₀)</span>
+              <span class="variant-card__existing-value">{{ form.get('existingCapital')?.value | number:'1.0-0' }} €</span>
+              <span class="variant-card__existing-label">Angewachsen bis Rente (5 % p.a., ~{{ (appState.currentAge() !== null ? 67 - appState.currentAge()! : 30) }} J.)</span>
+              <span class="variant-card__existing-value">≈ {{ existingCapitalGrown(ep.requiredCapital) | number:'1.0-0' }} €</span>
+              <span class="variant-card__existing-label">Noch anzusparendes Kapital</span>
+              <span class="variant-card__existing-value variant-card__existing-value--highlight">{{ remainingTarget(ep.requiredCapital) | number:'1.0-0' }} €</span>
+            </div>
+          }
+
+          <div class="variant-card__action">
+            <button type="button" class="btn btn--secondary"
+              (click)="goToSparrechner(ep.requiredCapital, 'Entnahmeplan')">
+              Sparplan berechnen →
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 %-Regel -->
+        <div class="variant-card variant-card--green">
+          <div class="variant-card__header">
+            <div class="variant-card__title">4&nbsp;%-Regel</div>
+            <div class="variant-card__sub">
+              4 % p.a. · Kapitalerhalt · Entnahme besteuert
+              <span class="tooltip tooltip--left">
+                <span class="tooltip__trigger">?</span>
+                <span class="tooltip__content">
+                  <strong>Kaufkraft sinkt über die Zeit</strong><br>
+                  Die Entnahme bleibt nominal gleich. Bei {{ constants.INFLATION_RATE * 100 | number:'1.0-0' }} % Inflation p.a. hat die Entnahme in Jahr {{ constants.ENTNAHMEPLAN_YEARS }} nur noch ca. <strong>{{ purchasingPowerPct }}&nbsp;%</strong> der heutigen Kaufkraft. Das nominales Kapital bleibt erhalten, verliert aber real an Wert.
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="variant-card__capital">
+            <div class="variant-card__capital-label">Benötigtes Startkapital</div>
+            <div class="variant-card__capital-value">
+              {{ vp.requiredCapital | number:'1.0-0' }} €
+              <span class="info-tip info-tip--left">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>K = Jahresentnahme_brutto / 4 %</strong><br>
+                  Jahresentnahme_brutto = Lücke_netto × 12 / (1 − KESt_eff)<br>
+                  Kapital bleibt dauerhaft erhalten (Gordonsches Wachstumsmodell)
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="variant-card__detail">
+            <span class="variant-card__detail-label">Monatl. Entnahme brutto</span>
+            <span class="variant-card__detail-value">
+              {{ vp.monthlyGross | number:'1.2-2' }} €
+              <span class="info-tip info-tip--left">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>PMT_brutto = Lücke_netto / (1 − KESt_eff)</strong><br>
+                  KESt_eff = {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }} %<br>
+                  Gesamte Entnahme gilt als Kapitalertrag
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="variant-card__detail variant-card__detail--muted">
+            <span class="variant-card__detail-label">Steuer mtl. <span class="variant-card__detail-hint">(Teilfr. 30&nbsp;%)</span></span>
+            <span class="variant-card__detail-value">
+              − {{ vp.monthlyTax | number:'1.2-2' }} €
+              <span class="info-tip info-tip--left">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>Steuer = PMT_brutto × KESt_eff</strong><br>
+                  Volle Teilfreistellung (30 %), da gesamte Entnahme als Kapitalertrag gilt
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="variant-card__detail variant-card__detail--highlight">
+            <span class="variant-card__detail-label">Monatl. Entnahme netto</span>
+            <span class="variant-card__detail-value">{{ vp.monthlyNet | number:'1.2-2' }} €</span>
+          </div>
+          <div class="variant-card__detail">
+            <span class="variant-card__detail-label">Jährl. Entnahme brutto</span>
+            <span class="variant-card__detail-value">{{ vp.annualGross | number:'1.0-0' }} €</span>
+          </div>
+          <div class="variant-card__detail">
+            <span class="variant-card__detail-label">Jährl. Steuer</span>
+            <span class="variant-card__detail-value">{{ vp.annualTax | number:'1.0-0' }} €</span>
+          </div>
+
+          <div class="variant-card__info variant-card__info--green">
+            4 % des Kapitals werden jährlich entnommen. Gesamte Entnahme gilt als Kapitalertrag —
+            Teilfreistellung 30&nbsp;% greift voll: effektiv {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }}&nbsp;%.
+            Sparerpauschbetrag (1.000&nbsp;€/Jahr) nicht eingerechnet. Kapital bleibt dauerhaft erhalten.
+          </div>
+
+          @if ((form.get('existingCapital')?.value ?? 0) > 0) {
+            <div class="variant-card__existing">
+              <span class="variant-card__existing-label">Vorhandenes Kapital (K₀)</span>
+              <span class="variant-card__existing-value">{{ form.get('existingCapital')?.value | number:'1.0-0' }} €</span>
+              <span class="variant-card__existing-label">Angewachsen bis Rente (5 % p.a., ~{{ (appState.currentAge() !== null ? 67 - appState.currentAge()! : 30) }} J.)</span>
+              <span class="variant-card__existing-value">≈ {{ existingCapitalGrown(vp.requiredCapital) | number:'1.0-0' }} €</span>
+              <span class="variant-card__existing-label">Noch anzusparendes Kapital</span>
+              <span class="variant-card__existing-value variant-card__existing-value--highlight">{{ remainingTarget(vp.requiredCapital) | number:'1.0-0' }} €</span>
+            </div>
+          }
+
+          <div class="variant-card__action">
+            <button type="button" class="btn btn--secondary"
+              (click)="goToSparrechner(vp.requiredCapital, '4%-Regel')">
+              Sparplan berechnen →
+            </button>
+          </div>
+        </div>
+
+      </div>
+    }
+  }
+</div>

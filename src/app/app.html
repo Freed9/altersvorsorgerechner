@@ -1,0 +1,268 @@
+@if (!consentGiven()) {
+  <div class="cookie-banner" role="dialog" aria-label="Zustimmung erforderlich">
+    <div class="cookie-banner__inner">
+      <div class="cookie-banner__header">
+        <span class="cookie-banner__icon">🍪</span>
+        <h2 class="cookie-banner__title">Zustimmung &amp; Rechtlicher Hinweis</h2>
+      </div>
+      <p class="cookie-banner__desc">
+        Bevor du den Rentenlückenrechner nutzt, bitten wir dich, den
+        <button type="button" class="cookie-banner__link" (click)="disclaimerOpen.set(true)">Rechtlichen Hinweis</button>
+        zu lesen. Deine Zustimmung wird in einem Cookie für 1 Jahr gespeichert.
+      </p>
+      <label class="cookie-banner__check-label">
+        <input
+          type="checkbox"
+          class="cookie-banner__checkbox"
+          [checked]="consentChecked()"
+          (change)="consentChecked.set($any($event.target).checked)"
+        />
+        <span>
+          Ich habe den
+          <button type="button" class="cookie-banner__link" (click)="disclaimerOpen.set(true)">Rechtlichen Hinweis</button>
+          gelesen und verstanden. Die Ergebnisse sind keine Anlageberatung.
+        </span>
+      </label>
+      <div class="cookie-banner__actions">
+        <button
+          type="button"
+          class="cookie-banner__btn"
+          [disabled]="!consentChecked()"
+          (click)="acceptConsent()"
+        >
+          Verstanden &amp; fortfahren →
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (consentGiven()) {
+<div class="stepper">
+
+  <!-- ── Schritt 1: Rentenlücke ── -->
+  <div class="step" [class.step--active]="appState.activeStep() === 1"
+       [class.step--done]="appState.step1Done()">
+    <button class="step__head" type="button" (click)="setStep(1)">
+      <div class="step__num" [class.step__num--done]="appState.step1Done()"
+           [class.step__num--active]="appState.activeStep() === 1 && !appState.step1Done()">
+        @if (appState.step1Done()) { <span class="step__check">✓</span> } @else { 1 }
+      </div>
+      <div class="step__info">
+        <span class="step__title">Rentenlücke berechnen</span>
+        @if (appState.step1Done() && appState.activeStep() !== 1) {
+          <span class="step__summary">Lücke: {{ appState.monthlyGap()! | number:'1.0-0' }} €/Monat</span>
+        } @else if (!appState.step1Done()) {
+          <span class="step__subtitle">Schritt 1 — Wie hoch ist meine Rente?</span>
+        }
+      </div>
+      <span class="step__chevron" [class.step__chevron--open]="appState.activeStep() === 1"></span>
+    </button>
+    <div [hidden]="appState.activeStep() !== 1" class="step__body">
+      <app-rentenluecke />
+    </div>
+  </div>
+
+  <div class="step-connector" [class.step-connector--done]="appState.step1Done()"></div>
+
+  <!-- ── Schritt 2: Kapitalbedarf ── -->
+  <div class="step" [class.step--active]="appState.activeStep() === 2"
+       [class.step--done]="appState.step2Done()"
+       [class.step--locked]="!appState.step1Done()">
+    <button class="step__head" type="button" (click)="setStep(2)"
+            [disabled]="!appState.step1Done()">
+      <div class="step__num" [class.step__num--done]="appState.step2Done()"
+           [class.step__num--active]="appState.activeStep() === 2 && !appState.step2Done()"
+           [class.step__num--locked]="!appState.step1Done()">
+        @if (appState.step2Done()) { <span class="step__check">✓</span> } @else { 2 }
+      </div>
+      <div class="step__info">
+        <span class="step__title">Kapitalbedarf ermitteln</span>
+        @if (appState.step2Done() && appState.activeStep() !== 2) {
+          <span class="step__summary">Wie viel Kapital brauche ich?</span>
+        } @else if (!appState.step1Done()) {
+          <span class="step__subtitle">Erst Schritt 1 abschließen</span>
+        } @else if (!appState.step2Done()) {
+          <span class="step__subtitle">Schritt 2 — Wie viel Kapital brauche ich?</span>
+        }
+      </div>
+      <span class="step__chevron" [class.step__chevron--open]="appState.activeStep() === 2"
+            [class.step__chevron--hidden]="!appState.step1Done()"></span>
+    </button>
+    <div [hidden]="appState.activeStep() !== 2" class="step__body">
+      <app-kapitalbedarf />
+    </div>
+  </div>
+
+  <div class="step-connector" [class.step-connector--done]="appState.step2Done()"></div>
+
+  <!-- ── Schritt 3: Sparplan ── -->
+  <div class="step" [class.step--active]="appState.activeStep() === 3"
+       [class.step--locked]="!appState.step2Done()">
+    <button class="step__head" type="button" (click)="setStep(3)"
+            [disabled]="!appState.step2Done()">
+      <div class="step__num" [class.step__num--active]="appState.activeStep() === 3"
+           [class.step__num--locked]="!appState.step2Done()">
+        3
+      </div>
+      <div class="step__info">
+        <span class="step__title">Sparplan & Altersvorsorgedepot</span>
+        @if (!appState.step2Done()) {
+          <span class="step__subtitle">Erst Schritt 2 abschließen</span>
+        } @else {
+          <span class="step__subtitle">Schritt 3 — Wie viel muss ich sparen?</span>
+        }
+      </div>
+      <span class="step__chevron" [class.step__chevron--open]="appState.activeStep() === 3"
+            [class.step__chevron--hidden]="!appState.step2Done()"></span>
+    </button>
+    <div [hidden]="appState.activeStep() !== 3" class="step__body">
+      <app-sparrechner />
+    </div>
+  </div>
+
+</div>
+  <footer class="app-footer">
+    <div class="app-footer__inner">
+      <p class="app-footer__copy">
+        © {{ currentYear }} Rentenlückenrechner &nbsp;·&nbsp; Keine Anlageberatung
+        &nbsp;·&nbsp; Nur zur Information
+        &nbsp;·&nbsp;
+        <button class="app-footer__impressum-btn" type="button" (click)="disclaimerOpen.set(true)">
+          Rechtlicher Hinweis
+        </button>
+        &nbsp;·&nbsp;
+        <button class="app-footer__impressum-btn" type="button" (click)="impressumOpen.set(true)">
+          Impressum
+        </button>
+        &nbsp;·&nbsp;
+        <button class="app-footer__impressum-btn" type="button" (click)="licenseOpen.set(true)">
+          MIT Lizenz
+        </button>
+      </p>
+    </div>
+  </footer>
+} <!-- end @if consentGiven -->
+
+<!-- Rechtlicher Hinweis Modal -->
+@if (disclaimerOpen()) {
+  <div class="modal-backdrop" (click)="disclaimerOpen.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Rechtlicher Hinweis">
+      <div class="modal__header">
+        <h2 class="modal__title">Rechtlicher Hinweis</h2>
+        <button class="modal__close" type="button" (click)="disclaimerOpen.set(false)" aria-label="Schließen">✕</button>
+      </div>
+      <div class="modal__body">
+        <p>
+          Diese Webanwendung trifft vereinfachende Annahmen zur Modellierung wirtschaftlicher
+          Zusammenhänge — u.&nbsp;a. konstante Renditen, Inflationsraten, Steuerregeln und
+          Förderkonditionen. Die Ergebnisse erheben keinen Anspruch auf <strong>Vollständigkeit
+          oder Richtigkeit</strong> und begründen keinerlei rechtliche Ansprüche gegenüber dem Betreiber.
+        </p>
+        <p>
+          Alle Berechnungen dienen ausschließlich der <strong>Information und Wissensvermittlung</strong>
+          und stellen weder eine Anlageempfehlung noch eine Finanz- oder Steuerberatung dar.
+          Insbesondere ersetzen sie keine individuelle Beratung durch lizenzierte Finanz-,
+          Steuer- oder Rentenberater.
+        </p>
+        <p>
+          Der Nutzer entscheidet <strong>eigenverantwortlich</strong>, ob und wie er für das Alter
+          finanziell vorsorgt. Die dargestellten Szenarien dienen ausschließlich dazu,
+          die <strong>Notwendigkeit privater Altersvorsorge zu veranschaulichen</strong>.
+        </p>
+        <p>
+          Steuerliche Regelungen, Förderkonditionen (z.&nbsp;B. Altersvorsorgedepot ab 2027)
+          und gesetzliche Rahmenbedingungen können sich ändern. Die Anwendung wird nicht
+          garantiert aktuell gehalten.
+        </p>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Impressum Modal -->
+@if (impressumOpen()) {
+  <div class="modal-backdrop" (click)="impressumOpen.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Impressum">
+      <div class="modal__header">
+        <h2 class="modal__title">Impressum</h2>
+        <button class="modal__close" type="button" (click)="impressumOpen.set(false)" aria-label="Schließen">✕</button>
+      </div>
+      <div class="modal__body">
+        <p><strong>Angaben gemäß § 5 TMG</strong></p>
+        <p>
+          Lorem Ipsum GmbH<br>
+          Musterstraße 42<br>
+          12345 Musterstadt
+        </p>
+        <p>
+          <strong>Vertreten durch:</strong><br>
+          Lorem Ipsum
+        </p>
+        <p>
+          <strong>Kontakt</strong><br>
+          E-Mail: lorem&#64;ipsum.de<br>
+          Telefon: +49 000 000 000
+        </p>
+        <p>
+          <strong>Haftung für Inhalte</strong><br>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
+          ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+          ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </p>
+        <p>
+          <strong>Haftung für Links</strong><br>
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+          nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+          deserunt mollit anim id est laborum.
+        </p>
+        <p>
+          <strong>Urheberrecht</strong><br>
+          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+          anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </p>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MIT Lizenz Modal -->
+@if (licenseOpen()) {
+  <div class="modal-backdrop" (click)="licenseOpen.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="MIT Lizenz">
+      <div class="modal__header">
+        <h2 class="modal__title">MIT Lizenz</h2>
+        <button class="modal__close" type="button" (click)="licenseOpen.set(false)" aria-label="Schließen">✕</button>
+      </div>
+      <div class="modal__body modal__body--license">
+        <p>MIT License</p>
+        <p>Copyright © 2026 Rentenlückenrechner Contributors</p>
+        <p>
+          Permission is hereby granted, free of charge, to any person obtaining a copy
+          of this software and associated documentation files (the "Software"), to deal
+          in the Software without restriction, including without limitation the rights
+          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+          copies of the Software, and to permit persons to whom the Software is
+          furnished to do so, subject to the following conditions:
+        </p>
+        <p>
+          The above copyright notice and this permission notice shall be included in all
+          copies or substantial portions of the Software.
+        </p>
+        <p>
+          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+          IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+          FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+          AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+          LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+          SOFTWARE.
+        </p>
+        <p>
+          Der Quellcode ist öffentlich verfügbar und darf unter den Bedingungen der MIT-Lizenz
+          frei verwendet, verändert und weiterverbreitet werden.
+        </p>
+      </div>
+    </div>
+  </div>
+}

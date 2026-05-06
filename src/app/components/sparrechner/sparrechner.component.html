@@ -1,0 +1,743 @@
+<div class="spar">
+  <header class="calculator__header">
+    <h1 class="calculator__title">Sparrechner</h1>
+    <p class="calculator__subtitle">
+      Ermittle deine monatliche Sparrate oder berechne dein Endkapital.
+    </p>
+  </header>
+
+  <div class="spar__input-card">
+
+    <div class="spar__mode-select">
+      <label class="form__label" for="modeSelect">Berechnung</label>
+      <div class="spar__select-wrapper">
+        <select
+          class="spar__select"
+          id="modeSelect"
+          [value]="mode()"
+          (change)="setMode($any($event.target).value)"
+        >
+          <option value="sparrate">Wie viel muss ich monatlich sparen?</option>
+          <option value="kapital">Wie viel Kapital erreiche ich?</option>
+        </select>
+      </div>
+    </div>
+
+    @if (appState.targetCapital() !== null && mode() === 'sparrate') {
+      <div class="spar__source-hint">
+        Zielkapital übernommen aus: <strong>{{ appState.targetCapitalSource() }}</strong>
+        ({{ appState.targetCapital()! | number:'1.0-0' }}&nbsp;€)
+      </div>
+    }
+
+    @if (mode() === 'sparrate') {
+      <form [formGroup]="sparrateForm" (ngSubmit)="calculate()" class="form spar__form">
+        <div class="spar__grid">
+          <div class="form__group">
+            <label class="form__label" for="targetCapital">Zielkapital (K<sub>E</sub>)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="targetCapital"
+                type="number" formControlName="targetCapital" min="1" />
+              <span class="form__suffix">€</span>
+            </div>
+            @if (sparrateForm.get('targetCapital')?.invalid && sparrateForm.get('targetCapital')?.touched) {
+              <span class="form__error">Bitte ein gültiges Zielkapital eingeben</span>
+            }
+          </div>
+
+          <div class="form__group">
+            <label class="form__label" for="startingCapital">Vorhandenes Kapital (K<sub>0</sub>)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="startingCapital"
+                type="number" formControlName="startingCapital" min="0" />
+              <span class="form__suffix">€</span>
+            </div>
+          </div>
+
+          <div class="form__group">
+            <label class="form__label" for="years">Anlagehorizont (n)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="years"
+                type="number" formControlName="years" min="1" max="60" />
+              <span class="form__suffix">J.</span>
+            </div>
+            @if (sparrateForm.get('years')?.invalid && sparrateForm.get('years')?.touched) {
+              <span class="form__error">1–60 Jahre</span>
+            }
+          </div>
+
+          <div class="form__group">
+            <label class="form__label" for="rendite">Rendite p.a. (r)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="rendite"
+                type="number" formControlName="rendite" min="0.1" max="20" step="0.1" />
+              <span class="form__suffix">%</span>
+            </div>
+            @if (sparrateForm.get('rendite')?.invalid && sparrateForm.get('rendite')?.touched) {
+              <span class="form__error">0,1–20 %</span>
+            }
+          </div>
+        </div>
+        <button type="submit" class="btn btn--primary">Berechnen</button>
+      </form>
+    }
+
+    @if (mode() === 'kapital') {
+      <form [formGroup]="kapitalForm" (ngSubmit)="calculate()" class="form spar__form">
+        <div class="spar__grid">
+          <div class="form__group">
+            <label class="form__label" for="monthlyRate">Monatliche Sparrate (PMT)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="monthlyRate"
+                type="number" formControlName="monthlyRate" min="1" />
+              <span class="form__suffix">€</span>
+            </div>
+            @if (kapitalForm.get('monthlyRate')?.invalid && kapitalForm.get('monthlyRate')?.touched) {
+              <span class="form__error">Bitte eine Sparrate eingeben</span>
+            }
+          </div>
+
+          <div class="form__group">
+            <label class="form__label" for="startingCapitalB">Vorhandenes Kapital (K<sub>0</sub>)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="startingCapitalB"
+                type="number" formControlName="startingCapital" min="0" />
+              <span class="form__suffix">€</span>
+            </div>
+          </div>
+
+          <div class="form__group">
+            <label class="form__label" for="yearsB">Anlagehorizont (n)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="yearsB"
+                type="number" formControlName="years" min="1" max="60" />
+              <span class="form__suffix">J.</span>
+            </div>
+            @if (kapitalForm.get('years')?.invalid && kapitalForm.get('years')?.touched) {
+              <span class="form__error">1–60 Jahre</span>
+            }
+          </div>
+
+          <div class="form__group">
+            <label class="form__label" for="renditeB">Rendite p.a. (r)</label>
+            <div class="form__input-wrapper">
+              <input class="form__input form__input--with-suffix" id="renditeB"
+                type="number" formControlName="rendite" min="0.1" max="20" step="0.1" />
+              <span class="form__suffix">%</span>
+            </div>
+            @if (kapitalForm.get('rendite')?.invalid && kapitalForm.get('rendite')?.touched) {
+              <span class="form__error">0,1–20 %</span>
+            }
+          </div>
+        </div>
+        <button type="submit" class="btn btn--primary">Berechnen</button>
+      </form>
+    }
+  </div>
+
+  @if (sparrateResult(); as r) {
+    <div class="spar__result">
+      <div class="spar__result-main">
+        <span class="spar__result-label">Monatliche Sparrate (PMT)</span>
+        <span class="spar__result-value">
+          {{ r.monthlyRate | number:'1.2-2' }} €
+          <span class="info-tip">
+            <i class="info-tip__icon">i</i>
+            <span class="info-tip__content">
+              <strong>PMT = (K_E_nötig × r) / ((1+r)^n − 1)</strong><br>
+              r = Rendite/12 monatlich<br>
+              n = Jahre × 12 Monate<br>
+              K_E_nötig = K_E − K₀ × (1+r)^n
+            </span>
+          </span>
+        </span>
+        @if (savingsRatePct(r.monthlyRate); as pct) {
+          <span class="spar__result-pct">
+            {{ pct | number:'1.1-1' }} % deines Nettoeinkommens
+            ({{ appState.currentMonthlyNetIncome()! | number:'1.0-0' }} €/Monat)
+          </span>
+        }
+      </div>
+
+      @if (savingsRatePct(r.monthlyRate) !== null) {
+        <div class="spar__dynamisierung">
+          <strong>Dynamisierung empfohlen:</strong>
+          Diese Sparrate sollte jährlich um ca. 2 % erhöht werden, um die Inflation auszugleichen —
+          im nächsten Jahr also <strong>{{ dynamisierungRate(r.monthlyRate) | number:'1.0-0' }} €/Monat</strong>.
+        </div>
+      }
+
+      <div class="spar__result-details">
+        <div class="spar__result-detail">
+          <span class="spar__result-detail-label">Zielkapital (K_E)</span>
+          <span class="spar__result-detail-value">{{ r.finalCapital | number:'1.0-0' }} €</span>
+        </div>
+        <div class="spar__result-detail">
+          <span class="spar__result-detail-label">Eigene Einzahlungen</span>
+          <span class="spar__result-detail-value">
+            {{ r.totalContributions | number:'1.0-0' }} €
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>Einzahlungen = PMT × n + K₀</strong><br>
+                Gesamte eigene Einzahlungen inkl. Startkapital, ohne Zinsgewinne
+              </span>
+            </span>
+          </span>
+        </div>
+        <div class="spar__result-detail spar__result-detail--gain">
+          <span class="spar__result-detail-label">Rendite (Zinseszins)</span>
+          <span class="spar__result-detail-value">
+            {{ r.gainFromReturns | number:'1.0-0' }} €
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>Renditegewinn = K_E − Einzahlungen</strong><br>
+                Zinseszinseffekt über {{ sparrateForm.get('years')?.value }} Jahre
+              </span>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <p class="spar__disclaimer">
+        Brutto-Rendite vor Steuern. Auf realisierte Gewinne fallen KESt 25 % + Soli 5,5 % an
+        (mit 30 % Teilfreistellung bei Aktien-ETF effektiv ca. 18,46 %). Die tatsächliche Nettorendite
+        liegt entsprechend niedriger.
+      </p>
+    </div>
+
+    <!-- Altersvorsorgedepot-Optimierung -->
+    @if (avdResult(); as avd) {
+      <div class="spar__avd">
+        <div class="spar__avd-header">
+          <h2 class="spar__avd-title">Optimierung mit Altersvorsorgedepot</h2>
+          <p class="spar__avd-subtitle">
+            Das staatlich geförderte Altersvorsorgedepot (ab 2027) kann deine Sparrate senken oder deine spätere Rente erhöhen.
+            AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a. · ETF-Rendite (nach TER) {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a. ·
+            Zulage 50 % (erste 360 €/J.) + 25 % (bis 1.800 €/J.) · max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr Grundzulage
+          </p>
+        </div>
+
+        <!-- Kostenparameter -->
+        <div class="spar__avd-costs">
+          <div class="spar__avd-cost-group">
+            <label class="form__label">
+              ETF-Kosten (TER)
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  Total Expense Ratio des ETF. Wird von der eingegebenen Rendite abgezogen.<br>
+                  Typisch: 0,07–0,20 % für breite Index-ETF.
+                </span>
+              </span>
+            </label>
+            <div class="form__input-wrapper">
+              <input type="number" class="form__input form__input--with-suffix spar__cost-input"
+                [value]="etfTer()" (change)="onCostChange('etfTer', $event)"
+                min="0" max="1.5" step="0.01" />
+              <span class="form__suffix">%</span>
+            </div>
+          </div>
+          <div class="spar__avd-cost-group">
+            <label class="form__label">
+              AVD-Kosten
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  Jährliche Kosten des Altersvorsorgedepots (Verwaltung, Depot, ggf. Fonds-TER).<br>
+                  Wird von der Brutto-Rendite (5 % = 7 % − 2 % Inflation) abgezogen.
+                </span>
+              </span>
+            </label>
+            <div class="form__input-wrapper">
+              <input type="number" class="form__input form__input--with-suffix spar__cost-input"
+                [value]="avdCost()" (change)="onCostChange('avdCost', $event)"
+                min="0" max="1.5" step="0.01" />
+              <span class="form__suffix">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kinder mit Alter -->
+        <div class="spar__avd-children">
+          <div class="spar__children-header">
+            <label class="form__label">
+              Kinder mit Kindergeldanspruch
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  Kinder, für die du Kindergeld beziehst (i.d.R. bis Vollendung des 18. Lebensjahres).
+                  Jedes Kind bringt {{ avdConst.KINDERZULAGE_YEAR | number }} €/Jahr zusätzliche Kinderzulage ins Depot.
+                </span>
+              </span>
+            </label>
+            @if (eligibleChildrenCount() > 0) {
+              <span class="spar__children-summary">
+                {{ eligibleChildrenCount() }} kindergeldberechtigt ·
+                {{ eligibleChildrenCount() * avdConst.KINDERZULAGE_YEAR | number }} €/Jahr Kinderzulage
+              </span>
+            }
+          </div>
+
+          @for (child of children(); track $index) {
+            <div class="spar__child-row">
+              <span class="spar__child-label">Kind {{ $index + 1 }}</span>
+              <div class="form__input-wrapper spar__child-age-wrapper">
+                <input
+                  type="number"
+                  class="form__input spar__child-age-input"
+                  [value]="child.age"
+                  (input)="updateChildAge($index, $event)"
+                  min="0"
+                  max="25"
+                  placeholder="Alter"
+                />
+                <span class="form__suffix">J.</span>
+              </div>
+              @if (child.age < 18) {
+                <span class="spar__child-badge spar__child-badge--ok">Kindergeld</span>
+              } @else {
+                <span class="spar__child-badge spar__child-badge--no">kein Kindergeld</span>
+              }
+              <button type="button" class="spar__child-remove" (click)="removeChild($index)" title="Kind entfernen">×</button>
+            </div>
+          }
+
+          @if (children().length < 9) {
+            <button type="button" class="btn btn--outline spar__child-add" (click)="addChild()">
+              + Kind hinzufügen
+            </button>
+          }
+        </div>
+
+        <div class="spar__avd-cards">
+
+          <!-- Gleiche Rente, weniger sparen -->
+          <div class="spar__avd-card spar__avd-card--save">
+            <div class="spar__avd-card-title">Gleiche Rente, günstigerer Sparplan</div>
+            <div class="spar__avd-card-sub">Monatliche Nettorente im Alter: {{ avd.refMonthlyIncome | number:'1.2-2' }} €</div>
+
+            <div class="spar__avd-split">
+              <div class="spar__avd-split-row">
+                <span class="spar__avd-split-label">ETF-Sparrate</span>
+                <span class="spar__avd-split-value">{{ avd.optEtf | number:'1.0-0' }} €/Monat</span>
+              </div>
+              <div class="spar__avd-split-row">
+                <span class="spar__avd-split-label">AVD Eigenanteil</span>
+                <span class="spar__avd-split-value">{{ avd.optAvdOwn | number:'1.0-0' }} €/Monat</span>
+              </div>
+              <div class="spar__avd-split-row spar__avd-split-row--bonus">
+                <span class="spar__avd-split-label">+ Staatszulage
+                  <span class="info-tip">
+                    <i class="info-tip__icon">i</i>
+                    <span class="info-tip__content">
+                      <strong>Grundzulage:</strong> 50 % auf erste 360 €/J. (max. 180 €) + 25 % auf weitere 1.440 €/J. (max. 360 €) = max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr<br>
+                      <strong>Kinderzulage:</strong> {{ avdConst.KINDERZULAGE_YEAR | number }} €/Jahr je Kind mit Kindergeldanspruch
+                    </span>
+                  </span>
+                </span>
+                <span class="spar__avd-split-value">+ {{ avd.optAvdBonus | number:'1.2-2' }} €/Monat</span>
+              </div>
+              <div class="spar__avd-split-row spar__avd-split-row--depot">
+                <span class="spar__avd-split-label">Ins Depot gesamt</span>
+                <span class="spar__avd-split-value">{{ avd.optAvdDepot | number:'1.2-2' }} €/Monat</span>
+              </div>
+            </div>
+
+            <div class="spar__avd-total">
+              <span class="spar__avd-total-label">Gesamt monatl. Aufwand</span>
+              <span class="spar__avd-total-value">{{ avd.optTotal | number:'1.0-0' }} €</span>
+            </div>
+
+            @if (avd.optSaving > 0) {
+              <div class="spar__avd-saving">
+                <strong>− {{ avd.optSaving | number:'1.0-0' }} €/Monat</strong> weniger als reiner ETF-Sparplan
+                ({{ avd.optSavingPct | number:'1.0-0' }} % Ersparnis)
+                @if (savingsRatePct(avd.optTotal); as pct) {
+                  · <strong>{{ pct | number:'1.1-1' }} %</strong> des Nettoeinkommens
+                }
+              </div>
+            }
+
+            <p class="spar__avd-note">
+              AVD-Auszahlung als lebenslange Rente, versteuert mit
+              <strong>{{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} %</strong>
+              Grenzsteuersatz
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  Grenzsteuersatz bei geschätztem ZvE aus GRV-Rente (§22 EStG).<br>
+                  Renteneintrittsjahr: {{ avd.avdRetirementYear }}<br>
+                  Besteuerungsanteil der GRV: {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} %<br>
+                  Analytisch aus §32a EStG 2024 – kein Soli, keine KiSt.
+                </span>
+              </span>.
+              ETF-Kapital via 4 %-Regel (18,46 % KESt effektiv).
+            </p>
+          </div>
+
+          <!-- Gleiche Sparrate, mehr Rente -->
+          <div class="spar__avd-card spar__avd-card--more">
+            <div class="spar__avd-card-title">Gleiche Sparrate, mehr Rente</div>
+            <div class="spar__avd-card-sub">Mit {{ r.monthlyRate | number:'1.0-0' }} €/Monat optimal gesplittet</div>
+
+            <div class="spar__avd-split">
+              <div class="spar__avd-split-row">
+                <span class="spar__avd-split-label">ETF-Sparrate</span>
+                <span class="spar__avd-split-value">{{ avd.fullEtf | number:'1.0-0' }} €/Monat</span>
+              </div>
+              <div class="spar__avd-split-row">
+                <span class="spar__avd-split-label">AVD Eigenanteil</span>
+                <span class="spar__avd-split-value">{{ avd.fullAvdOwn | number:'1.0-0' }} €/Monat</span>
+              </div>
+              <div class="spar__avd-split-row spar__avd-split-row--bonus">
+                <span class="spar__avd-split-label">+ Staatszulage
+                  <span class="info-tip">
+                    <i class="info-tip__icon">i</i>
+                    <span class="info-tip__content">
+                      <strong>Grundzulage:</strong> 50 % auf erste 360 €/J. + 25 % auf weitere Beiträge – max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr<br>
+                      <strong>Kinderzulage:</strong> {{ avdConst.KINDERZULAGE_YEAR | number }} €/Jahr je kindergeldberechtigtes Kind
+                    </span>
+                  </span>
+                </span>
+                <span class="spar__avd-split-value">+ {{ avd.fullAvdBonus | number:'1.2-2' }} €/Monat</span>
+              </div>
+            </div>
+
+            <div class="spar__avd-total">
+              <span class="spar__avd-total-label">Monatl. Nettorente im Alter</span>
+              <span class="spar__avd-total-value">{{ avd.fullMonthlyIncome | number:'1.2-2' }} €</span>
+            </div>
+
+            @if (avd.fullGainPct > 0) {
+              <div class="spar__avd-gain">
+                <strong>+ {{ avd.fullGainPct | number:'1.1-1' }} % mehr</strong> monatliche Nettorente
+                gegenüber reinem ETF-Sparplan
+              </div>
+            }
+
+            <p class="spar__avd-note">
+              Optimale Aufteilung: AVD maximal bis {{ avdConst.MAX_OWN_MONTH }} €/Monat eigener Beitrag (volle Grundzulage), Rest in ETF.
+              Steuersatz AVD-Auszahlung: {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % (Grenzsteuersatz im Rentenalter).
+            </p>
+          </div>
+        </div>
+
+        <!-- AVD-Kurve -->
+        @if (chartData(); as cd) {
+          <div class="spar__avd-chart">
+            <h3 class="spar__avd-chart-title">AVD-Eigenanteil vs. Nettorente</h3>
+            <p class="spar__avd-chart-sub">
+              Bewege die Maus über den Graphen, um zu sehen wie sich ETF-Rate, Staatszulage und Nettorente
+              bei verschiedenen AVD-Eigenanteilen ändern.
+            </p>
+            <div class="spar__chart-legend">
+              <span class="spar__chart-legend-item spar__chart-legend-item--opt">
+                <svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#059669"/></svg>
+                Optimum (max. Nettorente)
+              </span>
+              <span class="spar__chart-legend-item spar__chart-legend-item--sweet">
+                <svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#d97706"/></svg>
+                Sweetspot (Ende Tier-1-Zulage)
+              </span>
+            </div>
+            <div class="spar__chart-wrap">
+              <svg class="spar__chart-svg"
+                [attr.viewBox]="'0 0 ' + cd.W + ' ' + cd.H"
+                (mousemove)="onChartMouseMove($event)"
+                (mouseleave)="onChartMouseLeave()"
+              >
+                <defs>
+                  <linearGradient id="avdAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.15"/>
+                    <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.02"/>
+                  </linearGradient>
+                </defs>
+
+                <!-- horizontal grid lines -->
+                @for (tick of cd.yTicks; track tick.label) {
+                  <line class="spar__chart-grid"
+                    [attr.x1]="cd.PAD.l" [attr.x2]="cd.W - cd.PAD.r"
+                    [attr.y1]="tick.svgY" [attr.y2]="tick.svgY" />
+                }
+
+                <!-- area fill -->
+                <path class="spar__chart-area" [attr.d]="cd.area" fill="url(#avdAreaGrad)" />
+
+                <!-- smooth line -->
+                <path class="spar__chart-line" [attr.d]="cd.line" />
+
+                <!-- optimal point ring (maximales Nettoeinkommen) -->
+                @for (p of cd.scaled; track p.ownMonth) {
+                  @if (p.ownMonth === avd.fullAvdOwn) {
+                    <circle class="spar__chart-opt-ring" [attr.cx]="p.sx" [attr.cy]="p.sy" r="9"/>
+                    <circle class="spar__chart-opt-dot"  [attr.cx]="p.sx" [attr.cy]="p.sy" r="5"/>
+                  } @else if (p.ownMonth === avd.sweetspotOwnMonth) {
+                    <circle class="spar__chart-sweet-ring" [attr.cx]="p.sx" [attr.cy]="p.sy" r="9"/>
+                    <circle class="spar__chart-sweet-dot"  [attr.cx]="p.sx" [attr.cy]="p.sy" r="5"/>
+                  } @else {
+                    <circle class="spar__chart-dot" [attr.cx]="p.sx" [attr.cy]="p.sy" r="3"/>
+                  }
+                }
+
+                <!-- hover indicator -->
+                @if (hoverPoint(); as hp) {
+                  <line class="spar__chart-hover-line"
+                    [attr.x1]="hp.svgX" [attr.x2]="hp.svgX"
+                    [attr.y1]="cd.PAD.t" [attr.y2]="cd.PAD.t + cd.iH" />
+                  <circle class="spar__chart-hover-dot" [attr.cx]="hp.svgX" [attr.cy]="hp.svgY" r="5"/>
+                }
+
+                <!-- x-axis -->
+                @for (tick of cd.xTicks; track tick.label) {
+                  <line class="spar__chart-tick"
+                    [attr.x1]="tick.svgX" [attr.x2]="tick.svgX"
+                    [attr.y1]="cd.PAD.t + cd.iH" [attr.y2]="cd.PAD.t + cd.iH + 5" />
+                  <text class="spar__chart-axis-text"
+                    [attr.x]="tick.svgX" [attr.y]="cd.PAD.t + cd.iH + 18"
+                    text-anchor="middle">{{ tick.label }}</text>
+                }
+
+                <!-- y-axis -->
+                @for (tick of cd.yTicks; track tick.label) {
+                  <line class="spar__chart-tick"
+                    [attr.x1]="cd.PAD.l - 5" [attr.x2]="cd.PAD.l"
+                    [attr.y1]="tick.svgY" [attr.y2]="tick.svgY" />
+                  <text class="spar__chart-axis-text"
+                    [attr.x]="cd.PAD.l - 8" [attr.y]="tick.svgY + 4"
+                    text-anchor="end">{{ tick.label }}</text>
+                }
+
+                <!-- axis labels -->
+                <text class="spar__chart-axis-label"
+                  [attr.x]="cd.PAD.l + cd.iW / 2" [attr.y]="cd.H - 4"
+                  text-anchor="middle">AVD Eigenanteil (€/Monat)</text>
+                <text class="spar__chart-axis-label"
+                  transform="rotate(-90)"
+                  [attr.x]="-(cd.PAD.t + cd.iH / 2)"
+                  y="14"
+                  text-anchor="middle">Nettorente (€/Mon.)</text>
+
+                <!-- invisible overlay for mouse capture -->
+                <rect fill="transparent"
+                  [attr.x]="cd.PAD.l" [attr.y]="cd.PAD.t"
+                  [attr.width]="cd.iW" [attr.height]="cd.iH" />
+              </svg>
+
+              <!-- HTML tooltip -->
+              @if (hoverPoint(); as hp) {
+                @let hpt = cd.scaled[hp.index];
+                <div class="spar__chart-tooltip"
+                  [class.spar__chart-tooltip--left]="hp.rightSide"
+                  [style.left.px]="hp.left"
+                  [style.top.px]="hp.top"
+                >
+                  <div class="spar__chart-tt-head">{{ hpt.ownMonth | number:'1.0-0' }} €/Mon. AVD</div>
+                  <div class="spar__chart-tt-row">
+                    <span>ETF-Rate</span>
+                    <strong>{{ hpt.etfMonth | number:'1.0-0' }} €</strong>
+                  </div>
+                  <div class="spar__chart-tt-row spar__chart-tt-row--bonus">
+                    <span>+ Staatszulage</span>
+                    <strong>+{{ hpt.bonusMonth | number:'1.2-2' }} €</strong>
+                  </div>
+                  <div class="spar__chart-tt-row">
+                    <span>Ins Depot</span>
+                    <strong>{{ hpt.depotMonth | number:'1.2-2' }} €</strong>
+                  </div>
+                  <div class="spar__chart-tt-row spar__chart-tt-row--income">
+                    <span>Nettorente</span>
+                    <strong>{{ hpt.netIncomeMonth | number:'1.2-2' }} €</strong>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Alle 10 € Schritte mit Berechnungsaufschlüsselung -->
+        <div class="spar__avd-steps">
+          <h3 class="spar__avd-steps-title">
+            Warum ist das die optimale Aufteilung?
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>Nettorente = Rente aus AVD + Rente aus ETF</strong><br><br>
+                Rente aus AVD = (Eigenanteil + Zulage) × {{ avd.kAvd | number:'1.4-4' }}<br>
+                Rente aus ETF = ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br><br>
+                Der Faktor = FV-Annuität × 4 %-Regel ÷ 12 × (1 − Steuersatz).<br>
+                AVD hat niedrigere Rendite ({{ (5 - avdCost()) | number:'1.2-2' }} %) und Einkommensteuer,
+                aber die Staatszulage hebelt den Eigenanteil – besonders im ersten Tier (50 %).
+                Ab 30 €/Mon. gilt nur noch 25 % Zulage; dann kann ETF je nach Rendite effizienter werden.
+              </span>
+            </span>
+          </h3>
+          <p class="spar__avd-steps-sub">
+            Gleiches Gesamtbudget ({{ r.monthlyRate | number:'1.0-0' }} €/Monat) – nur die Aufteilung ändert sich
+          </p>
+          <div class="spar__avd-sweetspot-info">
+            <span class="spar__avd-sweetspot-badge">Sweetspot: {{ avd.sweetspotOwnMonth | number:'1.0-0' }} €/Mon.</span>
+            Bis {{ avd.sweetspotOwnMonth | number:'1.0-0' }} €/Mon. Eigenanteil greift die volle <strong>50 %-Zulage</strong> (Tier 1).
+            Danach sinkt die Förderquote auf <strong>25 %</strong> (Tier 2) — jeder weitere Euro AVD-Eigenanteil bringt
+            deutlich weniger Zulage, sodass das ETF häufig effizienter wird.
+            Das Optimum kann dennoch über dem Sweetspot liegen, wenn die Gesamtförderung die niedrigere Rendite
+            noch überwiegt.
+          </div>
+
+          @let maxIncome = avd.chartPoints.reduce((m, p) => p.netIncomeMonth > m ? p.netIncomeMonth : m, 0);
+          <div class="spar__avd-steps-scroll">
+            <table class="spar__avd-table spar__avd-table--steps">
+              <thead>
+                <tr>
+                  <th>AVD<br>eigener Anteil</th>
+                  <th>+ Staatszulage</th>
+                  <th>= Ins Depot</th>
+                  <th>ETF-Rate</th>
+                  <th>
+                    Rente AVD
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        = Ins Depot × {{ avd.kAvd | number:'1.4-4' }}<br>
+                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a., {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % Grenzsteuer)
+                      </span>
+                    </span>
+                  </th>
+                  <th>
+                    Rente ETF
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        = ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
+                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a., 18,46 % KESt effektiv)
+                      </span>
+                    </span>
+                  </th>
+                  <th>Gesamt<br>Nettorente</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (pt of avd.chartPoints; track pt.ownMonth) {
+                  <tr [class.spar__avd-table__row--best]="pt.netIncomeMonth === maxIncome"
+                      [class.spar__avd-table__row--sweet]="pt.ownMonth === avd.sweetspotOwnMonth && pt.netIncomeMonth !== maxIncome">
+                    <td>{{ pt.ownMonth | number:'1.0-0' }} €</td>
+                    <td class="spar__avd-table__bonus">+{{ pt.bonusMonth | number:'1.2-2' }} €</td>
+                    <td>{{ pt.depotMonth | number:'1.2-2' }} €</td>
+                    <td>{{ pt.etfMonth | number:'1.0-0' }} €</td>
+                    <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__etfincome">{{ pt.etfIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__income">
+                      {{ pt.netIncomeMonth | number:'1.2-2' }} €
+                      @if (pt.netIncomeMonth === maxIncome) {
+                        <span class="spar__avd-table__best-badge">Optimum</span>
+                      } @else if (pt.ownMonth === avd.sweetspotOwnMonth) {
+                        <span class="spar__avd-table__sweet-badge">Sweetspot</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <p class="spar__avd-steps-note">
+            Auszahlungsfaktor AVD: {{ avd.kAvd | number:'1.4-4' }} €/Mon. je 1 €/Mon. Depot ·
+            Auszahlungsfaktor ETF: {{ avd.kEtf | number:'1.4-4' }} €/Mon. je 1 €/Mon. Sparrate
+          </p>
+        </div>
+
+        <p class="spar__avd-disclaimer">
+          Modellrechnung. AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a. (7 % Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten).
+          ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a. (Brutto − {{ etfTer() | number:'1.2-2' }} % TER).
+          Mindesteinzahlung {{ avdConst.MIN_OWN_MONTH }} €/Monat; volle Grundzulage ab {{ avdConst.MAX_OWN_MONTH }} €/Monat Eigenanteil.
+          Grenzsteuersatz {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % aus §32a EStG 2024 bei ZvE aus GRV-Rente (Renteneintrittsjahr {{ avd.avdRetirementYear }},
+          Besteuerungsanteil {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} % nach JStG 2022).
+          Sonderausgabenabzug Ansparphase nicht eingerechnet. Kinderzulagen für Kinder mit Kindergeldanspruch.
+          Planmäßig ab 01.01.2027.
+        </p>
+      </div>
+    }
+  }
+
+  @if (kapitalResult(); as r) {
+    <div class="spar__result">
+      <div class="spar__result-main">
+        <span class="spar__result-label">Erreichtes Kapital (K_E)</span>
+        <span class="spar__result-value">
+          {{ r.finalCapital | number:'1.0-0' }} €
+          <span class="info-tip">
+            <i class="info-tip__icon">i</i>
+            <span class="info-tip__content">
+              <strong>K_E = PMT × ((1+r)^n − 1)/r + K₀ × (1+r)^n</strong><br>
+              r = Rendite/12 monatlich<br>
+              n = Jahre × 12 Monate<br>
+              Endwertformel (Future Value of Annuity + Kapitalwachstum)
+            </span>
+          </span>
+        </span>
+      </div>
+
+      @if (appState.targetCapital() !== null) {
+        <div class="spar__result-gap"
+          [class.spar__result-gap--ok]="r.finalCapital >= appState.targetCapital()!"
+          [class.spar__result-gap--short]="r.finalCapital < appState.targetCapital()!"
+        >
+          @if (r.finalCapital >= appState.targetCapital()!) {
+            ✓ Ziel aus {{ appState.targetCapitalSource() }} erreicht
+            (+{{ r.finalCapital - appState.targetCapital()! | number:'1.0-0' }}&nbsp;€)
+          } @else {
+            {{ appState.targetCapitalSource() }}: noch
+            {{ appState.targetCapital()! - r.finalCapital | number:'1.0-0' }}&nbsp;€ fehlend
+          }
+        </div>
+      }
+
+      <div class="spar__result-details">
+        <div class="spar__result-detail">
+          <span class="spar__result-detail-label">Eigene Einzahlungen</span>
+          <span class="spar__result-detail-value">
+            {{ r.totalContributions | number:'1.0-0' }} €
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>Einzahlungen = PMT × n + K₀</strong>
+              </span>
+            </span>
+          </span>
+        </div>
+        @if (r.startingCapitalGrown > 0) {
+          <div class="spar__result-detail">
+            <span class="spar__result-detail-label">Startkapital gewachsen auf</span>
+            <span class="spar__result-detail-value">
+              {{ r.startingCapitalGrown | number:'1.0-0' }} €
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>K₀_gewachsen = K₀ × (1+r)^n</strong>
+                </span>
+              </span>
+            </span>
+          </div>
+        }
+        <div class="spar__result-detail spar__result-detail--gain">
+          <span class="spar__result-detail-label">Rendite (Zinseszins)</span>
+          <span class="spar__result-detail-value">
+            {{ r.gainFromReturns | number:'1.0-0' }} €
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>Renditegewinn = K_E − Einzahlungen</strong>
+              </span>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <p class="spar__disclaimer">
+        Brutto-Rendite vor Steuern. Auf realisierte Gewinne fallen KESt 25 % + Soli 5,5 % an
+        (mit 30 % Teilfreistellung bei Aktien-ETF effektiv ca. 18,46 %). Die tatsächliche Nettorendite
+        liegt entsprechend niedriger.
+      </p>
+    </div>
+  }
+</div>

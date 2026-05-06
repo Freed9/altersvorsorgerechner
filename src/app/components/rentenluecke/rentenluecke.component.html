@@ -1,0 +1,280 @@
+<div class="calculator">
+  <header class="calculator__header">
+    <h1 class="calculator__title">Rentenlückenrechner</h1>
+    <p class="calculator__subtitle">
+      Berechne deine voraussichtliche gesetzliche Rente auf Basis deiner Beitragsjahre.
+    </p>
+  </header>
+
+  <div class="calculator__card">
+    <div class="mode-tabs">
+      <button
+        class="mode-tabs__tab"
+        [class.mode-tabs__tab--active]="mode() === 'simple'"
+        (click)="setMode('simple')"
+        type="button"
+      >
+        Einfache Berechnung
+      </button>
+      <button
+        class="mode-tabs__tab"
+        [class.mode-tabs__tab--active]="mode() === 'advanced'"
+        (click)="setMode('advanced')"
+        type="button"
+      >
+        Erweiterte Berechnung
+      </button>
+    </div>
+
+    @if (mode() === 'simple') {
+      <form [formGroup]="simpleForm" (ngSubmit)="calculate()" class="form">
+        <div class="form__group">
+          <label class="form__label" for="currentAge">Aktuelles Alter</label>
+          <input
+            class="form__input"
+            id="currentAge"
+            type="number"
+            formControlName="currentAge"
+            min="18"
+            max="66"
+          />
+          @if (simpleForm.get('currentAge')?.invalid && simpleForm.get('currentAge')?.touched) {
+            <span class="form__error">Bitte ein gültiges Alter zwischen 18 und 66 eingeben</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="startAge">
+            In dieser Gehaltsgröße seit Alter
+            <span class="info-tip info-tip--left">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">Alter, ab dem du dein heutiges Gehaltsniveau (ungefähr) erreichst hast – z.&nbsp;B. nach Ausbildung, Studium oder erster Beförderung. Bestimmt die Anzahl der Beitragsjahre in dieser Einkommensklasse.</span>
+            </span>
+          </label>
+          <input
+            class="form__input"
+            id="startAge"
+            type="number"
+            formControlName="startAge"
+            min="14"
+            max="65"
+          />
+          @if (simpleForm.get('startAge')?.invalid && simpleForm.get('startAge')?.touched) {
+            <span class="form__error">Bitte ein gültiges Alter eingeben</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="annualGrossIncome">Jahresbruttoeinkommen</label>
+          <div class="form__input-wrapper">
+            <input
+              class="form__input form__input--with-suffix"
+              id="annualGrossIncome"
+              type="number"
+              formControlName="annualGrossIncome"
+              min="1"
+            />
+            <span class="form__suffix">€</span>
+          </div>
+          @if (simpleForm.get('annualGrossIncome')?.invalid && simpleForm.get('annualGrossIncome')?.touched) {
+            <span class="form__error">Bitte ein gültiges Einkommen eingeben</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn--primary">Berechnen</button>
+      </form>
+    }
+
+    @if (mode() === 'advanced') {
+      <form [formGroup]="advancedForm" (ngSubmit)="calculate()" class="form">
+        <div class="form__group">
+          <label class="form__label" for="pointsFromStatement">
+            Rentenpunkte laut Rentenbescheid
+          </label>
+          <input
+            class="form__input"
+            id="pointsFromStatement"
+            type="number"
+            formControlName="pointsFromStatement"
+            min="0"
+            step="0.001"
+          />
+          @if (advancedForm.get('pointsFromStatement')?.invalid && advancedForm.get('pointsFromStatement')?.touched) {
+            <span class="form__error">Bitte gültige Rentenpunkte eingeben</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="statementYear">Jahr des Rentenbescheids</label>
+          <input
+            class="form__input"
+            id="statementYear"
+            type="number"
+            formControlName="statementYear"
+            min="1990"
+          />
+          @if (advancedForm.get('statementYear')?.invalid && advancedForm.get('statementYear')?.touched) {
+            <span class="form__error">Bitte ein gültiges Jahr eingeben</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="advCurrentAge">Aktuelles Alter</label>
+          <input
+            class="form__input"
+            id="advCurrentAge"
+            type="number"
+            formControlName="currentAge"
+            min="18"
+            max="66"
+          />
+          @if (advancedForm.get('currentAge')?.invalid && advancedForm.get('currentAge')?.touched) {
+            <span class="form__error">Bitte ein gültiges Alter zwischen 18 und 66 eingeben</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="advAnnualGrossIncome">Jahresbruttoeinkommen</label>
+          <div class="form__input-wrapper">
+            <input
+              class="form__input form__input--with-suffix"
+              id="advAnnualGrossIncome"
+              type="number"
+              formControlName="annualGrossIncome"
+              min="1"
+            />
+            <span class="form__suffix">€</span>
+          </div>
+          @if (advancedForm.get('annualGrossIncome')?.invalid && advancedForm.get('annualGrossIncome')?.touched) {
+            <span class="form__error">Bitte ein gültiges Einkommen eingeben</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn--primary">Berechnen</button>
+      </form>
+    }
+  </div>
+
+  @if (result(); as r) {
+    <div class="result">
+      <h2 class="result__title">Dein Ergebnis</h2>
+
+      @if (r.belowGrundsicherung) {
+        <div class="result__warning">
+          <strong>Grundsicherungsrisiko:</strong> Die erwartete Nettorente liegt unter dem Niveau der Grundsicherung im Alter für Alleinstehende (ca.&nbsp;{{ constants.GRUNDSICHERUNG_SCHWELLE | number }}&nbsp;€/Monat inkl.&nbsp;ø Wohnkosten, Stand&nbsp;2025). Du hast ggf.&nbsp;Anspruch auf ergänzende Grundsicherung (§§&nbsp;41–46 SGB&nbsp;XII) – die private Vorsorge ist hier besonders wichtig.
+        </div>
+      }
+
+      <div class="result__main">
+        <div class="result__main-col">
+          <span class="result__main-label">Monatsrente brutto</span>
+          <span class="result__main-value">{{ r.monthlyPension | number:'1.2-2' }} €</span>
+        </div>
+        <div class="result__main-divider"></div>
+        <div class="result__main-col">
+          <span class="result__main-label">Monatsrente netto <span class="result__main-label-hint">(nach KV + PV)</span></span>
+          <span class="result__main-value">{{ r.monthlyPensionNet | number:'1.2-2' }} €</span>
+        </div>
+      </div>
+
+      <div class="result__comparison">
+        <div class="result__comparison-col">
+          <span class="result__comparison-label">Heutiges Netto (mtl.)</span>
+          <span class="result__comparison-value">{{ r.currentMonthlyNetIncome | number:'1.2-2' }} €</span>
+        </div>
+        <div class="result__comparison-arrow">→</div>
+        <div class="result__comparison-col">
+          <span class="result__comparison-label">Rente netto (mtl.)</span>
+          <span class="result__comparison-value">{{ r.monthlyPensionNet | number:'1.2-2' }} €</span>
+        </div>
+        <div
+          class="result__comparison-gap"
+          [class.result__comparison-gap--orange]="r.pensionShortfallPercent < 50"
+          [class.result__comparison-gap--red]="r.pensionShortfallPercent >= 50"
+        >
+          −{{ r.pensionShortfallPercent | number:'1.0-0' }}&nbsp;%
+        </div>
+      </div>
+
+      <div class="result__assumption">
+        Nettolohn berechnet nach Steuerklasse&nbsp;I, ohne Kirchensteuer, ohne Soli
+        (KV&nbsp;{{ constants.KV_AN * 100 | number:'1.2-2' }}&nbsp;%
+        + PV&nbsp;{{ constants.PV_AN * 100 | number:'1.1-1' }}&nbsp;%
+        + RV&nbsp;{{ constants.RV_AN * 100 | number:'1.1-1' }}&nbsp;%
+        + AV&nbsp;{{ constants.AV_AN * 100 | number:'1.1-1' }}&nbsp;%,
+        §&nbsp;32a EStG 2024).
+      </div>
+
+      <div class="result__details">
+        <div class="result__detail">
+          <span class="result__detail-label">Rentenpunkte gesamt</span>
+          <span class="result__detail-value">
+            {{ r.totalPoints | number:'1.2-2' }}
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>P_gesamt = P_gesammelt + P_noch</strong><br>
+                P_gesammelt: {{ r.pointsAlreadyCollected | number:'1.2-2' }}<br>
+                P_noch: {{ r.pointsStillToCollect | number:'1.2-2' }}<br>
+                Pro Jahr: Brutto / Durchschnittsentgelt ({{ constants.DURCHSCHNITTSENTGELT | number }} €)
+              </span>
+            </span>
+          </span>
+        </div>
+        <div class="result__detail">
+          <span class="result__detail-label">Bereits gesammelt</span>
+          <span class="result__detail-value">
+            {{ r.pointsAlreadyCollected | number:'1.2-2' }}
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>P_gesammelt = (Brutto / DE) × Beitragsjahre</strong><br>
+                DE = Durchschnittsentgelt {{ constants.DURCHSCHNITTSENTGELT | number }} €<br>
+                Beitragsjahre = Alter − Eintrittsalter
+              </span>
+            </span>
+          </span>
+        </div>
+        <div class="result__detail">
+          <span class="result__detail-label">Noch zu sammeln</span>
+          <span class="result__detail-value">
+            {{ r.pointsStillToCollect | number:'1.2-2' }}
+            <span class="info-tip">
+              <i class="info-tip__icon">i</i>
+              <span class="info-tip__content">
+                <strong>P_noch = (Brutto / DE) × Restjahre</strong><br>
+                Restjahre bis Rentenalter {{ constants.RENTENALTER }}
+              </span>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <div class="result__info">
+        <div class="result__info-icon">ℹ</div>
+        <p class="result__info-text">
+          <strong>Heutige Kaufkraft:</strong> Alle Beträge sind in heutiger Kaufkraft angegeben.
+          Steigen Löhne und Renten <em>stärker</em> als die Inflation, erhöht sich deine reale Kaufkraft zum Renteneintritt.
+          Steigen sie <em>schwächer</em> als die Inflation, verringert sie sich entsprechend.
+        </p>
+      </div>
+
+      <button class="btn btn--secondary btn--full" (click)="goToKapital(r.monthlyGapAmount)" type="button">
+        Wie viel Kapital brauche ich? →
+      </button>
+
+      @if (r.incomeWasCapped) {
+        <div class="result__notice">
+          Dein Einkommen übersteigt die Beitragsbemessungsgrenze von
+          {{ constants.BEITRAGSBEMESSUNGSGRENZE | number }} €/Jahr. Die Berechnung wurde entsprechend gekappt.
+        </div>
+      }
+
+      <p class="result__disclaimer">
+        Netto nach KV ({{ constants.KV_BEITRAGSSATZ * 100 | number:'1.1-1' }} %) + PV ({{ constants.PV_BEITRAGSSATZ * 100 | number:'1.1-1' }} %). Einkommensteuer je nach Gesamteinkommen ggf. zusätzlich.
+        Grundlage: Rentenwert {{ constants.RENTENWERT | number:'1.2-2' }} € · Durchschnittsentgelt {{ constants.DURCHSCHNITTSENTGELT | number }} € · Rentenalter {{ constants.RENTENALTER }}.
+        Vereinfachte Schätzung – kein Ersatz für eine offizielle Rentenauskunft.
+      </p>
+    </div>
+  }
+</div>
