@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://altersvorsorgerechner.org/sitemap.xml
