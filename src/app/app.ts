@@ -25,7 +25,7 @@ export class App {
   }
 
   acceptConsent(): void {
-    document.cookie = `rl-consent=1; max-age=${365 * 24 * 60 * 60}; SameSite=Lax; path=/`;
+    document.cookie = `rl-consent=1; max-age=${14 * 24 * 60 * 60}; SameSite=Lax; path=/`;
     this.consentGiven.set(true);
   }
 

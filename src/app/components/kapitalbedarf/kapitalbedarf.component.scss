@@ -35,6 +35,18 @@
     margin: 0 0 1rem;
   }
 
+  &__effective-gap {
+    font-size: 0.82rem;
+    color: #059669;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    margin: 0 0 1.25rem;
+
+    strong { font-weight: 600; }
+  }
+
   &__variants {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
