@@ -7,7 +7,8 @@ export const SPAR_CONSTANTS = {
 
 export const AVD_CONSTANTS = {
   RENDITE: 4.0,                  // % p.a. (Marktrendite 7 % − Inflation 2 % − Kosten 1 %)
-  MAX_OWN_MONTH: 150,            // 1.800 €/Jahr Höchstbetrag
+  MAX_OWN_MONTH: 570,            // 6.840 €/Jahr gesetzlicher Höchstbeitrag (§10a EStG)
+  MAX_ZULAGE_MONTH: 150,         // 1.800 €/Jahr → volle Grundzulage (Optimierungsgrenze)
   MIN_OWN_MONTH: 10,             // 120 €/Jahr Mindestbeitrag
   TIER1_CAP_YEAR: 360,           // Ersten 360 € Eigenanteil/Jahr zu 50 %
   TIER1_RATE: 0.50,              // → max 180 €/Jahr
@@ -82,6 +83,11 @@ export interface AvdOptResult {
   kEtf: number;   // Nettorente je 1 €/Monat ETF (nach KESt + 4%-Regel)
 
   sweetspotOwnMonth: number;  // letzter Schritt mit 50 % Tier-1-Zulage (Knick der Kurve)
+
+  // Günstigerprüfung (§10a EStG Ansparphase)
+  guenstigerBreakEvenRate: number;    // Grenzsteuersatz ab dem Steuervorteil > Zulage
+  guenstigerAbzugsfaehigYear: number; // Abzugsfähiger Betrag/Jahr (Eigenbeitrag + Zulage)
+  guenstigerZulageYear: number;       // Zulageanspruch/Jahr beim opt. Eigenanteil
 
   // Sweetspot-Vergleich: ±10 € um das Optimum
   sweetspot: AvdSweetspotPoint[];
@@ -224,8 +230,8 @@ export class SparRechnerService {
     };
 
     // ---- Gleiche Rente, weniger sparen ----
-    // Maximales Einkommen bei vollem AVD-Einsatz (150 €/Monat)
-    const maxAvdIncome = incomeFor(AVD_CONSTANTS.MAX_OWN_MONTH, 0);
+    // Optimierungsgrenze: max. Eigenanteil mit voller Grundzulage (150 €/Monat)
+    const maxAvdIncome = incomeFor(AVD_CONSTANTS.MAX_ZULAGE_MONTH, 0);
 
     let optAvdOwn: number;
     let optEtf: number;
@@ -233,7 +239,7 @@ export class SparRechnerService {
     if (maxAvdIncome >= refMonthlyIncome) {
       // AVD allein reicht – minimale Eigeneinzahlung finden (binäre Suche)
       let lo = AVD_CONSTANTS.MIN_OWN_MONTH;
-      let hi = AVD_CONSTANTS.MAX_OWN_MONTH;
+      let hi = AVD_CONSTANTS.MAX_ZULAGE_MONTH;
       while (hi - lo > 1) {
         const mid = Math.floor((lo + hi) / 2);
         if (incomeFor(mid, 0) >= refMonthlyIncome) hi = mid;
@@ -242,8 +248,8 @@ export class SparRechnerService {
       optAvdOwn = hi;
       optEtf = 0;
     } else {
-      // AVD maximal ausschöpfen, Rest via ETF
-      optAvdOwn = AVD_CONSTANTS.MAX_OWN_MONTH;
+      // AVD maximal ausschöpfen (bis volle Zulage), Rest via ETF
+      optAvdOwn = AVD_CONSTANTS.MAX_ZULAGE_MONTH;
       const remaining = refMonthlyIncome - incomeFor(optAvdOwn, 0);
       optEtf = remaining > 0 ? Math.ceil(remaining / K_etf) : 0;
     }
@@ -253,6 +259,13 @@ export class SparRechnerService {
     const optTotal = optEtf + optAvdOwn;
     const optSaving = monthlyEtfRate - optTotal;
     const optSavingPct = monthlyEtfRate > 0 ? (optSaving / monthlyEtfRate) * 100 : 0;
+
+    // Günstigerprüfung (§10a EStG): Sonderausgabenabzug vs. Zulage in der Ansparphase
+    const guenstigerZulageYear = optAvdBonus * 12;
+    const guenstigerAbzugsfaehigYear = optAvdOwn * 12 + guenstigerZulageYear;
+    const guenstigerBreakEvenRate = guenstigerAbzugsfaehigYear > 0
+      ? guenstigerZulageYear / guenstigerAbzugsfaehigYear
+      : 0;
 
     // ---- Vollständige Kurve: zuerst alle Schritte berechnen ----
     const chartPoints: AvdChartPoint[] = [{
@@ -300,6 +313,7 @@ export class SparRechnerService {
       sweetspotOwnMonth,
       optEtf, optAvdOwn, optAvdBonus, optAvdDepot, optTotal, optSaving, optSavingPct,
       fullEtf, fullAvdOwn, fullAvdBonus, fullMonthlyIncome, fullGainPct,
+      guenstigerBreakEvenRate, guenstigerAbzugsfaehigYear, guenstigerZulageYear,
       sweetspot: [],
       chartPoints,
     };
