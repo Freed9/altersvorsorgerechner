@@ -612,22 +612,45 @@
                   <th>= Ins Depot</th>
                   <th>ETF-Rate</th>
                   <th>
-                    Rente AVD
+                    Rente AVD netto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        = Ins Depot × {{ avd.kAvd | number:'1.4-4' }}<br>
-                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a., {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % Grenzsteuer)
+                        Depot × {{ avd.kAvd | number:'1.4-4' }}<br>
+                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a.)<br>
+                        Nach {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % ESt (§22 EStG)
+                      </span>
+                    </span>
+                  </th>
+                  <th class="spar__avd-table__taxcol">
+                    − Steuer AVD
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        ESt {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % auf AVD-Bruttoeinkommen<br>
+                        (§22 Nr. 5 EStG, kein Sparerpauschbetrag)
                       </span>
                     </span>
                   </th>
                   <th>
-                    Rente ETF
+                    Rente ETF netto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        = ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
-                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a., 18,46 % KESt effektiv)
+                        ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
+                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a.)<br>
+                        Nach KESt 18,46 % (inkl. 30 % Teilfreistellung)
+                      </span>
+                    </span>
+                  </th>
+                  <th class="spar__avd-table__taxcol">
+                    − Steuer ETF
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        KESt 25 % + Soli 5,5 % = 26,375 %<br>
+                        mit 30 % Teilfreistellung (Aktien-ETF)<br>
+                        effektiv 18,4625 % auf Kapitalerträge
                       </span>
                     </span>
                   </th>
@@ -635,7 +658,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (pt of avd.chartPoints; track pt.ownMonth) {
+                @for (pt of tablePoints(); track pt.ownMonth) {
                   <tr [class.spar__avd-table__row--best]="pt.netIncomeMonth === maxIncome"
                       [class.spar__avd-table__row--sweet]="pt.ownMonth === avd.sweetspotOwnMonth && pt.netIncomeMonth !== maxIncome">
                     <td>{{ pt.ownMonth | number:'1.0-0' }} €</td>
@@ -643,7 +666,15 @@
                     <td>{{ pt.depotMonth | number:'1.2-2' }} €</td>
                     <td>{{ pt.etfMonth | number:'1.0-0' }} €</td>
                     <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__taxcol spar__avd-table__tax">
+                      @if (pt.avdTax > 0) { −{{ pt.avdTax | number:'1.2-2' }} € }
+                      @else { — }
+                    </td>
                     <td class="spar__avd-table__etfincome">{{ pt.etfIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__taxcol spar__avd-table__tax">
+                      @if (pt.etfTax > 0) { −{{ pt.etfTax | number:'1.2-2' }} € }
+                      @else { — }
+                    </td>
                     <td class="spar__avd-table__income">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
                       @if (pt.netIncomeMonth === maxIncome) {

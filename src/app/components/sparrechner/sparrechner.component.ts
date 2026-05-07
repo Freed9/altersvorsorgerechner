@@ -29,6 +29,52 @@ export class SparrechnnerComponent {
   children = signal<{ age: number }[]>([]);
   eligibleChildrenCount = computed(() => this.children().filter(c => c.age < 18).length);
 
+  tablePoints = computed(() => {
+    const avd = this.avdResult();
+    if (!avd || avd.chartPoints.length === 0) return [];
+
+    const pts = avd.chartPoints;
+    const ptMap = new Map(pts.map(p => [p.ownMonth, p]));
+    const maxOwn = pts[pts.length - 1].ownMonth;
+    const sweetspot = avd.sweetspotOwnMonth;
+    const optimum = avd.fullAvdOwn;
+
+    const selected = new Set<number>();
+
+    // 0€: reiner ETF
+    selected.add(0);
+
+    // Erster AVD-Schritt (10€)
+    if (maxOwn >= AVD_CONSTANTS.MIN_OWN_MONTH) {
+      selected.add(AVD_CONSTANTS.MIN_OWN_MONTH);
+    }
+
+    // Sweetspot
+    selected.add(sweetspot);
+
+    // Mittelpunkt zwischen Sweetspot und Optimum (wenn Abstand ≥ 20€)
+    if (optimum - sweetspot >= 20) {
+      const mid = Math.round((sweetspot + optimum) / 20) * 10;
+      if (mid > sweetspot && mid < optimum) selected.add(mid);
+    }
+
+    // Optimum
+    selected.add(optimum);
+
+    // Bis zu 3 äquidistante Punkte nach dem Optimum (inkl. Maximum)
+    if (maxOwn > optimum) {
+      const gap = maxOwn - optimum;
+      const n = Math.min(3, Math.floor(gap / 10));
+      for (let i = 1; i <= n; i++) {
+        const val = Math.round((optimum + gap * i / n) / 10) * 10;
+        if (val > optimum && val <= maxOwn && ptMap.has(val)) selected.add(val);
+      }
+      selected.add(maxOwn);
+    }
+
+    return pts.filter(p => selected.has(p.ownMonth));
+  });
+
   etfTer = signal(0.25);   // TER in % (0–1.5)
   avdCost = signal(1.0);   // AVD-Kosten in % (0–1.5)
 

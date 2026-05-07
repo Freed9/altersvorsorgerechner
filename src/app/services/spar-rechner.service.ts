@@ -47,8 +47,12 @@ export interface AvdChartPoint {
   etfMonth: number;
   bonusMonth: number;
   depotMonth: number;
-  avdIncome: number;     // Rentenanteil aus AVD-Depot (nach Steuer, 4%-Regel)
-  etfIncome: number;     // Rentenanteil aus ETF (nach KESt, 4%-Regel)
+  avdGrossIncome: number; // vor ESt (4%-Regel)
+  avdTax: number;         // ESt-Abzug auf AVD-Einkommen
+  avdIncome: number;      // nach ESt (4%-Regel)
+  etfGrossIncome: number; // vor KESt (4%-Regel)
+  etfTax: number;         // KESt-Abzug auf ETF-Erträge
+  etfIncome: number;      // nach KESt (4%-Regel)
   netIncomeMonth: number;
 }
 
@@ -217,9 +221,11 @@ export class SparRechnerService {
     const taxInfo = this.computeAvdTaxRate(monthlyPensionGross, currentAge);
     const avdTaxRate = taxInfo.rate;
 
-    // Monatl. Nettoeinkommen je 1 € monatl. investiert (4 %-Regel)
-    const K_etf = fvEtf * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
-    const K_avd = fvAvd * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - avdTaxRate);
+    // Brutto- und Netto-Faktoren je 1 € monatl. investiert (4 %-Regel)
+    const K_etf_gross = fvEtf * AVD_CONSTANTS.ENTNAHMERATE / 12;
+    const K_avd_gross = fvAvd * AVD_CONSTANTS.ENTNAHMERATE / 12;
+    const K_etf = K_etf_gross * (1 - ETF_STEUERSATZ_EFFEKTIV);
+    const K_avd = K_avd_gross * (1 - avdTaxRate);
 
     // Referenz: reiner ETF-Sparplan
     const refMonthlyIncome = targetCapital * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
@@ -268,9 +274,11 @@ export class SparRechnerService {
       : 0;
 
     // ---- Vollständige Kurve: zuerst alle Schritte berechnen ----
+    const etfGross0 = monthlyEtfRate * K_etf_gross;
     const chartPoints: AvdChartPoint[] = [{
       ownMonth: 0, etfMonth: monthlyEtfRate, bonusMonth: 0, depotMonth: 0,
-      avdIncome: 0,
+      avdGrossIncome: 0, avdTax: 0, avdIncome: 0,
+      etfGrossIncome: etfGross0, etfTax: etfGross0 - monthlyEtfRate * K_etf,
       etfIncome: monthlyEtfRate * K_etf,
       netIncomeMonth: incomeFor(0, monthlyEtfRate),
     }];
@@ -278,11 +286,13 @@ export class SparRechnerService {
       const etf = Math.max(0, monthlyEtfRate - own);
       const bonus = this.avdMonthlyBonus(own, eligibleChildren);
       const depot = own + bonus;
+      const avdGross = depot * K_avd_gross;
+      const etfGross = etf * K_etf_gross;
       chartPoints.push({
         ownMonth: own, etfMonth: etf, bonusMonth: bonus,
         depotMonth: depot,
-        avdIncome: depot * K_avd,
-        etfIncome: etf * K_etf,
+        avdGrossIncome: avdGross, avdTax: avdGross - depot * K_avd, avdIncome: depot * K_avd,
+        etfGrossIncome: etfGross, etfTax: etfGross - etf * K_etf, etfIncome: etf * K_etf,
         netIncomeMonth: incomeFor(own, etf),
       });
     }
