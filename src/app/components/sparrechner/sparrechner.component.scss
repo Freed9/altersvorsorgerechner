@@ -954,4 +954,57 @@
   .spar__avd-costs {
     grid-template-columns: 1fr;
   }
+
+  .spar__input-card {
+    padding: 1.25rem;
+  }
+
+  .spar__result-main {
+    padding: 1.25rem;
+  }
+
+  .spar__result-value {
+    font-size: 1.9rem;
+  }
+
+  .spar__result-detail {
+    padding: 0.65rem 1.25rem;
+  }
+
+  .spar__dynamisierung {
+    margin: 0 1.25rem 0.75rem;
+  }
+
+  .spar__result-gap {
+    margin: 0 1.25rem 0.75rem;
+  }
+
+  .spar__disclaimer {
+    margin: 1.25rem;
+  }
+
+  .spar__avd-card {
+    padding: 1.25rem;
+  }
+
+  .spar__avd-total-value {
+    font-size: 1.3rem;
+  }
+
+  .spar__avd-split-row {
+    flex-wrap: wrap;
+    gap: 0.1rem;
+  }
+
+  .spar__avd-steps {
+    padding: 1rem 1.25rem;
+  }
+
+  .spar__avd-chart {
+    padding: 1rem 1.25rem;
+  }
+
+  .spar__avd-children {
+    padding: 1rem 1.25rem;
+  }
 }

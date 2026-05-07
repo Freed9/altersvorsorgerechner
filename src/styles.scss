@@ -21,7 +21,6 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  min-width: fit-content;
 }
 
 body {
@@ -30,6 +29,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 // Formel-Tooltip: kleines ⓘ-Symbol neben berechneten Werten
@@ -106,5 +106,16 @@ body {
 
   &:hover &__content {
     display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-tip__content {
+    width: min(240px, calc(100vw - 2rem));
+    left: auto;
+    right: 0;
+    transform: none;
+
+    &::after { left: auto; right: 0.6rem; transform: none; }
   }
 }
