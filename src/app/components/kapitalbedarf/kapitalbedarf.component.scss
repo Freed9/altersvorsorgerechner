@@ -400,4 +400,41 @@
   .kapital__variants {
     grid-template-columns: 1fr;
   }
+
+  .kapital__input-card {
+    padding: 1.25rem;
+  }
+
+  .variant-card__header {
+    padding: 1.25rem;
+  }
+
+  .variant-card__capital {
+    padding: 0 1.25rem;
+  }
+
+  .variant-card__capital-value {
+    font-size: 1.75rem;
+  }
+
+  .variant-card__detail {
+    padding: 0.65rem 1.25rem;
+  }
+
+  .variant-card__action {
+    padding: 0 1.25rem 1.25rem;
+  }
+
+  .variant-card__info {
+    margin: 1rem 1.25rem 0;
+  }
+
+  .variant-card__existing {
+    margin: 0 1.25rem 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .variant-card__existing-value {
+    text-align: left;
+  }
 }

@@ -431,10 +431,20 @@
   .result__comparison {
     flex-wrap: wrap;
     gap: 0.75rem;
+    padding: 1rem;
   }
 
   .result__comparison-arrow {
     display: none;
+  }
+
+  .result__comparison-value {
+    font-size: 1.1rem;
+  }
+
+  .result__comparison-gap {
+    font-size: 1.1rem;
+    padding: 0.4rem 0.6rem;
   }
 
   .result__details {
@@ -443,5 +453,13 @@
 
   .result__main-value {
     font-size: 1.9rem;
+  }
+
+  .form {
+    padding: 1.25rem;
+  }
+
+  .result {
+    padding: 1.25rem;
   }
 }
