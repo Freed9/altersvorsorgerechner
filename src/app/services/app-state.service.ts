@@ -33,6 +33,9 @@ export class AppStateService {
   }
 
   navigateToSparrechner(capital: number, source: string): void {
+    // Reset to null first so the effect in Sparrechner always re-fires,
+    // even when the capital value hasn't changed since the last navigation.
+    this.targetCapital.set(null);
     this.targetCapital.set(capital);
     this.targetCapitalSource.set(source);
     this.kapitalCalculated.set(true);
