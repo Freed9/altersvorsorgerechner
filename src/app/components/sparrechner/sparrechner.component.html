@@ -418,9 +418,26 @@
             }
 
             <p class="spar__avd-note">
-              Optimale Aufteilung: AVD maximal bis {{ avdConst.MAX_OWN_MONTH }} €/Monat eigener Beitrag (volle Grundzulage), Rest in ETF.
+              Optimale Aufteilung: AVD maximal bis {{ avdConst.MAX_ZULAGE_MONTH }} €/Monat eigener Beitrag (volle Grundzulage), Rest in ETF.
               Steuersatz AVD-Auszahlung: {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % (Grenzsteuersatz im Rentenalter).
             </p>
+
+            <div class="spar__avd-guenstiger">
+              <strong>Günstigerprüfung (§10a EStG):</strong>
+              Ab einem Grenzsteuersatz von
+              <strong>{{ avd.guenstigerBreakEvenRate * 100 | number:'1.1-1' }} %</strong>
+              übersteigt die Steuerersparnis aus dem Sonderausgabenabzug die staatliche Zulage
+              ({{ avd.guenstigerZulageYear | number:'1.0-0' }} €/Jahr).
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>Abzugsfähig: {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} €/Jahr</strong>
+                  (Eigenbeitrag {{ avd.optAvdOwn * 12 | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYear | number:'1.0-0' }} €)<br><br>
+                  Das Finanzamt erstattet die Differenz: Steuersatz × {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} € − {{ avd.guenstigerZulageYear | number:'1.0-0' }} €<br><br>
+                  Gilt nur für die Ansparphase. AVD-Entnahmen im Rentenalter werden als sonstige Einkünfte (§22 EStG) besteuert — kein Sparerpauschbetrag.
+                </span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -649,7 +666,7 @@
         <p class="spar__avd-disclaimer">
           Modellrechnung. AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a. (7 % Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten).
           ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a. (Brutto − {{ etfTer() | number:'1.2-2' }} % TER).
-          Mindesteinzahlung {{ avdConst.MIN_OWN_MONTH }} €/Monat; volle Grundzulage ab {{ avdConst.MAX_OWN_MONTH }} €/Monat Eigenanteil.
+          Mindesteinzahlung {{ avdConst.MIN_OWN_MONTH }} €/Monat; volle Grundzulage ab {{ avdConst.MAX_ZULAGE_MONTH }} €/Monat Eigenanteil; gesetzl. Höchstbeitrag {{ avdConst.MAX_OWN_MONTH }} €/Monat.
           Grenzsteuersatz {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % aus §32a EStG 2024 bei ZvE aus GRV-Rente (Renteneintrittsjahr {{ avd.avdRetirementYear }},
           Besteuerungsanteil {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} % nach JStG 2022).
           Sonderausgabenabzug Ansparphase nicht eingerechnet. Kinderzulagen für Kinder mit Kindergeldanspruch.

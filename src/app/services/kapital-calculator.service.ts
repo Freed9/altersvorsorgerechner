@@ -7,6 +7,7 @@ export const KAPITAL_CONSTANTS = {
   KEST_SOLI_RATE: 0.26375,        // 25 % KESt + 5,5 % Soli = 26,375 %
   TEILFREISTELLUNG_ETF: 0.30,     // 30 % Teilfreistellung Aktien-ETF (≥ 51 % Aktienquote)
   INFLATION_RATE: 0.02,
+  SPARERPAUSCHBETRAG: 1000,       // §20 Abs. 9 EStG — gilt nur für ETF-Depot, NICHT für AVD
 };
 
 // Effektiver Steuersatz auf Kursgewinne/Ausschüttungen im ETF
@@ -44,22 +45,48 @@ export class KapitalCalculatorService {
     // gainFraction = 1 − (1 − (1+r)^−n) / (r × n)
     const pvFactor = (1 - Math.pow(1 + r, -n)) / r;
     const gainFraction = 1 - pvFactor / n;
-    const effectiveTaxRate = gainFraction * EFFEKTIVER_STEUERSATZ;
+    const t = EFFEKTIVER_STEUERSATZ;
+    const freibetragMonth = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG / 12; // 83,33 €/Mon.
 
-    // Brutto rückrechnen: PMT_netto = PMT_brutto × (1 − effektiver Steuersatz)
-    const monthlyGross = monthlyNetTarget / (1 - effectiveTaxRate);
+    let monthlyGross: number;
+    let monthlyTax: number;
+
+    if (monthlyNetTarget > freibetragMonth / gainFraction) {
+      // Freibetrag kleiner als monatlicher Gewinnanteil: Steuer auf Überschuss
+      // net = gross × (1 − g×t) + F×t  →  gross = (net − F×t) / (1 − g×t)
+      monthlyGross = (monthlyNetTarget - freibetragMonth * t) / (1 - gainFraction * t);
+      monthlyTax = (monthlyGross * gainFraction - freibetragMonth) * t;
+    } else {
+      // Gewinnanteil vollständig durch Freibetrag gedeckt → keine Steuer
+      monthlyGross = monthlyNetTarget;
+      monthlyTax = 0;
+    }
+
     const requiredCapital = monthlyGross * pvFactor;
     const totalWithdrawn = monthlyGross * n;
     const gainFromReturns = totalWithdrawn - requiredCapital;
-    const monthlyTax = monthlyGross * gainFraction * EFFEKTIVER_STEUERSATZ;
 
     return { requiredCapital, monthlyGross, monthlyTax, monthlyNet: monthlyNetTarget, totalWithdrawn, gainFromReturns, gainFraction };
   }
 
   calculateVierProzent(monthlyNetTarget: number): VierProzentResult {
     const annualNetNeeded = monthlyNetTarget * 12;
-    const annualGross = annualNetNeeded / (1 - EFFEKTIVER_STEUERSATZ);
-    const annualTax = annualGross * EFFEKTIVER_STEUERSATZ;
+    const F = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG; // 1.000 €/Jahr
+    const t = EFFEKTIVER_STEUERSATZ;
+
+    let annualGross: number;
+    let annualTax: number;
+
+    if (annualNetNeeded > F) {
+      // net = gross × (1−t) + F×t  →  gross = (net − F×t) / (1−t)
+      annualGross = (annualNetNeeded - F * t) / (1 - t);
+      annualTax = (annualGross - F) * t;
+    } else {
+      // Entnahme vollständig durch Freibetrag steuerfreigestellt
+      annualGross = annualNetNeeded;
+      annualTax = 0;
+    }
+
     const requiredCapital = annualGross / KAPITAL_CONSTANTS.VIER_PROZENT_RATE;
 
     return {
