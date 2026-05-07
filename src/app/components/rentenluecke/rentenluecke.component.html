@@ -1,11 +1,4 @@
 <div class="calculator">
-  <header class="calculator__header">
-    <h1 class="calculator__title">Rentenlückenrechner</h1>
-    <p class="calculator__subtitle">
-      Berechne deine voraussichtliche gesetzliche Rente auf Basis deiner Beitragsjahre.
-    </p>
-  </header>
-
   <div class="calculator__card">
     <div class="mode-tabs">
       <button
@@ -165,90 +158,85 @@
         </div>
       }
 
-      <div class="result__main">
-        <div class="result__main-col">
-          <span class="result__main-label">Monatsrente brutto</span>
-          <span class="result__main-value">{{ r.monthlyPension | number:'1.2-2' }} €</span>
+      <div class="result__main"
+        [class.result__main--orange]="r.pensionShortfallPercent < 50"
+        [class.result__main--red]="r.pensionShortfallPercent >= 50">
+        <div class="result__main-gap">
+          <span class="result__main-gap-label">Monatliche Rentenlücke</span>
+          <span class="result__main-gap-value">{{ r.monthlyGapAmount | number:'1.0-0' }} €</span>
+          <span class="result__main-gap-sub">−{{ r.pensionShortfallPercent | number:'1.0-0' }} % deines heutigen Nettoeinkommens</span>
         </div>
-        <div class="result__main-divider"></div>
-        <div class="result__main-col">
-          <span class="result__main-label">Monatsrente netto <span class="result__main-label-hint">(nach KV + PV)</span></span>
-          <span class="result__main-value">{{ r.monthlyPensionNet | number:'1.2-2' }} €</span>
-        </div>
-      </div>
-
-      <div class="result__comparison">
-        <div class="result__comparison-col">
-          <span class="result__comparison-label">Heutiges Netto (mtl.)</span>
-          <span class="result__comparison-value">{{ r.currentMonthlyNetIncome | number:'1.2-2' }} €</span>
-        </div>
-        <div class="result__comparison-arrow">→</div>
-        <div class="result__comparison-col">
-          <span class="result__comparison-label">Rente netto (mtl.)</span>
-          <span class="result__comparison-value">{{ r.monthlyPensionNet | number:'1.2-2' }} €</span>
-        </div>
-        <div
-          class="result__comparison-gap"
-          [class.result__comparison-gap--orange]="r.pensionShortfallPercent < 50"
-          [class.result__comparison-gap--red]="r.pensionShortfallPercent >= 50"
-        >
-          −{{ r.pensionShortfallPercent | number:'1.0-0' }}&nbsp;%
+        <div class="result__main-row">
+          <div class="result__main-col">
+            <span class="result__main-label">Heutiges Netto (mtl.)</span>
+            <span class="result__main-value">{{ r.currentMonthlyNetIncome | number:'1.0-0' }} €</span>
+          </div>
+          <div class="result__main-divider"></div>
+          <div class="result__main-col">
+            <span class="result__main-label">Rente netto (mtl.) <span class="result__main-label-hint">(nach KV + PV)</span></span>
+            <span class="result__main-value">{{ r.monthlyPensionNet | number:'1.0-0' }} €</span>
+          </div>
         </div>
       </div>
 
-      <div class="result__assumption">
-        Nettolohn berechnet nach Steuerklasse&nbsp;I, ohne Kirchensteuer, ohne Soli
-        (KV&nbsp;{{ constants.KV_AN * 100 | number:'1.2-2' }}&nbsp;%
-        + PV&nbsp;{{ constants.PV_AN * 100 | number:'1.1-1' }}&nbsp;%
-        + RV&nbsp;{{ constants.RV_AN * 100 | number:'1.1-1' }}&nbsp;%
-        + AV&nbsp;{{ constants.AV_AN * 100 | number:'1.1-1' }}&nbsp;%,
-        §&nbsp;32a EStG 2024).
-      </div>
-
-      <div class="result__details">
-        <div class="result__detail">
-          <span class="result__detail-label">Rentenpunkte gesamt</span>
-          <span class="result__detail-value">
-            {{ r.totalPoints | number:'1.2-2' }}
-            <span class="info-tip">
-              <i class="info-tip__icon">i</i>
-              <span class="info-tip__content">
-                <strong>P_gesamt = P_gesammelt + P_noch</strong><br>
-                P_gesammelt: {{ r.pointsAlreadyCollected | number:'1.2-2' }}<br>
-                P_noch: {{ r.pointsStillToCollect | number:'1.2-2' }}<br>
-                Pro Jahr: Brutto / Durchschnittsentgelt ({{ constants.DURCHSCHNITTSENTGELT | number }} €)
+      <details class="result__collapse">
+        <summary class="result__collapse-toggle">
+          Berechnung anzeigen
+          <span class="result__collapse-hint">{{ r.totalPoints | number:'1.2-2' }} Rentenpunkte</span>
+        </summary>
+        <div class="result__details">
+          <div class="result__detail">
+            <span class="result__detail-label">Rentenpunkte gesamt</span>
+            <span class="result__detail-value">
+              {{ r.totalPoints | number:'1.2-2' }}
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>P_gesamt = P_gesammelt + P_noch</strong><br>
+                  P_gesammelt: {{ r.pointsAlreadyCollected | number:'1.2-2' }}<br>
+                  P_noch: {{ r.pointsStillToCollect | number:'1.2-2' }}<br>
+                  Pro Jahr: Brutto / Durchschnittsentgelt ({{ constants.DURCHSCHNITTSENTGELT | number }} €)
+                </span>
               </span>
             </span>
-          </span>
-        </div>
-        <div class="result__detail">
-          <span class="result__detail-label">Bereits gesammelt</span>
-          <span class="result__detail-value">
-            {{ r.pointsAlreadyCollected | number:'1.2-2' }}
-            <span class="info-tip">
-              <i class="info-tip__icon">i</i>
-              <span class="info-tip__content">
-                <strong>P_gesammelt = (Brutto / DE) × Beitragsjahre</strong><br>
-                DE = Durchschnittsentgelt {{ constants.DURCHSCHNITTSENTGELT | number }} €<br>
-                Beitragsjahre = Alter − Eintrittsalter
+          </div>
+          <div class="result__detail">
+            <span class="result__detail-label">Bereits gesammelt</span>
+            <span class="result__detail-value">
+              {{ r.pointsAlreadyCollected | number:'1.2-2' }}
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>P_gesammelt = (Brutto / DE) × Beitragsjahre</strong><br>
+                  DE = Durchschnittsentgelt {{ constants.DURCHSCHNITTSENTGELT | number }} €<br>
+                  Beitragsjahre = Alter − Eintrittsalter
+                </span>
               </span>
             </span>
-          </span>
-        </div>
-        <div class="result__detail">
-          <span class="result__detail-label">Noch zu sammeln</span>
-          <span class="result__detail-value">
-            {{ r.pointsStillToCollect | number:'1.2-2' }}
-            <span class="info-tip">
-              <i class="info-tip__icon">i</i>
-              <span class="info-tip__content">
-                <strong>P_noch = (Brutto / DE) × Restjahre</strong><br>
-                Restjahre bis Rentenalter {{ constants.RENTENALTER }}
+          </div>
+          <div class="result__detail">
+            <span class="result__detail-label">Noch zu sammeln</span>
+            <span class="result__detail-value">
+              {{ r.pointsStillToCollect | number:'1.2-2' }}
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>P_noch = (Brutto / DE) × Restjahre</strong><br>
+                  Restjahre bis Rentenalter {{ constants.RENTENALTER }}
+                </span>
               </span>
             </span>
-          </span>
+          </div>
         </div>
-      </div>
+        <div class="result__assumption">
+          Nettolohn nach Steuerklasse&nbsp;I, ohne KiSt, ohne Soli
+          (KV&nbsp;{{ constants.KV_AN * 100 | number:'1.2-2' }}&nbsp;%
+          + PV&nbsp;{{ constants.PV_AN * 100 | number:'1.1-1' }}&nbsp;%
+          + RV&nbsp;{{ constants.RV_AN * 100 | number:'1.1-1' }}&nbsp;%
+          + AV&nbsp;{{ constants.AV_AN * 100 | number:'1.1-1' }}&nbsp;%,
+          §&nbsp;32a EStG 2024).
+        </div>
+      </details>
 
       <div class="result__info">
         <div class="result__info-icon">ℹ</div>
