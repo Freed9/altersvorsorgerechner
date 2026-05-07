@@ -460,10 +460,39 @@
 
     strong { font-weight: 600; }
 
+    a.modal__link,
+    .modal__link {
+      color: var(--primary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      word-break: break-all;
+
+      &:hover { color: var(--primary-hover); }
+    }
+
     &--license {
       font-size: 0.8rem;
       color: var(--text-muted);
     }
+  }
+
+  &__note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem !important;
+  }
+
+  &__list {
+    margin: 0 0 0.875rem 1.25rem;
+    padding: 0;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--text);
+
+    li strong { font-weight: 600; }
   }
 }
 

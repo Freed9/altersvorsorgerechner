@@ -145,6 +145,10 @@
         <button class="app-footer__impressum-btn" type="button" (click)="licenseOpen.set(true)">
           MIT Lizenz
         </button>
+        &nbsp;·&nbsp;
+        <button class="app-footer__impressum-btn" type="button" (click)="datenschutzOpen.set(true)">
+          Datenschutz
+        </button>
       </p>
     </div>
   </footer>
@@ -197,35 +201,120 @@
       <div class="modal__body">
         <p><strong>Angaben gemäß § 5 TMG</strong></p>
         <p>
-          Lorem Ipsum GmbH<br>
-          Musterstraße 42<br>
-          12345 Musterstadt
-        </p>
-        <p>
-          <strong>Vertreten durch:</strong><br>
-          Lorem Ipsum
+          Daniel Patzelt<br>
+          c/o MDC#589<br>
+          Welserstraße 3<br>
+          87463 Dietmannsried
         </p>
         <p>
           <strong>Kontakt</strong><br>
-          E-Mail: lorem&#64;ipsum.de<br>
-          Telefon: +49 000 000 000
+          E-Mail: <a href="mailto:kontakt&#64;altersvorsorgerechner.org" class="modal__link">kontakt&#64;altersvorsorgerechner.org</a>
         </p>
+        <p class="modal__note">
+          Diese Website wird als privates, nicht-kommerzielles Informationsangebot betrieben.
+        </p>
+
         <p>
           <strong>Haftung für Inhalte</strong><br>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-          ullamco laboris nisi ut aliquip ex ea commodo consequat.
+          Als Diensteanbieter bin ich gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten
+          nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG bin ich als
+          Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
+          Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige
+          Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von
+          Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine
+          diesbezügliche Haftung ist erst ab dem Zeitpunkt der Kenntnis einer konkreten
+          Rechtsverletzung möglich. Bei Bekanntwerden entsprechender Rechtsverletzungen werde
+          ich diese Inhalte umgehend entfernen.
         </p>
+
         <p>
           <strong>Haftung für Links</strong><br>
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-          nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-          deserunt mollit anim id est laborum.
+          Diese Website enthält derzeit keine Links zu externen Drittseiten. Sollten dennoch
+          solche Links vorhanden sein, gilt: Für die Inhalte verlinkter Seiten ist stets der
+          jeweilige Anbieter verantwortlich. Eine permanente inhaltliche Kontrolle der verlinkten
+          Seiten ist ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei
+          Bekanntwerden von Rechtsverletzungen werde ich derartige Links umgehend entfernen.
         </p>
+
         <p>
           <strong>Urheberrecht</strong><br>
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-          anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          Die durch mich erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen
+          Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung
+          außerhalb der Grenzen des Urheberrechts bedürfen meiner schriftlichen Zustimmung.
+          Downloads und Kopien dieser Seite sind nur für den privaten, nicht-kommerziellen Gebrauch
+          gestattet. Der Quellcode dieser Webanwendung steht unter der
+          <strong>MIT-Lizenz</strong> zur freien Verwendung zur Verfügung.
+        </p>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Datenschutz Modal -->
+@if (datenschutzOpen()) {
+  <div class="modal-backdrop" (click)="datenschutzOpen.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Datenschutzerklärung">
+      <div class="modal__header">
+        <h2 class="modal__title">Datenschutzerklärung</h2>
+        <button class="modal__close" type="button" (click)="datenschutzOpen.set(false)" aria-label="Schließen">✕</button>
+      </div>
+      <div class="modal__body">
+        <p>
+          <strong>Verantwortlicher (Art. 4 Nr. 7 DSGVO)</strong><br>
+          Daniel Patzelt<br>
+          c/o MDC#589, Welserstraße 3, 87463 Dietmannsried<br>
+          E-Mail: <a href="mailto:kontakt&#64;altersvorsorgerechner.org" class="modal__link">kontakt&#64;altersvorsorgerechner.org</a>
+        </p>
+
+        <p>
+          <strong>Hosting</strong><br>
+          Diese Website wird auf einem privaten Server innerhalb der Europäischen Union betrieben.
+          Bei jedem Seitenaufruf speichert der Server automatisch technische Zugriffsdaten in
+          Server-Logs (IP-Adresse, Zeitpunkt, aufgerufene URL, Browser-Typ). Diese Daten werden
+          ausschließlich zur Sicherstellung des Betriebs und zur Fehleranalyse verwendet und nach
+          spätestens 14 Tagen gelöscht. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
+          (berechtigtes Interesse am sicheren Betrieb).
+        </p>
+
+        <p>
+          <strong>Keine weiteren Datenerhebungen</strong><br>
+          Diese Website ist ein reines Informations- und Berechnungsangebot. Es werden keine
+          personenbezogenen Daten erhoben, gespeichert oder an Dritte weitergegeben. Alle
+          Berechnungen finden ausschließlich lokal im Browser statt. Es werden keine
+          Analysedienste, Tracking-Tools oder Social-Media-Plugins eingesetzt.
+        </p>
+
+        <p>
+          <strong>Cookie (technisch notwendig)</strong><br>
+          Nach Ihrer Zustimmung zum Rechtlichen Hinweis wird ein einzelnes technisch notwendiges
+          Cookie gesetzt:
+        </p>
+        <ul class="modal__list">
+          <li><strong>Name:</strong> rl-consent</li>
+          <li><strong>Inhalt:</strong> Ihre Zustimmungsbestätigung (Wert: 1)</li>
+          <li><strong>Speicherdauer:</strong> 14 Tage</li>
+          <li><strong>Zweck:</strong> Vermeidung der wiederholten Anzeige des Hinweisbanners</li>
+          <li><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse)</li>
+        </ul>
+        <p>
+          Dieses Cookie enthält keine personenbezogenen Daten und wird nicht an Dritte
+          weitergegeben. Sie können es jederzeit über die Einstellungen Ihres Browsers löschen.
+        </p>
+
+        <p>
+          <strong>Ihre Rechte (Art. 15–22 DSGVO)</strong><br>
+          Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung,
+          Datenübertragbarkeit und Widerspruch. Da diese Website keine personenbezogenen Daten
+          dauerhaft speichert, sind diese Rechte durch einfache Nichtnutzung der Website faktisch
+          vollständig gewahrt. Für Anfragen wenden Sie sich an:
+          <a href="mailto:kontakt&#64;altersvorsorgerechner.org" class="modal__link">kontakt&#64;altersvorsorgerechner.org</a>
+        </p>
+
+        <p>
+          <strong>Beschwerderecht</strong><br>
+          Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.
+          Zuständig ist das Bayerische Landesamt für Datenschutzaufsicht (BayLDA),
+          Promenade 18, 91522 Ansbach (<a href="https://www.lda.bayern.de" class="modal__link" target="_blank" rel="noopener">www.lda.bayern.de</a>).
         </p>
       </div>
     </div>

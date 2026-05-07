@@ -17,6 +17,7 @@ export class App {
   impressumOpen = signal(false);
   disclaimerOpen = signal(false);
   licenseOpen = signal(false);
+  datenschutzOpen = signal(false);
   consentGiven = signal(App.readConsent());
   consentChecked = signal(false);
 
