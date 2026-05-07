@@ -41,7 +41,7 @@
 <div class="stepper">
 
   <!-- ── Schritt 1: Rentenlücke ── -->
-  <div class="step" [class.step--active]="appState.activeStep() === 1"
+  <div id="step-1" class="step" [class.step--active]="appState.activeStep() === 1"
        [class.step--done]="appState.step1Done()">
     <button class="step__head" type="button" (click)="setStep(1)">
       <div class="step__num" [class.step__num--done]="appState.step1Done()"
@@ -66,7 +66,7 @@
   <div class="step-connector" [class.step-connector--done]="appState.step1Done()"></div>
 
   <!-- ── Schritt 2: Kapitalbedarf ── -->
-  <div class="step" [class.step--active]="appState.activeStep() === 2"
+  <div id="step-2" class="step" [class.step--active]="appState.activeStep() === 2"
        [class.step--done]="appState.step2Done()"
        [class.step--locked]="!appState.step1Done()">
     <button class="step__head" type="button" (click)="setStep(2)"
@@ -97,7 +97,7 @@
   <div class="step-connector" [class.step-connector--done]="appState.step2Done()"></div>
 
   <!-- ── Schritt 3: Sparplan ── -->
-  <div class="step" [class.step--active]="appState.activeStep() === 3"
+  <div id="step-3" class="step" [class.step--active]="appState.activeStep() === 3"
        [class.step--locked]="!appState.step2Done()">
     <button class="step__head" type="button" (click)="setStep(3)"
             [disabled]="!appState.step2Done()">

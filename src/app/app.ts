@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { AppStateService, ActiveStep } from './services/app-state.service';
 import { RentenlueckeComponent } from './components/rentenluecke/rentenluecke.component';
@@ -19,6 +19,19 @@ export class App {
   licenseOpen = signal(false);
   consentGiven = signal(App.readConsent());
   consentChecked = signal(false);
+
+  private _stepScrollInit = false;
+
+  constructor() {
+    effect(() => {
+      const step = this.appState.activeStep();
+      if (!this._stepScrollInit) { this._stepScrollInit = true; return; }
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`step-${step}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
 
   private static readConsent(): boolean {
     return document.cookie.split(';').some(c => c.trim() === 'rl-consent=1');
