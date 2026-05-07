@@ -1,26 +1,23 @@
 <div class="spar">
-  <header class="calculator__header">
-    <h1 class="calculator__title">Sparrechner</h1>
-    <p class="calculator__subtitle">
-      Ermittle deine monatliche Sparrate oder berechne dein Endkapital.
-    </p>
-  </header>
-
   <div class="spar__input-card">
 
-    <div class="spar__mode-select">
-      <label class="form__label" for="modeSelect">Berechnung</label>
-      <div class="spar__select-wrapper">
-        <select
-          class="spar__select"
-          id="modeSelect"
-          [value]="mode()"
-          (change)="setMode($any($event.target).value)"
-        >
-          <option value="sparrate">Wie viel muss ich monatlich sparen?</option>
-          <option value="kapital">Wie viel Kapital erreiche ich?</option>
-        </select>
-      </div>
+    <div class="mode-tabs">
+      <button
+        class="mode-tabs__tab"
+        [class.mode-tabs__tab--active]="mode() === 'sparrate'"
+        (click)="setMode('sparrate')"
+        type="button"
+      >
+        Sparrate berechnen
+      </button>
+      <button
+        class="mode-tabs__tab"
+        [class.mode-tabs__tab--active]="mode() === 'kapital'"
+        (click)="setMode('kapital')"
+        type="button"
+      >
+        Endkapital berechnen
+      </button>
     </div>
 
     @if (appState.targetCapital() !== null && mode() === 'sparrate') {
@@ -213,9 +210,7 @@
         <div class="spar__avd-header">
           <h2 class="spar__avd-title">Optimierung mit Altersvorsorgedepot</h2>
           <p class="spar__avd-subtitle">
-            Das staatlich geförderte Altersvorsorgedepot (ab 2027) kann deine Sparrate senken oder deine spätere Rente erhöhen.
-            AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a. · ETF-Rendite (nach TER) {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a. ·
-            Zulage 50 % (erste 360 €/J.) + 25 % (bis 1.800 €/J.) · max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr Grundzulage
+            Das staatlich geförderte Altersvorsorgedepot (ab 2027) kann deine Sparrate senken oder deine Rente erhöhen — je nachdem, wie du dein Budget aufteilst.
           </p>
         </div>
 
@@ -441,6 +436,10 @@
           </div>
         </div>
 
+        <!-- Detaillierte Aufschlüsselung (collapsible) -->
+        <details class="spar__avd-detail-section">
+          <summary class="spar__avd-detail-toggle">Aufschlüsselung & Optimierungskurve</summary>
+
         <!-- AVD-Kurve -->
         @if (chartData(); as cd) {
           <div class="spar__avd-chart">
@@ -612,22 +611,45 @@
                   <th>= Ins Depot</th>
                   <th>ETF-Rate</th>
                   <th>
-                    Rente AVD
+                    Rente AVD netto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        = Ins Depot × {{ avd.kAvd | number:'1.4-4' }}<br>
-                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a., {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % Grenzsteuer)
+                        Depot × {{ avd.kAvd | number:'1.4-4' }}<br>
+                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a.)<br>
+                        Nach {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % ESt (§22 EStG)
+                      </span>
+                    </span>
+                  </th>
+                  <th class="spar__avd-table__taxcol">
+                    − Steuer AVD
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        ESt {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % auf AVD-Bruttoeinkommen<br>
+                        (§22 Nr. 5 EStG, kein Sparerpauschbetrag)
                       </span>
                     </span>
                   </th>
                   <th>
-                    Rente ETF
+                    Rente ETF netto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        = ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
-                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a., 18,46 % KESt effektiv)
+                        ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
+                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a.)<br>
+                        Nach KESt 18,46 % (inkl. 30 % Teilfreistellung)
+                      </span>
+                    </span>
+                  </th>
+                  <th class="spar__avd-table__taxcol">
+                    − Steuer ETF
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        KESt 25 % + Soli 5,5 % = 26,375 %<br>
+                        mit 30 % Teilfreistellung (Aktien-ETF)<br>
+                        effektiv 18,4625 % auf Kapitalerträge
                       </span>
                     </span>
                   </th>
@@ -635,7 +657,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (pt of avd.chartPoints; track pt.ownMonth) {
+                @for (pt of tablePoints(); track pt.ownMonth) {
                   <tr [class.spar__avd-table__row--best]="pt.netIncomeMonth === maxIncome"
                       [class.spar__avd-table__row--sweet]="pt.ownMonth === avd.sweetspotOwnMonth && pt.netIncomeMonth !== maxIncome">
                     <td>{{ pt.ownMonth | number:'1.0-0' }} €</td>
@@ -643,7 +665,15 @@
                     <td>{{ pt.depotMonth | number:'1.2-2' }} €</td>
                     <td>{{ pt.etfMonth | number:'1.0-0' }} €</td>
                     <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__taxcol spar__avd-table__tax">
+                      @if (pt.avdTax > 0) { −{{ pt.avdTax | number:'1.2-2' }} € }
+                      @else { — }
+                    </td>
                     <td class="spar__avd-table__etfincome">{{ pt.etfIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__taxcol spar__avd-table__tax">
+                      @if (pt.etfTax > 0) { −{{ pt.etfTax | number:'1.2-2' }} € }
+                      @else { — }
+                    </td>
                     <td class="spar__avd-table__income">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
                       @if (pt.netIncomeMonth === maxIncome) {
@@ -663,14 +693,19 @@
           </p>
         </div>
 
+        </details><!-- end spar__avd-detail-section -->
+
         <p class="spar__avd-disclaimer">
-          Modellrechnung. AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a. (7 % Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten).
-          ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a. (Brutto − {{ etfTer() | number:'1.2-2' }} % TER).
-          Mindesteinzahlung {{ avdConst.MIN_OWN_MONTH }} €/Monat; volle Grundzulage ab {{ avdConst.MAX_ZULAGE_MONTH }} €/Monat Eigenanteil; gesetzl. Höchstbeitrag {{ avdConst.MAX_OWN_MONTH }} €/Monat.
-          Grenzsteuersatz {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % aus §32a EStG 2024 bei ZvE aus GRV-Rente (Renteneintrittsjahr {{ avd.avdRetirementYear }},
-          Besteuerungsanteil {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} % nach JStG 2022).
-          Sonderausgabenabzug Ansparphase nicht eingerechnet. Kinderzulagen für Kinder mit Kindergeldanspruch.
-          Planmäßig ab 01.01.2027.
+          Modellrechnung — keine Anlageberatung. AVD ab 01.01.2027 geplant.
+          <span class="info-tip">
+            <i class="info-tip__icon">i</i>
+            <span class="info-tip__content">
+              AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a. (7 % Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten).
+              ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a. (Brutto − {{ etfTer() | number:'1.2-2' }} % TER).
+              Mindesteinzahlung {{ avdConst.MIN_OWN_MONTH }} €/Mon.; volle Grundzulage ab {{ avdConst.MAX_ZULAGE_MONTH }} €/Mon.; gesetzl. Max. {{ avdConst.MAX_OWN_MONTH }} €/Mon.
+              Grenzsteuersatz {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % (§32a EStG 2024, Renteneintrittsjahr {{ avd.avdRetirementYear }}, Besteuerungsanteil {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} %).
+            </span>
+          </span>
         </p>
       </div>
     }

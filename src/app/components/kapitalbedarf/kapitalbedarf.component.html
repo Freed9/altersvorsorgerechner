@@ -1,11 +1,4 @@
 <div class="kapital">
-  <header class="calculator__header">
-    <h1 class="calculator__title">Kapitalbedarf</h1>
-    <p class="calculator__subtitle">
-      Berechne, wie viel Kapital du benötigst, um deine monatliche Rentenlücke zu schließen.
-    </p>
-  </header>
-
   <div class="kapital__input-card">
     <form [formGroup]="form" (ngSubmit)="calculate()" class="form">
       <div class="form__group">
@@ -97,9 +90,9 @@
             <div class="variant-card__title">Entnahmeplan</div>
             <div class="variant-card__sub">
               4 % p.a. · 28 Jahre · Kapital aufgezehrt
-              <span class="tooltip">
-                <span class="tooltip__trigger">?</span>
-                <span class="tooltip__content">
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
                   <strong>Kaufkraft sinkt über die Zeit</strong><br>
                   Die Entnahme bleibt nominal gleich. Bei {{ constants.INFLATION_RATE * 100 | number:'1.0-0' }} % Inflation p.a. hat die Entnahme in Jahr {{ constants.ENTNAHMEPLAN_YEARS }} nur noch ca. <strong>{{ purchasingPowerPct }}&nbsp;%</strong> der heutigen Kaufkraft. Die reale Kaufkraft ist zu Beginn am höchsten und nimmt jährlich ab.
                 </span>
@@ -214,11 +207,11 @@
             <div class="variant-card__title">4&nbsp;%-Regel</div>
             <div class="variant-card__sub">
               4 % p.a. · Kapitalerhalt · Entnahme besteuert
-              <span class="tooltip tooltip--left">
-                <span class="tooltip__trigger">?</span>
-                <span class="tooltip__content">
+              <span class="info-tip info-tip--left">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
                   <strong>Kaufkraft sinkt über die Zeit</strong><br>
-                  Die Entnahme bleibt nominal gleich. Bei {{ constants.INFLATION_RATE * 100 | number:'1.0-0' }} % Inflation p.a. hat die Entnahme in Jahr {{ constants.ENTNAHMEPLAN_YEARS }} nur noch ca. <strong>{{ purchasingPowerPct }}&nbsp;%</strong> der heutigen Kaufkraft. Das nominales Kapital bleibt erhalten, verliert aber real an Wert.
+                  Die Entnahme bleibt nominal gleich. Bei {{ constants.INFLATION_RATE * 100 | number:'1.0-0' }} % Inflation p.a. hat die Entnahme in Jahr {{ constants.ENTNAHMEPLAN_YEARS }} nur noch ca. <strong>{{ purchasingPowerPct }}&nbsp;%</strong> der heutigen Kaufkraft. Das nominale Kapital bleibt erhalten, verliert aber real an Wert.
                 </span>
               </span>
             </div>
