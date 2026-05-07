@@ -70,7 +70,14 @@ export class KapitalbedarfComponent {
     this.appState.markKapitalDone();
   }
 
-  goToSparrechner(capital: number, source: string): void {
+  goToSparrechner(source: 'Entnahmeplan' | '4%-Regel'): void {
+    // Always recalculate with the current form state (e.g. otherMonthlyIncome
+    // may have changed since the last explicit "Berechnen" click).
+    this.calculate();
+    const capital = source === 'Entnahmeplan'
+      ? this.entnahmeResult()?.requiredCapital
+      : this.vierProzentResult()?.requiredCapital;
+    if (capital == null) return;
     this.appState.existingCapital.set(this.form.get('existingCapital')?.value ?? 0);
     this.appState.navigateToSparrechner(capital, source);
   }
