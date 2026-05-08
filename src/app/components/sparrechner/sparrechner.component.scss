@@ -385,6 +385,70 @@
     line-height: 1.4;
   }
 
+  &__avd-gp-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #16a34a;
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__avd-gp-info-label {
+    color: #166534;
+    font-weight: 500;
+  }
+
+  &__avd-gp-info-value {
+    color: #15803d;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  &__avd-guenstiger--active {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    border-left-color: #16a34a;
+    color: #14532d;
+  }
+
+  &__avd-gp-rows {
+    margin: 0.5rem 0 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  &__avd-gp-row-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: #166534;
+
+    strong { color: #14532d; }
+
+    &--arrow {
+      display: block;
+      justify-content: unset;
+      color: #86efac;
+      font-size: 0.72rem;
+      font-style: italic;
+    }
+
+    &--result {
+      border-top: 1px solid #bbf7d0;
+      padding-top: 0.2rem;
+      margin-top: 0.1rem;
+      font-weight: 500;
+    }
+  }
+
   &__avd-flexibility-note {
     margin-bottom: 0.75rem;
     padding: 0.65rem 0.875rem 0.65rem 1.1rem;
@@ -504,13 +568,19 @@
 
   &__avd-costs {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem 1.25rem;
     background: white;
     border-radius: 0.75rem;
     box-shadow: var(--shadow);
     padding: 1rem 1.5rem;
     margin-bottom: 1rem;
+  }
+
+  &__avd-cost-group--taxrate {
+    border-left: 2px solid #e0f2fe;
+    padding-left: 1.25rem;
+    margin-left: -0.25rem;
   }
 
   &__avd-cost-group {
@@ -886,6 +956,13 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
+
+    &__gpcol {
+      color: #15803d;
+      font-weight: 500;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
   }
 }
 
@@ -1014,7 +1091,16 @@
   }
 
   .spar__avd-costs {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+
+    .spar__avd-cost-group--taxrate {
+      grid-column: 1 / -1;
+      border-left: none;
+      padding-left: 0;
+      margin-left: 0;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+    }
   }
 
   .spar__input-card {

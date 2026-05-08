@@ -252,6 +252,28 @@
               <span class="form__suffix">%</span>
             </div>
           </div>
+          <div class="spar__avd-cost-group spar__avd-cost-group--taxrate">
+            <label class="form__label">
+              Dein Grenzsteuersatz
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  <strong>Günstigerprüfung §10a EStG</strong><br>
+                  Dein aktueller Grenzsteuersatz während der Ansparphase.<br><br>
+                  Liegt er über dem Break-Even, erstattet das Finanzamt die Differenz
+                  (Steuerersparnis − Zulage) jährlich zurück. Diese Erstattung
+                  wird ins ETF reinvestiert und erhöht deine spätere Nettorente.<br><br>
+                  <strong>0 = Günstigerprüfung deaktivieren</strong>
+                </span>
+              </span>
+            </label>
+            <div class="form__input-wrapper">
+              <input type="number" class="form__input form__input--with-suffix spar__cost-input"
+                [value]="currentTaxRate()" (change)="onCostChange('currentTaxRate', $event)"
+                min="0" max="45" step="1" placeholder="0" />
+              <span class="form__suffix">%</span>
+            </div>
+          </div>
         </div>
 
         <!-- Kinder mit Alter -->
@@ -355,6 +377,26 @@
               </div>
             }
 
+            @if (avd.guenstigerActive && avd.guenstigerRefundAtOpt > 0) {
+              <div class="spar__avd-gp-info">
+                <span class="spar__avd-gp-info-label">
+                  Günstigerprüfung
+                  <span class="info-tip">
+                    <i class="info-tip__icon">i</i>
+                    <span class="info-tip__content">
+                      Dein Grenzsteuersatz ({{ avd.guenstigerCurrentTaxRate * 100 | number:'1.0-0' }} %) liegt
+                      über dem Break-Even ({{ avd.guenstigerBreakEvenRate * 100 | number:'1.1-1' }} %).<br><br>
+                      Das Finanzamt erstattet dir jährlich
+                      <strong>{{ avd.guenstigerRefundAtOpt | number:'1.0-0' }} €</strong>
+                      (Steuerersparnis − Zulage). Diese Erstattung wird im Folgejahr
+                      ins ETF reinvestiert und ist bereits in der Berechnung enthalten.
+                    </span>
+                  </span>
+                </span>
+                <span class="spar__avd-gp-info-value">+ {{ avd.guenstigerRefundAtOpt | number:'1.0-0' }} €/Jahr → ETF</span>
+              </div>
+            }
+
             <p class="spar__avd-note">
               AVD-Auszahlung als lebenslange Rente, versteuert mit
               <strong>{{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} %</strong>
@@ -417,22 +459,52 @@
               Steuersatz AVD-Auszahlung: {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % (Grenzsteuersatz im Rentenalter).
             </p>
 
-            <div class="spar__avd-guenstiger">
-              <strong>Günstigerprüfung (§10a EStG):</strong>
-              Ab einem Grenzsteuersatz von
-              <strong>{{ avd.guenstigerBreakEvenRate * 100 | number:'1.1-1' }} %</strong>
-              übersteigt die Steuerersparnis aus dem Sonderausgabenabzug die staatliche Zulage
-              ({{ avd.guenstigerZulageYear | number:'1.0-0' }} €/Jahr).
-              <span class="info-tip">
-                <i class="info-tip__icon">i</i>
-                <span class="info-tip__content">
-                  <strong>Abzugsfähig: {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} €/Jahr</strong>
-                  (Eigenbeitrag {{ avd.optAvdOwn * 12 | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYear | number:'1.0-0' }} €)<br><br>
-                  Das Finanzamt erstattet die Differenz: Steuersatz × {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} € − {{ avd.guenstigerZulageYear | number:'1.0-0' }} €<br><br>
-                  Gilt nur für die Ansparphase. AVD-Entnahmen im Rentenalter werden als sonstige Einkünfte (§22 EStG) besteuert — kein Sparerpauschbetrag.
+            @if (avd.guenstigerActive && avd.guenstigerRefundAtFull > 0) {
+              <div class="spar__avd-guenstiger spar__avd-guenstiger--active">
+                <strong>Günstigerprüfung aktiv</strong> —
+                dein Grenzsteuersatz ({{ avd.guenstigerCurrentTaxRate * 100 | number:'1.0-0' }} %)
+                liegt über dem Break-Even ({{ avd.guenstigerBreakEvenRate * 100 | number:'1.1-1' }} %).
+                <div class="spar__avd-gp-rows">
+                  <div class="spar__avd-gp-row-item">
+                    <span>Jährl. Steuererstattung</span>
+                    <strong>{{ avd.guenstigerRefundAtFull | number:'1.0-0' }} €/Jahr</strong>
+                  </div>
+                  <div class="spar__avd-gp-row-item spar__avd-gp-row-item--arrow">→ jährlich in ETF reinvestiert</div>
+                  <div class="spar__avd-gp-row-item spar__avd-gp-row-item--result">
+                    <span>Bereits enthalten in Nettorente</span>
+                    <strong>{{ avd.fullMonthlyIncome | number:'1.2-2' }} €/Mon.</strong>
+                  </div>
+                </div>
+                <span class="info-tip">
+                  <i class="info-tip__icon">i</i>
+                  <span class="info-tip__content">
+                    <strong>Abzugsfähig: {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} €/Jahr</strong>
+                    (Eigenbeitrag {{ avd.optAvdOwn * 12 | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYear | number:'1.0-0' }} €)<br><br>
+                    Erstattung = {{ avd.guenstigerCurrentTaxRate * 100 | number:'1.0-0' }} % × {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} € − {{ avd.guenstigerZulageYear | number:'1.0-0' }} € = {{ avd.guenstigerRefundAtFull | number:'1.0-0' }} €/Jahr<br><br>
+                    Die Erstattung wird jährlich ins ETF-Depot einbezahlt und wächst
+                    dort bis zum Renteneintritt. AVD-Entnahmen im Rentenalter (§22 EStG) bleiben davon unberührt.
+                  </span>
                 </span>
-              </span>
-            </div>
+              </div>
+            } @else {
+              <div class="spar__avd-guenstiger">
+                <strong>Günstigerprüfung (§10a EStG):</strong>
+                Ab einem Grenzsteuersatz von
+                <strong>{{ avd.guenstigerBreakEvenRate * 100 | number:'1.1-1' }} %</strong>
+                übersteigt die Steuerersparnis den Zulagenwert
+                ({{ avd.guenstigerZulageYear | number:'1.0-0' }} €/Jahr). Das Finanzamt erstattet
+                dann die Differenz — trag deinen Steuersatz oben ein, um den Effekt zu berechnen.
+                <span class="info-tip">
+                  <i class="info-tip__icon">i</i>
+                  <span class="info-tip__content">
+                    <strong>Abzugsfähig: {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} €/Jahr</strong>
+                    (Eigenbeitrag {{ avd.optAvdOwn * 12 | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYear | number:'1.0-0' }} €)<br><br>
+                    Erstattung = Steuersatz × {{ avd.guenstigerAbzugsfaehigYear | number:'1.0-0' }} € − {{ avd.guenstigerZulageYear | number:'1.0-0' }} €<br><br>
+                    Gilt nur für die Ansparphase. AVD-Entnahmen im Rentenalter werden als sonstige Einkünfte (§22 EStG) besteuert — kein Sparerpauschbetrag.
+                  </span>
+                </span>
+              </div>
+            }
           </div>
         </div>
 
@@ -661,6 +733,18 @@
                       </span>
                     </span>
                   </th>
+                  @if (avd.guenstigerActive) {
+                    <th class="spar__avd-table__gpcol">
+                      GP-Bonus
+                      <span class="info-tip">
+                        <i class="info-tip__icon">i</i>
+                        <span class="info-tip__content">
+                          Monatlicher Rentenbonus aus der reinvestierten Günstigerprüfungs-Erstattung.<br><br>
+                          Berechnung: Jährl. Erstattung × ETF-FV-Faktor × 4 %-Regel ÷ 12 × (1 − 18,46 % KESt)
+                        </span>
+                      </span>
+                    </th>
+                  }
                   <th>Gesamt<br>Nettorente</th>
                 </tr>
               </thead>
@@ -686,6 +770,13 @@
                         <span class="spar__avd-table__tax-rate">(18,46 %)</span>
                       } @else { — }
                     </td>
+                    @if (avd.guenstigerActive) {
+                      <td class="spar__avd-table__gpcol">
+                        @if (pt.guenstigerEtfBonus > 0) {
+                          +{{ pt.guenstigerEtfBonus | number:'1.2-2' }} €
+                        } @else { — }
+                      </td>
+                    }
                     <td class="spar__avd-table__income">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
                       @if (pt.netIncomeMonth === maxIncome) {
