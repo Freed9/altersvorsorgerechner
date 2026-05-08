@@ -116,6 +116,22 @@ export class SparRechnerService {
     return Math.max(0, annualGrossRente * ratio - WERBUNGSKOSTEN_RENTNER - SONDERAUSGABEN_PAUSCH);
   }
 
+  // §32a EStG 2024 — absoluter Steuerbetrag
+  // Zonenkonstanten für Zonenübergänge berechnet (Stetigkeit sichergestellt)
+  private einkStBetrag(zvE: number): number {
+    if (zvE <= GRUNDFREIBETRAG) return 0;
+    if (zvE <= 17005) {
+      const y = (zvE - GRUNDFREIBETRAG) / 10000;
+      return (979.18 * y + 1400) * y;
+    }
+    if (zvE <= 66760) {
+      const z = (zvE - 17005) / 10000;
+      return (192.59 * z + 2397) * z + 966.53;
+    }
+    if (zvE <= 277826) return 0.42 * zvE - 10378.72;
+    return 0.45 * zvE - 18713.50;
+  }
+
   // §32a EStG 2024 — analytischer Grenzsteuersatz
   private marginalTaxRate(zvE: number): number {
     if (zvE <= GRUNDFREIBETRAG) return 0;
@@ -135,7 +151,7 @@ export class SparRechnerService {
   computeAvdTaxRate(
     monthlyPensionGross: number | null,
     currentAge: number | null,
-  ): { rate: number; retirementYear: number; besteuerungsanteil: number } {
+  ): { rate: number; retirementYear: number; besteuerungsanteil: number; zvE: number } {
     const CURRENT_YEAR = new Date().getFullYear();
     const retirementYear = currentAge != null
       ? CURRENT_YEAR + Math.max(0, 67 - currentAge)
@@ -143,13 +159,13 @@ export class SparRechnerService {
     const ba = this.besteuerungsanteil(retirementYear);
 
     if (monthlyPensionGross == null || monthlyPensionGross <= 0) {
-      return { rate: AVD_CONSTANTS.FALLBACK_STEUERSATZ, retirementYear, besteuerungsanteil: ba };
+      return { rate: AVD_CONSTANTS.FALLBACK_STEUERSATZ, retirementYear, besteuerungsanteil: ba, zvE: 0 };
     }
 
     const annualGrossRente = monthlyPensionGross * 12;
     const zvE = this.taxableRenteZvE(annualGrossRente, retirementYear);
     const rate = this.marginalTaxRate(zvE);
-    return { rate, retirementYear, besteuerungsanteil: ba };
+    return { rate, retirementYear, besteuerungsanteil: ba, zvE };
   }
 
   // ── AVD-Förderung ─────────────────────────────────────────────────────────
@@ -217,23 +233,36 @@ export class SparRechnerService {
     const fvEtf = r_etf > 0 ? (Math.pow(1 + r_etf, n) - 1) / r_etf : n;
     const fvAvd = r_avd > 0 ? (Math.pow(1 + r_avd, n) - 1) / r_avd : n;
 
-    // Grenzsteuersatz auf AVD-Auszahlung aus realen Rentendaten
+    // Steuerinfo: Grenzsteuersatz + ZvE aus GRV-Rente allein
     const taxInfo = this.computeAvdTaxRate(monthlyPensionGross, currentAge);
-    const avdTaxRate = taxInfo.rate;
+    const avdTaxRate = taxInfo.rate;   // Grenzrate bei ZvE_GRV (für kAvd-Referenzanzeige)
+    const zvE_grv = taxInfo.zvE;       // ZvE nur aus GRV — Basis für Differenzsteuer
+    const tax_grv = this.einkStBetrag(zvE_grv);
 
-    // Brutto- und Netto-Faktoren je 1 € monatl. investiert (4 %-Regel)
+    // Brutto-Faktoren je 1 € monatl. investiert (4 %-Regel, vor Steuer)
     const K_etf_gross = fvEtf * AVD_CONSTANTS.ENTNAHMERATE / 12;
     const K_avd_gross = fvAvd * AVD_CONSTANTS.ENTNAHMERATE / 12;
+
+    // Netto-ETF-Faktor: KESt ist unabhängig vom Gesamteinkommen → konstant
     const K_etf = K_etf_gross * (1 - ETF_STEUERSATZ_EFFEKTIV);
+
+    // K_avd nur für Referenzanzeige (kAvd-Feld); Berechnungen nutzen Differenzsteuer
     const K_avd = K_avd_gross * (1 - avdTaxRate);
 
     // Referenz: reiner ETF-Sparplan
     const refMonthlyIncome = targetCapital * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
 
-    const incomeFor = (own: number, etf: number): number => {
+    // Netto-AVD-Monatseinkommen für einen gegebenen Eigenanteil:
+    // Differenzsteuer §32a(ZvE_GRV + AVD_Jahresbrutto) − §32a(ZvE_GRV)
+    const avdNetMonth = (own: number): number => {
       const bonus = this.avdMonthlyBonus(own, eligibleChildren);
-      return (own + bonus) * K_avd + etf * K_etf;
+      const avdAnnualGross = (own + bonus) * K_avd_gross * 12;
+      const taxOnAvd = this.einkStBetrag(zvE_grv + avdAnnualGross) - tax_grv;
+      return (avdAnnualGross - taxOnAvd) / 12;
     };
+
+    const incomeFor = (own: number, etf: number): number =>
+      (own > 0 ? avdNetMonth(own) : 0) + etf * K_etf;
 
     // ---- Gleiche Rente, weniger sparen ----
     // Optimierungsgrenze: max. Eigenanteil mit voller Grundzulage (150 €/Monat)
@@ -273,7 +302,7 @@ export class SparRechnerService {
       ? guenstigerZulageYear / guenstigerAbzugsfaehigYear
       : 0;
 
-    // ---- Vollständige Kurve: zuerst alle Schritte berechnen ----
+    // ---- Vollständige Kurve: alle Schritte mit Differenzsteuer ----
     const etfGross0 = monthlyEtfRate * K_etf_gross;
     const chartPoints: AvdChartPoint[] = [{
       ownMonth: 0, etfMonth: monthlyEtfRate, bonusMonth: 0, depotMonth: 0,
@@ -286,14 +315,20 @@ export class SparRechnerService {
       const etf = Math.max(0, monthlyEtfRate - own);
       const bonus = this.avdMonthlyBonus(own, eligibleChildren);
       const depot = own + bonus;
-      const avdGross = depot * K_avd_gross;
+
+      // Differenzsteuer: §32a(ZvE_GRV + AVD_Jahresbrutto) − §32a(ZvE_GRV)
+      const avdAnnualGross = depot * K_avd_gross * 12;
+      const avdTaxAnnual = this.einkStBetrag(zvE_grv + avdAnnualGross) - tax_grv;
+      const avdGrossMonth = avdAnnualGross / 12;
+      const avdTaxMonth = avdTaxAnnual / 12;
+      const avdIncomeMonth = avdGrossMonth - avdTaxMonth;
+
       const etfGross = etf * K_etf_gross;
       chartPoints.push({
-        ownMonth: own, etfMonth: etf, bonusMonth: bonus,
-        depotMonth: depot,
-        avdGrossIncome: avdGross, avdTax: avdGross - depot * K_avd, avdIncome: depot * K_avd,
+        ownMonth: own, etfMonth: etf, bonusMonth: bonus, depotMonth: depot,
+        avdGrossIncome: avdGrossMonth, avdTax: avdTaxMonth, avdIncome: avdIncomeMonth,
         etfGrossIncome: etfGross, etfTax: etfGross - etf * K_etf, etfIncome: etf * K_etf,
-        netIncomeMonth: incomeFor(own, etf),
+        netIncomeMonth: avdIncomeMonth + etf * K_etf,
       });
     }
 
