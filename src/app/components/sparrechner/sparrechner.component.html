@@ -436,6 +436,14 @@
           </div>
         </div>
 
+        <div class="spar__avd-flexibility-note">
+          <strong>Flexibilität beachten:</strong> Das AVD unterliegt strengeren Auszahlungsregeln —
+          Entnahmen sind erst ab dem gesetzlichen Rentenalter möglich und grundsätzlich als
+          lebenslange Rente vorgesehen (kein Kapitalzugriff, keine Teilentnahmen).
+          Ein klassisches ETF-Depot bietet hingegen volle Freiheit: Entnahmen jederzeit,
+          in beliebiger Höhe und für jeden Verwendungszweck.
+        </div>
+
         <!-- Detaillierte Aufschlüsselung (collapsible) -->
         <details class="spar__avd-detail-section">
           <summary class="spar__avd-detail-toggle">Aufschlüsselung & Optimierungskurve</summary>
@@ -666,13 +674,17 @@
                     <td>{{ pt.etfMonth | number:'1.0-0' }} €</td>
                     <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
-                      @if (pt.avdTax > 0) { −{{ pt.avdTax | number:'1.2-2' }} € }
-                      @else { — }
+                      @if (pt.avdTax > 0) {
+                        −{{ pt.avdTax | number:'1.2-2' }} €
+                        <span class="spar__avd-table__tax-rate">({{ (pt.avdTax / pt.avdGrossIncome * 100) | number:'1.1-1' }} %)</span>
+                      } @else { — }
                     </td>
                     <td class="spar__avd-table__etfincome">{{ pt.etfIncome | number:'1.2-2' }} €</td>
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
-                      @if (pt.etfTax > 0) { −{{ pt.etfTax | number:'1.2-2' }} € }
-                      @else { — }
+                      @if (pt.etfTax > 0) {
+                        −{{ pt.etfTax | number:'1.2-2' }} €
+                        <span class="spar__avd-table__tax-rate">(18,46 %)</span>
+                      } @else { — }
                     </td>
                     <td class="spar__avd-table__income">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
