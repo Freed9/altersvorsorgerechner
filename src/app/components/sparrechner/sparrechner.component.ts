@@ -75,8 +75,9 @@ export class SparrechnnerComponent {
     return pts.filter(p => selected.has(p.ownMonth));
   });
 
-  etfTer = signal(0.25);   // TER in % (0–1.5)
-  avdCost = signal(1.0);   // AVD-Kosten in % (0–1.5)
+  etfTer = signal(0.25);        // TER in % (0–1.5)
+  avdCost = signal(1.0);        // AVD-Kosten in % (0–1.5)
+  currentTaxRate = signal(0);   // Grenzsteuersatz jetzt in % (0–45), 0 = deaktiviert
 
   readonly CHART = { W: 540, H: 200, PAD: { t: 16, r: 20, b: 44, l: 58 } };
 
@@ -191,6 +192,7 @@ export class SparrechnnerComponent {
         this.appState.currentAge(),
         this.etfTer(),
         this.avdCost(),
+        this.currentTaxRate() / 100,
       ));
     } else {
       if (this.kapitalForm.invalid) { this.kapitalForm.markAllAsTouched(); return; }
@@ -211,11 +213,19 @@ export class SparrechnnerComponent {
       this.appState.currentAge(),
       this.etfTer(),
       this.avdCost(),
+      this.currentTaxRate() / 100,
     ));
   }
 
-  onCostChange(field: 'etfTer' | 'avdCost', event: Event): void {
+  onCostChange(field: 'etfTer' | 'avdCost' | 'currentTaxRate', event: Event): void {
     const raw = (event.target as HTMLInputElement).value;
+    if (field === 'currentTaxRate') {
+      const val = Math.round(parseFloat(raw));
+      if (isNaN(val) || val < 0 || val > 45) return;
+      this.currentTaxRate.set(val);
+      this.recalculateAvd();
+      return;
+    }
     const val = Math.round(parseFloat(raw) * 100) / 100;
     if (isNaN(val) || val < 0 || val > 1.5) return;
     if (field === 'etfTer') this.etfTer.set(val);

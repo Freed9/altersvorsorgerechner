@@ -53,6 +53,8 @@ export interface AvdChartPoint {
   etfGrossIncome: number; // vor KESt (4%-Regel)
   etfTax: number;         // KESt-Abzug auf ETF-Erträge
   etfIncome: number;      // nach KESt (4%-Regel)
+  guenstigerRefundAnnual: number; // Jährl. Steuererstattung Günstigerprüfung (0 wenn n.a.)
+  guenstigerEtfBonus: number;     // Zusätzl. monatl. Nettorente aus reinvestierter Erstattung
   netIncomeMonth: number;
 }
 
@@ -92,6 +94,10 @@ export interface AvdOptResult {
   guenstigerBreakEvenRate: number;    // Grenzsteuersatz ab dem Steuervorteil > Zulage
   guenstigerAbzugsfaehigYear: number; // Abzugsfähiger Betrag/Jahr (Eigenbeitrag + Zulage)
   guenstigerZulageYear: number;       // Zulageanspruch/Jahr beim opt. Eigenanteil
+  guenstigerActive: boolean;          // true wenn aktueller Steuersatz > Break-Even
+  guenstigerCurrentTaxRate: number;   // eingegebener Grenzsteuersatz (0 = deaktiviert)
+  guenstigerRefundAtOpt: number;      // Jährl. Erstattung beim "weniger sparen"-Optimum
+  guenstigerRefundAtFull: number;     // Jährl. Erstattung beim "mehr Rente"-Optimum
 
   // Sweetspot-Vergleich: ±10 € um das Optimum
   sweetspot: AvdSweetspotPoint[];
@@ -224,6 +230,7 @@ export class SparRechnerService {
     currentAge: number | null = null,
     etfTerPct: number = 0.25,
     avdCostPct: number = 1.0,
+    currentMarginalTaxRate: number = 0,  // 0 = Günstigerprüfung deaktiviert
   ): AvdOptResult {
     const n = years * 12;
     // Effektive Renditen nach Kosten: ETF = Brutto − TER; AVD = 5 % (7 % − 2 % Infl.) − Kosten
@@ -232,6 +239,12 @@ export class SparRechnerService {
 
     const fvEtf = r_etf > 0 ? (Math.pow(1 + r_etf, n) - 1) / r_etf : n;
     const fvAvd = r_avd > 0 ? (Math.pow(1 + r_avd, n) - 1) / r_avd : n;
+
+    // Jährlicher FV-Faktor für die ETF-Reinvestition der Steuererstattung (Günstigerprüfung)
+    const r_etf_annual = Math.max(0, etfAnnualRatePct - etfTerPct) / 100;
+    const fvEtfAnnual = r_etf_annual > 0
+      ? (Math.pow(1 + r_etf_annual, years) - 1) / r_etf_annual
+      : years;
 
     // Steuerinfo: Grenzsteuersatz + ZvE aus GRV-Rente allein
     const taxInfo = this.computeAvdTaxRate(monthlyPensionGross, currentAge);
@@ -261,8 +274,22 @@ export class SparRechnerService {
       return (avdAnnualGross - taxOnAvd) / 12;
     };
 
-    const incomeFor = (own: number, etf: number): number =>
-      (own > 0 ? avdNetMonth(own) : 0) + etf * K_etf;
+    // Günstigerprüfung §10a EStG: Steuererstattung = max(0, Steuersatz × Abzug − Zulage)
+    // Die Erstattung wird jährlich ins ETF reinvestiert → zusätzl. monatl. Nettorente
+    const guenstigerFor = (own: number, bonus: number): { refundAnnual: number; etfBonus: number } => {
+      if (currentMarginalTaxRate <= 0 || own <= 0) return { refundAnnual: 0, etfBonus: 0 };
+      const zulageAnnual = bonus * 12;
+      const abzugAnnual = own * 12 + zulageAnnual;
+      const refundAnnual = Math.max(0, currentMarginalTaxRate * abzugAnnual - zulageAnnual);
+      const etfBonus = refundAnnual * fvEtfAnnual * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
+      return { refundAnnual, etfBonus };
+    };
+
+    const incomeFor = (own: number, etf: number): number => {
+      if (own <= 0) return etf * K_etf;
+      const bonus = this.avdMonthlyBonus(own, eligibleChildren);
+      return avdNetMonth(own) + etf * K_etf + guenstigerFor(own, bonus).etfBonus;
+    };
 
     // ---- Gleiche Rente, weniger sparen ----
     // Optimierungsgrenze: max. Eigenanteil mit voller Grundzulage (150 €/Monat)
@@ -302,6 +329,9 @@ export class SparRechnerService {
       ? guenstigerZulageYear / guenstigerAbzugsfaehigYear
       : 0;
 
+    // Jährl. Erstattung am "weniger sparen"-Optimum (für Anzeige)
+    const guenstigerRefundAtOpt = guenstigerFor(optAvdOwn, optAvdBonus).refundAnnual;
+
     // ---- Vollständige Kurve: alle Schritte mit Differenzsteuer ----
     const etfGross0 = monthlyEtfRate * K_etf_gross;
     const chartPoints: AvdChartPoint[] = [{
@@ -309,6 +339,7 @@ export class SparRechnerService {
       avdGrossIncome: 0, avdTax: 0, avdIncome: 0,
       etfGrossIncome: etfGross0, etfTax: etfGross0 - monthlyEtfRate * K_etf,
       etfIncome: monthlyEtfRate * K_etf,
+      guenstigerRefundAnnual: 0, guenstigerEtfBonus: 0,
       netIncomeMonth: incomeFor(0, monthlyEtfRate),
     }];
     for (let own = AVD_CONSTANTS.MIN_OWN_MONTH; own <= Math.min(AVD_CONSTANTS.MAX_OWN_MONTH, monthlyEtfRate); own += 10) {
@@ -324,11 +355,13 @@ export class SparRechnerService {
       const avdIncomeMonth = avdGrossMonth - avdTaxMonth;
 
       const etfGross = etf * K_etf_gross;
+      const { refundAnnual: gpRefund, etfBonus: gpEtfBonus } = guenstigerFor(own, bonus);
       chartPoints.push({
         ownMonth: own, etfMonth: etf, bonusMonth: bonus, depotMonth: depot,
         avdGrossIncome: avdGrossMonth, avdTax: avdTaxMonth, avdIncome: avdIncomeMonth,
         etfGrossIncome: etfGross, etfTax: etfGross - etf * K_etf, etfIncome: etf * K_etf,
-        netIncomeMonth: avdIncomeMonth + etf * K_etf,
+        guenstigerRefundAnnual: gpRefund, guenstigerEtfBonus: gpEtfBonus,
+        netIncomeMonth: avdIncomeMonth + etf * K_etf + gpEtfBonus,
       });
     }
 
@@ -348,6 +381,9 @@ export class SparRechnerService {
     const fullGainPct = refMonthlyIncome > 0
       ? ((fullMonthlyIncome - refMonthlyIncome) / refMonthlyIncome) * 100 : 0;
 
+    const guenstigerRefundAtFull = maxPt.guenstigerRefundAnnual;
+    const guenstigerActive = guenstigerRefundAtFull > 0 || guenstigerRefundAtOpt > 0;
+
     return {
       refMonthlyIncome,
       avdEffTaxRate: avdTaxRate,
@@ -359,6 +395,8 @@ export class SparRechnerService {
       optEtf, optAvdOwn, optAvdBonus, optAvdDepot, optTotal, optSaving, optSavingPct,
       fullEtf, fullAvdOwn, fullAvdBonus, fullMonthlyIncome, fullGainPct,
       guenstigerBreakEvenRate, guenstigerAbzugsfaehigYear, guenstigerZulageYear,
+      guenstigerActive, guenstigerCurrentTaxRate: currentMarginalTaxRate,
+      guenstigerRefundAtOpt, guenstigerRefundAtFull,
       sweetspot: [],
       chartPoints,
     };
