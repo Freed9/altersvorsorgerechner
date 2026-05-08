@@ -174,6 +174,14 @@ export class SparRechnerService {
     return { rate, retirementYear, besteuerungsanteil: ba, zvE };
   }
 
+  computeWorkingMarginalTaxRate(annualGross: number): number {
+    const bbg = 90600;
+    const capped = Math.min(annualGross, bbg);
+    const sv = capped * (0.0815 + 0.018 + 0.093 + 0.013);
+    const zvE = Math.max(0, annualGross - sv - 1230 - SONDERAUSGABEN_PAUSCH);
+    return this.marginalTaxRate(zvE);
+  }
+
   // ── AVD-Förderung ─────────────────────────────────────────────────────────
 
   private avdMonthlyBonus(monthlyOwn: number, eligibleChildren: number): number {

@@ -148,6 +148,17 @@ export class SparrechnnerComponent {
 
   constructor() {
     effect(() => {
+      const gross = this.appState.annualGrossIncome();
+      if (gross !== null && gross > 0) {
+        const rate = this.service.computeWorkingMarginalTaxRate(gross);
+        untracked(() => {
+          this.currentTaxRate.set(Math.round(rate * 100));
+          this.recalculateAvd();
+        });
+      }
+    }, { allowSignalWrites: true });
+
+    effect(() => {
       const capital = this.appState.targetCapital();
       if (capital !== null) {
         const age = this.appState.currentAge();

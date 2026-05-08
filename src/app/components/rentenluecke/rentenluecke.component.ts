@@ -56,6 +56,7 @@ export class RentenlueckeComponent {
       }
       const { currentAge, startAge, annualGrossIncome } = this.simpleForm.getRawValue();
       this.appState.currentAge.set(currentAge);
+      this.appState.annualGrossIncome.set(annualGrossIncome);
       const r = this.calculator.calculateSimple(currentAge, startAge, annualGrossIncome);
       this.result.set(r);
       this.appState.currentMonthlyNetIncome.set(r.currentMonthlyNetIncome);
@@ -68,6 +69,7 @@ export class RentenlueckeComponent {
       const { pointsFromStatement, statementYear, currentAge, annualGrossIncome } =
         this.advancedForm.getRawValue();
       this.appState.currentAge.set(currentAge);
+      this.appState.annualGrossIncome.set(annualGrossIncome);
       const r = this.calculator.calculateAdvanced(pointsFromStatement, statementYear, currentAge, annualGrossIncome);
       this.result.set(r);
       this.appState.currentMonthlyNetIncome.set(r.currentMonthlyNetIncome);
