@@ -109,6 +109,36 @@ body {
   }
 }
 
+// Table-header tooltips open downward so they aren't clipped by overflow-x: auto scroll containers
+th .info-tip__content {
+  bottom: auto;
+  top: calc(100% + 0.4rem);
+
+  &::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: #0f172a;
+  }
+}
+
+// First two columns: pin tooltip to left edge so it doesn't bleed left
+th:nth-child(1) .info-tip__content,
+th:nth-child(2) .info-tip__content {
+  left: 0;
+  transform: none;
+  &::after { left: 0.6rem; transform: none; }
+}
+
+// Last two columns: pin tooltip to right edge
+th:nth-last-child(1) .info-tip__content,
+th:nth-last-child(2) .info-tip__content {
+  left: auto;
+  right: 0;
+  transform: none;
+  &::after { left: auto; right: 0.6rem; transform: none; }
+}
+
 @media (max-width: 480px) {
   .info-tip__content {
     width: min(240px, calc(100vw - 2rem));

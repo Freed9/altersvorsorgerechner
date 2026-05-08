@@ -385,6 +385,20 @@
     line-height: 1.4;
   }
 
+  &__avd-flexibility-note {
+    margin-bottom: 0.75rem;
+    padding: 0.65rem 0.875rem 0.65rem 1.1rem;
+    background: #fafafa;
+    border: 1px solid var(--border);
+    border-left: 4px solid #94a3b8;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+
+    strong { color: var(--text); }
+  }
+
   &__avd-disclaimer {
     font-size: 0.74rem;
     color: var(--text-muted);
@@ -843,6 +857,13 @@
     &__tax {
       font-size: 0.78rem;
       color: #b91c1c;
+    }
+
+    &__tax-rate {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      font-weight: 400;
+      white-space: nowrap;
     }
 
     &--steps {
