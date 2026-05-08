@@ -12,6 +12,7 @@ export class AppStateService {
   currentAge = signal<number | null>(null);
   currentMonthlyNetIncome = signal<number | null>(null);
   monthlyPensionGross = signal<number | null>(null);
+  annualGrossIncome = signal<number | null>(null);
 
   // Step 2 – Kapitalbedarf
   kapitalCalculated = signal<boolean>(false);
