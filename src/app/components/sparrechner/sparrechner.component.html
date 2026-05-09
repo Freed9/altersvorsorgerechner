@@ -20,6 +20,17 @@
       </button>
     </div>
 
+    @if (highVolatilityRisk()) {
+      <div class="spar__age-warning">
+        <strong>Hinweis: Kurzer Anlagehorizont bis zur Rente</strong><br>
+        Mit über 52 Jahren verbleiben voraussichtlich <strong>weniger als 15 Jahre</strong> bis zur
+        gesetzlichen Rente (67). Aktien können aufgrund ihrer Volatilität in diesem kurzen Zeitraum
+        ein <strong>erhöhtes Risiko</strong> darstellen — ein Kurseinbruch kurz vor Rentenbeginn
+        lässt sich möglicherweise nicht mehr ausgleichen. Bitte berücksichtige dies unbedingt
+        bei deiner Anlageentscheidung.
+      </div>
+    }
+
     @if (appState.targetCapital() !== null && mode() === 'sparrate') {
       <div class="spar__source-hint">
         Zielkapital übernommen aus: <strong>{{ appState.targetCapitalSource() }}</strong>

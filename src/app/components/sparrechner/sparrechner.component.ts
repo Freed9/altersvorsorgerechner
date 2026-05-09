@@ -30,6 +30,11 @@ export class SparrechnnerComponent {
   children = signal<{ age: number }[]>([]);
   eligibleChildrenCount = computed(() => this.children().filter(c => c.age < 18).length);
 
+  highVolatilityRisk = computed(() => {
+    const age = this.appState.currentAge();
+    return age !== null && age > 52;
+  });
+
   tablePoints = computed(() => {
     const avd = this.avdResult();
     if (!avd || avd.chartPoints.length === 0) return [];
