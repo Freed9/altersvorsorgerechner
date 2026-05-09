@@ -104,7 +104,8 @@ body {
     &::after { left: auto; right: 0.6rem; transform: none; }
   }
 
-  &:hover &__content {
+  &:hover &__content,
+  &--open &__content {
     display: block;
   }
 }
@@ -140,12 +141,25 @@ th:nth-last-child(2) .info-tip__content {
 }
 
 @media (max-width: 480px) {
+  // Tooltips open below the icon on mobile so they don't clip off the top,
+  // and are centered (JS directive clamps them to the viewport if they overflow).
   .info-tip__content {
     width: min(240px, calc(100vw - 2rem));
-    left: auto;
-    right: 0;
-    transform: none;
+    bottom: auto;
+    top: calc(100% + 0.4rem);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
 
-    &::after { left: auto; right: 0.6rem; transform: none; }
+    // Arrow points up at the icon
+    &::after {
+      top: auto;
+      bottom: 100%;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      border-top-color: transparent;
+      border-bottom-color: #0f172a;
+    }
   }
 }

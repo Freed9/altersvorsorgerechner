@@ -82,6 +82,7 @@ export interface AvdOptResult {
   fullEtf: number;
   fullAvdOwn: number;
   fullAvdBonus: number;
+  fullAvdDepot: number;
   fullMonthlyIncome: number;
   fullGainPct: number;
 
@@ -270,8 +271,8 @@ export class SparRechnerService {
     // K_avd nur für Referenzanzeige (kAvd-Feld); Berechnungen nutzen Differenzsteuer
     const K_avd = K_avd_gross * (1 - avdTaxRate);
 
-    // Referenz: reiner ETF-Sparplan
-    const refMonthlyIncome = targetCapital * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
+    // Referenz: reiner ETF-Sparplan (nur aus der monatlichen Sparrate, ohne Startkapital)
+    const refMonthlyIncome = monthlyEtfRate * K_etf;
 
     // Netto-AVD-Monatseinkommen für einen gegebenen Eigenanteil:
     // Differenzsteuer §32a(ZvE_GRV + AVD_Jahresbrutto) − §32a(ZvE_GRV)
@@ -379,12 +380,51 @@ export class SparRechnerService {
       .filter(p => p.ownMonth > 0 && p.ownMonth <= tier1MaxMonth)
       .pop()?.ownMonth ?? chartPoints[1]?.ownMonth ?? 0;
 
-    // ---- Gleiche Sparrate, mehr Rente: tatsächliches Einkommensmaximum ----
+    // ---- Gleiche Sparrate, mehr Rente: exaktes Einkommensmaximum ----
+    // Grobes Optimum aus 10€-Raster, dann 1€-Feinscan im ±9€-Umfeld
+    const coarsePt = chartPoints.reduce((best, p) =>
+      p.netIncomeMonth > best.netIncomeMonth ? p : best, chartPoints[0]);
+
+    const scanLimit = Math.min(AVD_CONSTANTS.MAX_OWN_MONTH, monthlyEtfRate);
+    const scanLo = Math.max(0, coarsePt.ownMonth - 9);
+    const scanHi = Math.min(scanLimit, coarsePt.ownMonth + 9);
+    let exactOwn = coarsePt.ownMonth;
+    let exactIncome = coarsePt.netIncomeMonth;
+    for (let own = scanLo; own <= scanHi; own++) {
+      if (own % 10 === 0) continue;
+      const income = incomeFor(own, Math.max(0, monthlyEtfRate - own));
+      if (income > exactIncome) { exactIncome = income; exactOwn = own; }
+    }
+
+    // Exaktes Optimum in chartPoints einfügen wenn kein 10€-Vielfaches
+    if (exactOwn % 10 !== 0) {
+      const own = exactOwn;
+      const etf = Math.max(0, monthlyEtfRate - own);
+      const bonus = this.avdMonthlyBonus(own, eligibleChildren);
+      const depot = own + bonus;
+      const avdAnnualGross = depot * K_avd_gross * 12;
+      const avdTaxAnnual = this.einkStBetrag(zvE_grv + avdAnnualGross) - tax_grv;
+      const avdGrossMonth = avdAnnualGross / 12;
+      const avdTaxMonth = avdTaxAnnual / 12;
+      const avdIncomeMonth = avdGrossMonth - avdTaxMonth;
+      const etfGross = etf * K_etf_gross;
+      const { refundAnnual: gpRefund, etfBonus: gpEtfBonus } = guenstigerFor(own, bonus);
+      const insertIdx = chartPoints.findIndex(p => p.ownMonth > own);
+      chartPoints.splice(insertIdx < 0 ? chartPoints.length : insertIdx, 0, {
+        ownMonth: own, etfMonth: etf, bonusMonth: bonus, depotMonth: depot,
+        avdGrossIncome: avdGrossMonth, avdTax: avdTaxMonth, avdIncome: avdIncomeMonth,
+        etfGrossIncome: etfGross, etfTax: etfGross - etf * K_etf, etfIncome: etf * K_etf,
+        guenstigerRefundAnnual: gpRefund, guenstigerEtfBonus: gpEtfBonus,
+        netIncomeMonth: exactIncome,
+      });
+    }
+
     const maxPt = chartPoints.reduce((best, p) =>
       p.netIncomeMonth > best.netIncomeMonth ? p : best, chartPoints[0]);
     const fullAvdOwn = maxPt.ownMonth;
     const fullEtf = maxPt.etfMonth;
     const fullAvdBonus = maxPt.bonusMonth;
+    const fullAvdDepot = maxPt.depotMonth;
     const fullMonthlyIncome = maxPt.netIncomeMonth;
     const fullGainPct = refMonthlyIncome > 0
       ? ((fullMonthlyIncome - refMonthlyIncome) / refMonthlyIncome) * 100 : 0;
@@ -401,7 +441,7 @@ export class SparRechnerService {
       kEtf: K_etf,
       sweetspotOwnMonth,
       optEtf, optAvdOwn, optAvdBonus, optAvdDepot, optTotal, optSaving, optSavingPct,
-      fullEtf, fullAvdOwn, fullAvdBonus, fullMonthlyIncome, fullGainPct,
+      fullEtf, fullAvdOwn, fullAvdBonus, fullAvdDepot, fullMonthlyIncome, fullGainPct,
       guenstigerBreakEvenRate, guenstigerAbzugsfaehigYear, guenstigerZulageYear,
       guenstigerActive, guenstigerCurrentTaxRate: currentMarginalTaxRate,
       guenstigerRefundAtOpt, guenstigerRefundAtFull,

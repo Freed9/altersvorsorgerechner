@@ -3,13 +3,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { RentenCalculatorService, RentenResult, RENTEN_CONSTANTS } from '../../services/renten-calculator.service';
 import { AppStateService } from '../../services/app-state.service';
+import { InfoTipDirective } from '../../directives/info-tip.directive';
 
 type Mode = 'simple' | 'advanced';
 
 @Component({
   selector: 'app-rentenluecke',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe],
+  imports: [ReactiveFormsModule, DecimalPipe, InfoTipDirective],
   templateUrl: './rentenluecke.component.html',
   styleUrl: './rentenluecke.component.scss',
 })

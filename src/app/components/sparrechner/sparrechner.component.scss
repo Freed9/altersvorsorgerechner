@@ -93,6 +93,18 @@
     transform: rotate(90deg);
   }
 
+  &__age-warning {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-left: 4px solid #ea580c;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: #9a3412;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+  }
+
   &__source-hint {
     background: #eff6ff;
     border: 1px solid #bfdbfe;
@@ -336,11 +348,45 @@
   &__avd-split-label { color: var(--text-muted); font-size: 0.8rem; }
   &__avd-split-value { font-weight: 500; color: var(--text); font-size: 0.85rem; }
 
+  &__avd-ref {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    font-size: 0.78rem;
+    padding: 0.4rem 0.6rem;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__avd-ref-label {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  &__avd-ref-value {
+    color: var(--text-muted);
+  }
+
+  &__avd-totals {
+    margin-bottom: 0.75rem;
+  }
+
   &__avd-total {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
+
+    &--income {
+      border-top: 1px solid var(--border);
+      padding-top: 0.4rem;
+      margin-top: 0.15rem;
+      margin-bottom: 0;
+    }
   }
 
   &__avd-total-label {
@@ -356,6 +402,8 @@
     letter-spacing: -0.03em;
     color: var(--text);
     line-height: 1;
+
+    &--income { color: #059669; }
   }
 
   &__avd-saving {
@@ -1092,6 +1140,7 @@
 
   .spar__avd-costs {
     grid-template-columns: 1fr 1fr;
+    padding: 0.875rem 1rem;
 
     .spar__avd-cost-group--taxrate {
       grid-column: 1 / -1;
@@ -1113,6 +1162,8 @@
 
   .spar__result-value {
     font-size: 1.9rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .spar__result-detail {
@@ -1121,6 +1172,7 @@
 
   .spar__dynamisierung {
     margin: 0 1.25rem 0.75rem;
+    overflow-wrap: break-word;
   }
 
   .spar__result-gap {
@@ -1129,6 +1181,7 @@
 
   .spar__disclaimer {
     margin: 1.25rem;
+    overflow-wrap: break-word;
   }
 
   .spar__avd-card {
@@ -1144,6 +1197,21 @@
     gap: 0.1rem;
   }
 
+  .spar__avd-ref-value {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .spar__avd-saving,
+  .spar__avd-gain,
+  .spar__avd-guenstiger,
+  .spar__avd-flexibility-note,
+  .spar__avd-sweetspot-info,
+  .spar__avd-disclaimer,
+  .spar__avd-steps-note {
+    overflow-wrap: break-word;
+  }
+
   .spar__avd-steps {
     padding: 1rem 1.25rem;
   }
@@ -1154,5 +1222,12 @@
 
   .spar__avd-children {
     padding: 1rem 1.25rem;
+  }
+
+  // Child row wraps badge to next line on very narrow screens
+  .spar__child-row {
+    flex-wrap: wrap;
+
+    .spar__child-remove { margin-left: 0; }
   }
 }

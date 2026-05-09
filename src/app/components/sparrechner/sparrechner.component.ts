@@ -3,13 +3,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { SparRechnerService, SparrateResult, KapitalResult, AvdOptResult, SPAR_CONSTANTS, AVD_CONSTANTS } from '../../services/spar-rechner.service';
 import { AppStateService } from '../../services/app-state.service';
+import { InfoTipDirective } from '../../directives/info-tip.directive';
 
 type Mode = 'sparrate' | 'kapital';
 
 @Component({
   selector: 'app-sparrechner',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe],
+  imports: [ReactiveFormsModule, DecimalPipe, InfoTipDirective],
   templateUrl: './sparrechner.component.html',
   styleUrl: './sparrechner.component.scss',
 })
@@ -28,6 +29,11 @@ export class SparrechnnerComponent {
 
   children = signal<{ age: number }[]>([]);
   eligibleChildrenCount = computed(() => this.children().filter(c => c.age < 18).length);
+
+  highVolatilityRisk = computed(() => {
+    const age = this.appState.currentAge();
+    return age !== null && age > 52;
+  });
 
   tablePoints = computed(() => {
     const avd = this.avdResult();
