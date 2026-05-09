@@ -270,8 +270,8 @@ export class SparRechnerService {
     // K_avd nur für Referenzanzeige (kAvd-Feld); Berechnungen nutzen Differenzsteuer
     const K_avd = K_avd_gross * (1 - avdTaxRate);
 
-    // Referenz: reiner ETF-Sparplan
-    const refMonthlyIncome = targetCapital * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
+    // Referenz: reiner ETF-Sparplan (nur aus der monatlichen Sparrate, ohne Startkapital)
+    const refMonthlyIncome = monthlyEtfRate * K_etf;
 
     // Netto-AVD-Monatseinkommen für einen gegebenen Eigenanteil:
     // Differenzsteuer §32a(ZvE_GRV + AVD_Jahresbrutto) − §32a(ZvE_GRV)
