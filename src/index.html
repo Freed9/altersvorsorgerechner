@@ -21,6 +21,10 @@
   <meta property="og:url" content="https://altersvorsorgerechner.org/">
   <meta property="og:title" content="Rentenlückenrechner – Altersvorsorge kostenlos berechnen">
   <meta property="og:description" content="Rentenlücke berechnen, Kapitalbedarf ermitteln und die optimale Aufteilung zwischen ETF-Sparplan und Altersvorsorgedepot (AVD) finden – kostenlos, ohne Anmeldung.">
+  <meta property="og:image" content="https://altersvorsorgerechner.org/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Rentenlückenrechner – Kostenlos Rentenlücke, Kapitalbedarf und ETF/AVD-Optimierung berechnen">
   <meta property="og:locale" content="de_DE">
   <meta property="og:site_name" content="Rentenlückenrechner">
 
@@ -28,16 +32,26 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Rentenlückenrechner – Altersvorsorge kostenlos berechnen">
   <meta name="twitter:description" content="Rentenlücke berechnen und die optimale Aufteilung zwischen ETF-Depot und Altersvorsorgedepot (AVD) ermitteln – kostenlos.">
+  <meta name="twitter:image" content="https://altersvorsorgerechner.org/og-image.png">
+  <meta name="twitter:image:alt" content="Rentenlückenrechner – ETF/AVD-Optimierung">
 
-  <!-- Icons -->
+  <!-- Icons & Manifest -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="application-name" content="Rentenlückenrechner">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Rentenlücke">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
-  <!-- Structured Data -->
+  <!-- Structured Data: WebApplication -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -56,8 +70,63 @@
     }
   }
   </script>
+
+  <!-- Structured Data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Was ist eine Rentenlücke?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Die Rentenlücke ist die monatliche Differenz zwischen dem aktuellen Nettoeinkommen und der zu erwartenden gesetzlichen Nettorente. Sie zeigt, wie viel Geld im Alter zusätzlich benötigt wird, um den gewohnten Lebensstandard aufrechtzuerhalten."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Wie viel Kapital benötige ich für die Altersvorsorge?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Der Kapitalbedarf ergibt sich aus der monatlichen Rentenlücke und der 4-Prozent-Regel: Kapitalbedarf = monatliche Lücke × 12 ÷ 0,04. Eine monatliche Lücke von 1.000 € erfordert demnach rund 300.000 € angespartes Kapital."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Was ist ein Altersvorsorgedepot (AVD)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Das Altersvorsorgedepot (AVD) ist ein staatlich gefördertes Investmentkonto für die private Altersvorsorge nach §10a EStG. Der Staat gewährt eine Grundzulage von bis zu 540 € pro Jahr sowie eine Kinderzulage von 300 € pro Kind. Zusätzlich können Beiträge (Eigenanteil + Zulage) als Sonderausgaben steuerlich abgesetzt werden."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Was ist die 4-Prozent-Regel?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Die 4-Prozent-Regel besagt, dass man jährlich 4 % seines angesparten Kapitals entnehmen kann, ohne es statistisch zu erschöpfen. Sie basiert auf historischen Marktrenditen über lange Zeiträume und gilt als Faustformel für die Entnahmephase im Ruhestand."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ETF-Sparplan oder Altersvorsorgedepot – was ist besser?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Das hängt vom individuellen Grenzsteuersatz ab. Wer wenig verdient, profitiert stärker von der Zulage des AVD. Wer viel verdient, kann durch den Steuerabzug beim AVD (Günstigerprüfung) mehr gewinnen als die Zulage wert ist. Dieser Rechner berechnet das optimale Verhältnis zwischen ETF und AVD für die eigene Situation."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <app-root></app-root>
+  <noscript>
+    <p style="font-family:sans-serif;padding:2rem;text-align:center">
+      Dieser Rechner benötigt JavaScript. Bitte aktiviere JavaScript in deinem Browser.
+    </p>
+  </noscript>
 </body>
 </html>

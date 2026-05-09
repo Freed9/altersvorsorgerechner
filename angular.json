@@ -24,6 +24,8 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "server": "src/main.server.ts",
+            "outputMode": "static",
             "assets": [
               {
                 "glob": "**/*",
