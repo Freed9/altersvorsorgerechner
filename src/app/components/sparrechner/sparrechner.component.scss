@@ -1128,6 +1128,7 @@
 
   .spar__avd-costs {
     grid-template-columns: 1fr 1fr;
+    padding: 0.875rem 1rem;
 
     .spar__avd-cost-group--taxrate {
       grid-column: 1 / -1;
@@ -1149,6 +1150,8 @@
 
   .spar__result-value {
     font-size: 1.9rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .spar__result-detail {
@@ -1157,6 +1160,7 @@
 
   .spar__dynamisierung {
     margin: 0 1.25rem 0.75rem;
+    overflow-wrap: break-word;
   }
 
   .spar__result-gap {
@@ -1165,6 +1169,7 @@
 
   .spar__disclaimer {
     margin: 1.25rem;
+    overflow-wrap: break-word;
   }
 
   .spar__avd-card {
@@ -1180,6 +1185,21 @@
     gap: 0.1rem;
   }
 
+  .spar__avd-ref-value {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .spar__avd-saving,
+  .spar__avd-gain,
+  .spar__avd-guenstiger,
+  .spar__avd-flexibility-note,
+  .spar__avd-sweetspot-info,
+  .spar__avd-disclaimer,
+  .spar__avd-steps-note {
+    overflow-wrap: break-word;
+  }
+
   .spar__avd-steps {
     padding: 1rem 1.25rem;
   }
@@ -1190,5 +1210,12 @@
 
   .spar__avd-children {
     padding: 1rem 1.25rem;
+  }
+
+  // Child row wraps badge to next line on very narrow screens
+  .spar__child-row {
+    flex-wrap: wrap;
+
+    .spar__child-remove { margin-left: 0; }
   }
 }

@@ -3,13 +3,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { SparRechnerService, SparrateResult, KapitalResult, AvdOptResult, SPAR_CONSTANTS, AVD_CONSTANTS } from '../../services/spar-rechner.service';
 import { AppStateService } from '../../services/app-state.service';
+import { InfoTipDirective } from '../../directives/info-tip.directive';
 
 type Mode = 'sparrate' | 'kapital';
 
 @Component({
   selector: 'app-sparrechner',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe],
+  imports: [ReactiveFormsModule, DecimalPipe, InfoTipDirective],
   templateUrl: './sparrechner.component.html',
   styleUrl: './sparrechner.component.scss',
 })

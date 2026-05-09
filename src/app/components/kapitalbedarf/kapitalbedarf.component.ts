@@ -3,11 +3,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { KapitalCalculatorService, EntnahmeplanResult, VierProzentResult, KAPITAL_CONSTANTS } from '../../services/kapital-calculator.service';
 import { AppStateService } from '../../services/app-state.service';
+import { InfoTipDirective } from '../../directives/info-tip.directive';
 
 @Component({
   selector: 'app-kapitalbedarf',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe],
+  imports: [ReactiveFormsModule, DecimalPipe, InfoTipDirective],
   templateUrl: './kapitalbedarf.component.html',
   styleUrl: './kapitalbedarf.component.scss',
 })
