@@ -4,10 +4,11 @@ import { AppStateService, ActiveStep } from './services/app-state.service';
 import { RentenlueckeComponent } from './components/rentenluecke/rentenluecke.component';
 import { KapitalbedarfComponent } from './components/kapitalbedarf/kapitalbedarf.component';
 import { SparrechnnerComponent } from './components/sparrechner/sparrechner.component';
+import { GlossarComponent } from './components/glossar/glossar.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RentenlueckeComponent, KapitalbedarfComponent, SparrechnnerComponent, DecimalPipe],
+  imports: [RentenlueckeComponent, KapitalbedarfComponent, SparrechnnerComponent, DecimalPipe, GlossarComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

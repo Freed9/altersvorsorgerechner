@@ -1,0 +1,80 @@
+<section class="glossar">
+  <button class="glossar__toggle" type="button" (click)="toggle()" [attr.aria-expanded]="open()">
+    <span class="glossar__toggle-label">
+      <span class="glossar__toggle-icon">📖</span>
+      Glossar — Begriffe &amp; Tabellen
+    </span>
+    <span class="glossar__toggle-chevron" [class.glossar__toggle-chevron--open]="open()">▼</span>
+  </button>
+
+  @if (open()) {
+    <div class="glossar__body">
+      <div class="glossar__search-wrap">
+        <input class="glossar__search" type="search"
+          placeholder="Begriff suchen … z. B. &quot;ZvE&quot;, &quot;ETF&quot;, &quot;Günstigerprüfung&quot;"
+          [value]="searchQuery()" (input)="onSearch($event)"
+          autocomplete="off" />
+        @if (searchQuery()) {
+          <span class="glossar__search-count">
+            {{ resultCount() }} {{ resultCount() === 1 ? 'Treffer' : 'Treffer' }}
+          </span>
+        }
+      </div>
+
+      <div class="glossar__list">
+        @for (group of displayGroups(); track group.label) {
+          @if (group.label) {
+            <h3 class="glossar__group-title">{{ group.label }}</h3>
+          }
+          @if (group.entries.length === 0 && !searchQuery()) {
+          } @else if (group.entries.length === 0 && searchQuery()) {
+            <p class="glossar__empty">Keine Treffer für „{{ searchQuery() }}"</p>
+          } @else {
+            @for (entry of group.entries; track entry.term) {
+              <div class="glossar__entry" [class.glossar__entry--abbr]="entry.type === 'abbr'">
+                <div class="glossar__term-row">
+                  <span class="glossar__term">{{ entry.term }}</span>
+                  @if (entry.short) {
+                    <span class="glossar__short">{{ entry.short }}</span>
+                  }
+                  <span class="glossar__type-badge" [class.glossar__type-badge--abbr]="entry.type === 'abbr'">
+                    {{ entry.type === 'abbr' ? 'Abk.' : 'Begriff' }}
+                  </span>
+                </div>
+                <div class="glossar__def">
+                  {{ entry.definition }}
+                  @if (entry.table) {
+                    <div class="glossar__table-wrap">
+                      <table class="glossar__table">
+                        <thead>
+                          <tr>
+                            @for (h of entry.table.headers; track h) {
+                              <th>{{ h }}</th>
+                            }
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (row of entry.table.rows; track $index) {
+                            <tr>
+                              @for (cell of row; track $index) {
+                                <td>{{ cell }}</td>
+                              }
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          }
+        }
+
+        @if (searchQuery() && resultCount() === 0) {
+          <p class="glossar__empty">Keine Treffer für „{{ searchQuery() }}"</p>
+        }
+      </div>
+    </div>
+  }
+</section>
