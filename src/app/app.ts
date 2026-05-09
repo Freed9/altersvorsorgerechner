@@ -1,5 +1,5 @@
-import { Component, inject, signal, effect } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { Component, inject, signal, effect, PLATFORM_ID } from '@angular/core';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { AppStateService, ActiveStep } from './services/app-state.service';
 import { RentenlueckeComponent } from './components/rentenluecke/rentenluecke.component';
 import { KapitalbedarfComponent } from './components/kapitalbedarf/kapitalbedarf.component';
@@ -13,12 +13,13 @@ import { SparrechnnerComponent } from './components/sparrechner/sparrechner.comp
 })
 export class App {
   appState = inject(AppStateService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly currentYear = new Date().getFullYear();
   impressumOpen = signal(false);
   disclaimerOpen = signal(false);
   licenseOpen = signal(false);
   datenschutzOpen = signal(false);
-  consentGiven = signal(App.readConsent());
+  consentGiven = signal(this.isBrowser && App.readConsent());
   consentChecked = signal(false);
 
   private _stepScrollInit = false;
@@ -27,6 +28,7 @@ export class App {
     effect(() => {
       const step = this.appState.activeStep();
       if (!this._stepScrollInit) { this._stepScrollInit = true; return; }
+      if (!this.isBrowser) return;
       requestAnimationFrame(() => {
         const el = document.getElementById(`step-${step}`);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
