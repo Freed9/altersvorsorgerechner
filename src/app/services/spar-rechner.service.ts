@@ -82,6 +82,7 @@ export interface AvdOptResult {
   fullEtf: number;
   fullAvdOwn: number;
   fullAvdBonus: number;
+  fullAvdDepot: number;
   fullMonthlyIncome: number;
   fullGainPct: number;
 
@@ -385,6 +386,7 @@ export class SparRechnerService {
     const fullAvdOwn = maxPt.ownMonth;
     const fullEtf = maxPt.etfMonth;
     const fullAvdBonus = maxPt.bonusMonth;
+    const fullAvdDepot = maxPt.depotMonth;
     const fullMonthlyIncome = maxPt.netIncomeMonth;
     const fullGainPct = refMonthlyIncome > 0
       ? ((fullMonthlyIncome - refMonthlyIncome) / refMonthlyIncome) * 100 : 0;
@@ -401,7 +403,7 @@ export class SparRechnerService {
       kEtf: K_etf,
       sweetspotOwnMonth,
       optEtf, optAvdOwn, optAvdBonus, optAvdDepot, optTotal, optSaving, optSavingPct,
-      fullEtf, fullAvdOwn, fullAvdBonus, fullMonthlyIncome, fullGainPct,
+      fullEtf, fullAvdOwn, fullAvdBonus, fullAvdDepot, fullMonthlyIncome, fullGainPct,
       guenstigerBreakEvenRate, guenstigerAbzugsfaehigYear, guenstigerZulageYear,
       guenstigerActive, guenstigerCurrentTaxRate: currentMarginalTaxRate,
       guenstigerRefundAtOpt, guenstigerRefundAtFull,

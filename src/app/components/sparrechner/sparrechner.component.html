@@ -333,7 +333,11 @@
           <!-- Gleiche Rente, weniger sparen -->
           <div class="spar__avd-card spar__avd-card--save">
             <div class="spar__avd-card-title">Gleiche Rente, günstigerer Sparplan</div>
-            <div class="spar__avd-card-sub">Monatliche Nettorente im Alter: {{ avd.refMonthlyIncome | number:'1.2-2' }} €</div>
+
+            <div class="spar__avd-ref">
+              <span class="spar__avd-ref-label">Reiner ETF-Sparplan</span>
+              <span class="spar__avd-ref-value">{{ r.monthlyRate | number:'1.0-0' }} €/Mon. → {{ avd.refMonthlyIncome | number:'1.2-2' }} €/Mon. Nettorente</span>
+            </div>
 
             <div class="spar__avd-split">
               <div class="spar__avd-split-row">
@@ -357,20 +361,26 @@
                 <span class="spar__avd-split-value">+ {{ avd.optAvdBonus | number:'1.2-2' }} €/Monat</span>
               </div>
               <div class="spar__avd-split-row spar__avd-split-row--depot">
-                <span class="spar__avd-split-label">Ins Depot gesamt</span>
+                <span class="spar__avd-split-label">Ins Altersvorsorgedepot gesamt</span>
                 <span class="spar__avd-split-value">{{ avd.optAvdDepot | number:'1.2-2' }} €/Monat</span>
               </div>
             </div>
 
-            <div class="spar__avd-total">
-              <span class="spar__avd-total-label">Gesamt monatl. Aufwand</span>
-              <span class="spar__avd-total-value">{{ avd.optTotal | number:'1.0-0' }} €</span>
+            <div class="spar__avd-totals">
+              <div class="spar__avd-total">
+                <span class="spar__avd-total-label">Gesamt monatl. Aufwand</span>
+                <span class="spar__avd-total-value">{{ avd.optTotal | number:'1.0-0' }} €</span>
+              </div>
+              <div class="spar__avd-total spar__avd-total--income">
+                <span class="spar__avd-total-label">Monatl. Nettorente im Alter</span>
+                <span class="spar__avd-total-value spar__avd-total-value--income">{{ avd.refMonthlyIncome | number:'1.2-2' }} €</span>
+              </div>
             </div>
 
             @if (avd.optSaving > 0) {
               <div class="spar__avd-saving">
                 <strong>− {{ avd.optSaving | number:'1.0-0' }} €/Monat</strong> weniger als reiner ETF-Sparplan
-                ({{ avd.optSavingPct | number:'1.0-0' }} % Ersparnis)
+                ({{ avd.optSavingPct | number:'1.0-0' }} % günstiger)
                 @if (savingsRatePct(avd.optTotal); as pct) {
                   · <strong>{{ pct | number:'1.1-1' }} %</strong> des Nettoeinkommens
                 }
@@ -417,7 +427,11 @@
           <!-- Gleiche Sparrate, mehr Rente -->
           <div class="spar__avd-card spar__avd-card--more">
             <div class="spar__avd-card-title">Gleiche Sparrate, mehr Rente</div>
-            <div class="spar__avd-card-sub">Mit {{ r.monthlyRate | number:'1.0-0' }} €/Monat optimal gesplittet</div>
+
+            <div class="spar__avd-ref">
+              <span class="spar__avd-ref-label">Reiner ETF-Sparplan</span>
+              <span class="spar__avd-ref-value">{{ r.monthlyRate | number:'1.0-0' }} €/Mon. → {{ avd.refMonthlyIncome | number:'1.2-2' }} €/Mon. Nettorente</span>
+            </div>
 
             <div class="spar__avd-split">
               <div class="spar__avd-split-row">
@@ -440,11 +454,21 @@
                 </span>
                 <span class="spar__avd-split-value">+ {{ avd.fullAvdBonus | number:'1.2-2' }} €/Monat</span>
               </div>
+              <div class="spar__avd-split-row spar__avd-split-row--depot">
+                <span class="spar__avd-split-label">Ins Altersvorsorgedepot gesamt</span>
+                <span class="spar__avd-split-value">{{ avd.fullAvdDepot | number:'1.2-2' }} €/Monat</span>
+              </div>
             </div>
 
-            <div class="spar__avd-total">
-              <span class="spar__avd-total-label">Monatl. Nettorente im Alter</span>
-              <span class="spar__avd-total-value">{{ avd.fullMonthlyIncome | number:'1.2-2' }} €</span>
+            <div class="spar__avd-totals">
+              <div class="spar__avd-total">
+                <span class="spar__avd-total-label">Gesamt monatl. Aufwand</span>
+                <span class="spar__avd-total-value">{{ r.monthlyRate | number:'1.0-0' }} €</span>
+              </div>
+              <div class="spar__avd-total spar__avd-total--income">
+                <span class="spar__avd-total-label">Monatl. Nettorente im Alter</span>
+                <span class="spar__avd-total-value spar__avd-total-value--income">{{ avd.fullMonthlyIncome | number:'1.2-2' }} €</span>
+              </div>
             </div>
 
             @if (avd.fullGainPct > 0) {
