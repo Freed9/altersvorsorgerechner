@@ -4,7 +4,7 @@ ARG NGINX_VERSION=alpine3.22
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json* .npmrc* ./
 RUN npm ci
 
 COPY . .
