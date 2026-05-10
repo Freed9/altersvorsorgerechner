@@ -227,6 +227,46 @@
 
         <!-- Kostenparameter -->
         <div class="spar__avd-costs">
+          <div class="spar__avd-return-group">
+            <label class="form__label">
+              Brutto-Marktrendite
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  Nominale Rendite vor Inflation und Kosten.<br>
+                  ETF-Rendite nach Kosten: {{ (grossMarketReturn() - 2.0 - etfTer()) | number:'1.2-2' }} % (Markt − 2 % Inflation − {{ etfTer() | number:'1.2-2' }} % TER)<br>
+                  AVD-Rendite nach Kosten: {{ avdRealReturn() | number:'1.2-2' }} % (Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten)
+                </span>
+              </span>
+            </label>
+            <div class="spar__return-input-row">
+              <div class="form__input-wrapper">
+                <input type="number" class="form__input form__input--with-suffix spar__cost-input"
+                  [value]="grossMarketReturn()" (change)="onGrossReturnInputChange($event)"
+                  min="0.1" max="20" step="0.1" />
+                <span class="form__suffix">%</span>
+              </div>
+              <div class="spar__return-presets">
+                <button type="button" class="spar__return-preset"
+                  [class.spar__return-preset--active]="grossMarketReturn() === 7.0"
+                  (click)="setGrossReturn(7.0)">
+                  7 % · Langer Horizont
+                </button>
+                <button type="button" class="spar__return-preset"
+                  [class.spar__return-preset--active]="grossMarketReturn() === 3.0"
+                  (click)="setGrossReturn(3.0)">
+                  3 % · Konservativ
+                </button>
+              </div>
+            </div>
+            @if (grossMarketReturn() === 7.0) {
+              <p class="spar__return-desc">Historische Durchschnittsrendite eines global gestreuten Aktienportfolios über einen langen Anlagehorizont (&gt; 15 Jahre).</p>
+            } @else if (grossMarketReturn() === 3.0) {
+              <p class="spar__return-desc">Konservative Mischrendite für risikoaverse Portfolios aus Tagesgeld, Geldmarkt, sicheren Anleihen und einem geringen Anteil schwankungsarmer Aktien-ETF — empfohlen bei weniger als 15 Jahren bis zur Rente.</p>
+            } @else {
+              <p class="spar__return-desc">Individuelle Rendite · ETF nach Kosten: {{ (grossMarketReturn() - 2.0 - etfTer()) | number:'1.2-2' }} % · AVD nach Kosten: {{ avdRealReturn() | number:'1.2-2' }} %</p>
+            }
+          </div>
           <div class="spar__avd-cost-group">
             <label class="form__label">
               ETF-Kosten (TER)
@@ -252,7 +292,7 @@
                 <i class="info-tip__icon">i</i>
                 <span class="info-tip__content">
                   Jährliche Kosten des Altersvorsorgedepots (Verwaltung, Depot, ggf. Fonds-TER).<br>
-                  Wird von der Brutto-Rendite (5 % = 7 % − 2 % Inflation) abgezogen.
+                  Wird von der Brutto-Rendite ({{ avdRealReturn() + avdCost() | number:'1.2-2' }} % = {{ grossMarketReturn() | number:'1.0-0' }} % − 2 % Inflation) abgezogen.
                 </span>
               </span>
             </label>
@@ -698,7 +738,7 @@
                 Rente aus AVD = (Eigenanteil + Zulage) × {{ avd.kAvd | number:'1.4-4' }}<br>
                 Rente aus ETF = ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br><br>
                 Der Faktor = FV-Annuität × 4 %-Regel ÷ 12 × (1 − Steuersatz).<br>
-                AVD hat niedrigere Rendite ({{ (5 - avdCost()) | number:'1.2-2' }} %) und Einkommensteuer,
+                AVD hat niedrigere Rendite ({{ avdRealReturn() | number:'1.2-2' }} %) und Einkommensteuer,
                 aber die Staatszulage hebelt den Eigenanteil – besonders im ersten Tier (50 %).
                 Ab 30 €/Mon. gilt nur noch 25 % Zulage; dann kann ETF je nach Rendite effizienter werden.
               </span>
@@ -732,7 +772,7 @@
                       <span class="info-tip__content">
                         Brutto-Monatseinkommen aus dem AVD-Depot vor Einkommensteuer<br>
                         = Gesamtdepot × {{ avd.kAvd / (1 - avd.avdEffTaxRate) | number:'1.4-4' }}<br>
-                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a., 4 %-Regel)
+                        (AVD-Rendite {{ avdRealReturn() | number:'1.2-2' }} % p.a., 4 %-Regel)
                       </span>
                     </span>
                   </th>
@@ -747,24 +787,24 @@
                       </span>
                     </span>
                   </th>
-                  <th>
-                    Rente AVD netto
+                  <th class="spar__avd-table__netto-part">
+                    AVD netto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
                         AVD-Brutto − Steuer (Differenzsteuer)<br>
-                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a.)
+                        (AVD-Rendite {{ avdRealReturn() | number:'1.2-2' }} % p.a.)
                       </span>
                     </span>
                   </th>
                   <th>
-                    Rente ETF netto
+                    ETF brutto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
-                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a.)<br>
-                        Nach KESt 18,46 % (inkl. 30 % Teilfreistellung)
+                        Brutto-Monatseinkommen aus ETF vor KESt<br>
+                        = ETF-Rate × {{ avd.kEtf / (1 - 0.184625) | number:'1.4-4' }}<br>
+                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a., 4 %-Regel)
                       </span>
                     </span>
                   </th>
@@ -779,19 +819,30 @@
                       </span>
                     </span>
                   </th>
+                  <th class="spar__avd-table__netto-part">
+                    + ETF netto
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
+                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a.)<br>
+                        Nach KESt 18,46 % (inkl. 30 % Teilfreistellung)
+                      </span>
+                    </span>
+                  </th>
                   @if (avd.guenstigerActive) {
-                    <th class="spar__avd-table__gpcol">
-                      GP-Bonus
+                    <th class="spar__avd-table__gpcol spar__avd-table__netto-part">
+                      + Netto+ Bonus
                       <span class="info-tip">
                         <i class="info-tip__icon">i</i>
                         <span class="info-tip__content">
                           Monatlicher Rentenbonus aus der reinvestierten Günstigerprüfungs-Erstattung.<br><br>
-                          Berechnung: Jährl. Erstattung × ETF-FV-Faktor × 4 %-Regel ÷ 12 × (1 − 18,46 % KESt)
+                          Berechnung: Jährl. Erstattung × ETF-FV-Faktor × 4 %-Regel ÷ 12 × (1 − 18,46 % KeSt)
                         </span>
                       </span>
                     </th>
                   }
-                  <th>Gesamt<br>Nettorente</th>
+                  <th class="spar__avd-table__netto-total">= Nettorente</th>
                 </tr>
               </thead>
               <tbody>
@@ -813,22 +864,25 @@
                         </span>
                       } @else { — }
                     </td>
-                    <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
-                    <td class="spar__avd-table__etfincome">{{ pt.etfIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__avdincome spar__avd-table__netto-part">{{ pt.avdIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__etfgross">
+                      @if (pt.etfGrossIncome > 0) { {{ pt.etfGrossIncome | number:'1.2-2' }} € } @else { — }
+                    </td>
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
                       @if (pt.etfTax > 0) {
                         −{{ pt.etfTax | number:'1.2-2' }} €
-                        <span class="spar__avd-table__tax-rate">(18,46 %)</span>
+                        <span class="spar__avd-table__tax-rate spar__avd-table__tax-rate--bold">18,46 %</span>
                       } @else { — }
                     </td>
+                    <td class="spar__avd-table__etfincome spar__avd-table__netto-part">{{ pt.etfIncome | number:'1.2-2' }} €</td>
                     @if (avd.guenstigerActive) {
-                      <td class="spar__avd-table__gpcol">
+                      <td class="spar__avd-table__gpcol spar__avd-table__netto-part">
                         @if (pt.guenstigerEtfBonus > 0) {
                           +{{ pt.guenstigerEtfBonus | number:'1.2-2' }} €
                         } @else { — }
                       </td>
                     }
-                    <td class="spar__avd-table__income">
+                    <td class="spar__avd-table__income spar__avd-table__netto-total">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
                       @if (pt.netIncomeMonth === maxIncome) {
                         <span class="spar__avd-table__best-badge">Optimum</span>
@@ -863,7 +917,7 @@
           <span class="info-tip">
             <i class="info-tip__icon">i</i>
             <span class="info-tip__content">
-              AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a. (7 % Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten).
+              AVD-Rendite {{ avdRealReturn() | number:'1.2-2' }} % p.a. ({{ grossMarketReturn() | number:'1.0-0' }} % Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten).
               ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a. (Brutto − {{ etfTer() | number:'1.2-2' }} % TER).
               Mindesteinzahlung {{ avdConst.MIN_OWN_MONTH }} €/Mon.; volle Grundzulage ab {{ avdConst.MAX_ZULAGE_MONTH }} €/Mon.; gesetzl. Max. {{ avdConst.MAX_OWN_MONTH }} €/Mon.
               Grenzsteuersatz {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % (§32a EStG 2024, Renteneintrittsjahr {{ avd.avdRetirementYear }}, Besteuerungsanteil {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} %).

@@ -240,11 +240,12 @@ export class SparRechnerService {
     etfTerPct: number = 0.25,
     avdCostPct: number = 1.0,
     currentMarginalTaxRate: number = 0,  // 0 = Günstigerprüfung deaktiviert
+    grossMarketReturnPct: number = 7.0,  // Nominale Brutto-Marktrendite vor Inflation und Kosten
   ): AvdOptResult {
     const n = years * 12;
-    // Effektive Renditen nach Kosten: ETF = Brutto − TER; AVD = 5 % (7 % − 2 % Infl.) − Kosten
+    // Effektive Renditen nach Kosten: ETF = Brutto − TER; AVD = Markt − 2 % Infl. − AVD-Kosten
     const r_etf = Math.max(0, etfAnnualRatePct - etfTerPct) / 100 / 12;
-    const r_avd = Math.max(0, 5.0 - avdCostPct) / 100 / 12;
+    const r_avd = Math.max(0, grossMarketReturnPct - 2.0 - avdCostPct) / 100 / 12;
 
     const fvEtf = r_etf > 0 ? (Math.pow(1 + r_etf, n) - 1) / r_etf : n;
     const fvAvd = r_avd > 0 ? (Math.pow(1 + r_avd, n) - 1) / r_avd : n;
@@ -299,47 +300,6 @@ export class SparRechnerService {
       const bonus = this.avdMonthlyBonus(own, eligibleChildren);
       return avdNetMonth(own) + etf * K_etf + guenstigerFor(own, bonus).etfBonus;
     };
-
-    // ---- Gleiche Rente, weniger sparen ----
-    // Optimierungsgrenze: max. Eigenanteil mit voller Grundzulage (150 €/Monat)
-    const maxAvdIncome = incomeFor(AVD_CONSTANTS.MAX_ZULAGE_MONTH, 0);
-
-    let optAvdOwn: number;
-    let optEtf: number;
-
-    if (maxAvdIncome >= refMonthlyIncome) {
-      // AVD allein reicht – minimale Eigeneinzahlung finden (binäre Suche)
-      let lo = AVD_CONSTANTS.MIN_OWN_MONTH;
-      let hi = AVD_CONSTANTS.MAX_ZULAGE_MONTH;
-      while (hi - lo > 1) {
-        const mid = Math.floor((lo + hi) / 2);
-        if (incomeFor(mid, 0) >= refMonthlyIncome) hi = mid;
-        else lo = mid + 1;
-      }
-      optAvdOwn = hi;
-      optEtf = 0;
-    } else {
-      // AVD maximal ausschöpfen (bis volle Zulage), Rest via ETF
-      optAvdOwn = AVD_CONSTANTS.MAX_ZULAGE_MONTH;
-      const remaining = refMonthlyIncome - incomeFor(optAvdOwn, 0);
-      optEtf = remaining > 0 ? Math.ceil(remaining / K_etf) : 0;
-    }
-
-    const optAvdBonus = this.avdMonthlyBonus(optAvdOwn, eligibleChildren);
-    const optAvdDepot = optAvdOwn + optAvdBonus;
-    const optTotal = optEtf + optAvdOwn;
-    const optSaving = monthlyEtfRate - optTotal;
-    const optSavingPct = monthlyEtfRate > 0 ? (optSaving / monthlyEtfRate) * 100 : 0;
-
-    // Günstigerprüfung (§10a EStG): Sonderausgabenabzug vs. Zulage in der Ansparphase
-    const guenstigerZulageYear = optAvdBonus * 12;
-    const guenstigerAbzugsfaehigYear = optAvdOwn * 12 + guenstigerZulageYear;
-    const guenstigerBreakEvenRate = guenstigerAbzugsfaehigYear > 0
-      ? guenstigerZulageYear / guenstigerAbzugsfaehigYear
-      : 0;
-
-    // Jährl. Erstattung am "weniger sparen"-Optimum (für Anzeige)
-    const guenstigerRefundAtOpt = guenstigerFor(optAvdOwn, optAvdBonus).refundAnnual;
 
     // ---- Vollständige Kurve: alle Schritte mit Differenzsteuer ----
     const etfGross0 = monthlyEtfRate * K_etf_gross;
@@ -430,6 +390,29 @@ export class SparRechnerService {
       ? ((fullMonthlyIncome - refMonthlyIncome) / refMonthlyIncome) * 100 : 0;
 
     const guenstigerRefundAtFull = maxPt.guenstigerRefundAnnual;
+
+    // ---- Gleiche Rente, weniger sparen: basierend auf dem globalen Optimum ----
+    // Statt bei 150 € (volle Grundzulage) zu cappen, wird fullAvdOwn als fester
+    // AVD-Eigenanteil verwendet und das minimale ETF-Supplement berechnet.
+    const optAvdOwn = fullAvdOwn;
+    const optAvdBonus = this.avdMonthlyBonus(optAvdOwn, eligibleChildren);
+    const { etfBonus: gpBonusAtOpt } = guenstigerFor(optAvdOwn, optAvdBonus);
+    const avdOnlyIncome = optAvdOwn > 0 ? avdNetMonth(optAvdOwn) + gpBonusAtOpt : 0;
+    const optEtf = avdOnlyIncome >= refMonthlyIncome
+      ? 0
+      : Math.max(0, Math.ceil((refMonthlyIncome - avdOnlyIncome) / K_etf));
+    const optAvdDepot = optAvdOwn + optAvdBonus;
+    const optTotal = optEtf + optAvdOwn;
+    const optSaving = monthlyEtfRate - optTotal;
+    const optSavingPct = monthlyEtfRate > 0 ? (optSaving / monthlyEtfRate) * 100 : 0;
+
+    // ---- Günstigerprüfung (§10a EStG) ----
+    const guenstigerZulageYear = optAvdBonus * 12;
+    const guenstigerAbzugsfaehigYear = optAvdOwn * 12 + guenstigerZulageYear;
+    const guenstigerBreakEvenRate = guenstigerAbzugsfaehigYear > 0
+      ? guenstigerZulageYear / guenstigerAbzugsfaehigYear
+      : 0;
+    const guenstigerRefundAtOpt = guenstigerFor(optAvdOwn, optAvdBonus).refundAnnual;
     const guenstigerActive = guenstigerRefundAtFull > 0 || guenstigerRefundAtOpt > 0;
 
     return {
