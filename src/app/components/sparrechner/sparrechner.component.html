@@ -768,13 +768,23 @@
           <div class="spar__avd-steps-scroll">
             <table class="spar__avd-table spar__avd-table--steps">
               <thead>
+                <!-- Gruppenköpfe -->
+                <tr class="spar__avd-table__group-row">
+                  <th colspan="3" class="spar__avd-table__group spar__avd-table__group--depot">AVD-Depot</th>
+                  <th colspan="3" class="spar__avd-table__group spar__avd-table__group--avd">AVD-Rente</th>
+                  <th colspan="4" class="spar__avd-table__group spar__avd-table__group--etf">ETF-Rente</th>
+                  @if (avd.guenstigerActive) {
+                    <th class="spar__avd-table__group spar__avd-table__group--bonus">§10a</th>
+                  }
+                  <th class="spar__avd-table__group spar__avd-table__group--total">Ergebnis</th>
+                </tr>
+                <!-- Spaltenköpfe -->
                 <tr>
-                  <th>AVD<br>eigener Anteil</th>
-                  <th>+ Staatszulage</th>
+                  <th>AVD<br>Eigenanteil</th>
+                  <th>+ Zulage</th>
                   <th>= Ins Depot</th>
-                  <th>ETF-Rate</th>
-                  <th>
-                    Rente AVD brutto
+                  <th class="spar__avd-table__sep--avd">
+                    AVD brutto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
@@ -805,6 +815,7 @@
                       </span>
                     </span>
                   </th>
+                  <th class="spar__avd-table__sep--etf">ETF-Rate</th>
                   <th>
                     ETF brutto
                     <span class="info-tip">
@@ -860,8 +871,7 @@
                     <td>{{ pt.ownMonth | number:'1.0-0' }} €</td>
                     <td class="spar__avd-table__bonus">+{{ pt.bonusMonth | number:'1.2-2' }} €</td>
                     <td>{{ pt.depotMonth | number:'1.2-2' }} €</td>
-                    <td>{{ pt.etfMonth | number:'1.0-0' }} €</td>
-                    <td class="spar__avd-table__avdgross">
+                    <td class="spar__avd-table__avdgross spar__avd-table__sep--avd">
                       @if (pt.avdGrossIncome > 0) { {{ pt.avdGrossIncome | number:'1.2-2' }} € } @else { — }
                     </td>
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
@@ -873,6 +883,7 @@
                       } @else { — }
                     </td>
                     <td class="spar__avd-table__avdincome spar__avd-table__netto-part">{{ pt.avdIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__etfrate spar__avd-table__sep--etf">{{ pt.etfMonth | number:'1.0-0' }} €</td>
                     <td class="spar__avd-table__etfgross">
                       @if (pt.etfGrossIncome > 0) { {{ pt.etfGrossIncome | number:'1.2-2' }} € } @else { — }
                     </td>
