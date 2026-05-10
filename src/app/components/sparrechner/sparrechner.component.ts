@@ -82,9 +82,12 @@ export class SparrechnnerComponent {
     return pts.filter(p => selected.has(p.ownMonth));
   });
 
-  etfTer = signal(0.25);        // TER in % (0–1.5)
-  avdCost = signal(1.0);        // AVD-Kosten in % (0–1.5)
-  currentTaxRate = signal(0);   // Grenzsteuersatz jetzt in % (0–45), 0 = deaktiviert
+  etfTer = signal(0.25);           // TER in % (0–1.5)
+  avdCost = signal(1.0);           // AVD-Kosten in % (0–1.5)
+  currentTaxRate = signal(0);      // Grenzsteuersatz jetzt in % (0–45), 0 = deaktiviert
+  grossMarketReturn = signal(7.0); // Nominale Brutto-Marktrendite in % vor Inflation und Kosten
+
+  avdRealReturn = computed(() => Math.max(0, this.grossMarketReturn() - 2.0 - this.avdCost()));
 
   readonly CHART = { W: 540, H: 200, PAD: { t: 16, r: 20, b: 44, l: 58 } };
 
@@ -173,7 +176,11 @@ export class SparrechnnerComponent {
           ? Math.max(1, Math.min(60, 67 - age))
           : SPAR_CONSTANTS.DEFAULT_JAHRE;
         const existing = untracked(() => this.appState.existingCapital());
-        this.sparrateForm.patchValue({ targetCapital: Math.round(capital), years, startingCapital: existing });
+        const gross = age !== null && age > 52 ? 3.0 : 7.0;
+        this.grossMarketReturn.set(gross);
+        const rendite = Math.max(0.1, gross - 2.0);
+        this.sparrateForm.patchValue({ targetCapital: Math.round(capital), years, startingCapital: existing, rendite });
+        this.kapitalForm.patchValue({ rendite });
         this.calculate();
       }
     }, { allowSignalWrites: true });
@@ -213,6 +220,7 @@ export class SparrechnnerComponent {
         this.etfTer(),
         this.avdCost(),
         this.currentTaxRate() / 100,
+        this.grossMarketReturn(),
       ));
     } else {
       if (this.kapitalForm.invalid) { this.kapitalForm.markAllAsTouched(); return; }
@@ -234,7 +242,22 @@ export class SparrechnnerComponent {
       this.etfTer(),
       this.avdCost(),
       this.currentTaxRate() / 100,
+      this.grossMarketReturn(),
     ));
+  }
+
+  setGrossReturn(pct: number): void {
+    this.grossMarketReturn.set(pct);
+    const rendite = Math.max(0.1, pct - 2.0);
+    this.sparrateForm.patchValue({ rendite });
+    this.kapitalForm.patchValue({ rendite });
+    this.calculate();
+  }
+
+  onGrossReturnInputChange(event: Event): void {
+    const val = Math.round(parseFloat((event.target as HTMLInputElement).value) * 10) / 10;
+    if (isNaN(val) || val < 0.1 || val > 20) return;
+    this.setGrossReturn(val);
   }
 
   onCostChange(field: 'etfTer' | 'avdCost' | 'currentTaxRate', event: Event): void {

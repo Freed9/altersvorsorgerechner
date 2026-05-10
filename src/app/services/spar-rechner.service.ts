@@ -240,11 +240,12 @@ export class SparRechnerService {
     etfTerPct: number = 0.25,
     avdCostPct: number = 1.0,
     currentMarginalTaxRate: number = 0,  // 0 = Günstigerprüfung deaktiviert
+    grossMarketReturnPct: number = 7.0,  // Nominale Brutto-Marktrendite vor Inflation und Kosten
   ): AvdOptResult {
     const n = years * 12;
-    // Effektive Renditen nach Kosten: ETF = Brutto − TER; AVD = 5 % (7 % − 2 % Infl.) − Kosten
+    // Effektive Renditen nach Kosten: ETF = Brutto − TER; AVD = Markt − 2 % Infl. − AVD-Kosten
     const r_etf = Math.max(0, etfAnnualRatePct - etfTerPct) / 100 / 12;
-    const r_avd = Math.max(0, 5.0 - avdCostPct) / 100 / 12;
+    const r_avd = Math.max(0, grossMarketReturnPct - 2.0 - avdCostPct) / 100 / 12;
 
     const fvEtf = r_etf > 0 ? (Math.pow(1 + r_etf, n) - 1) / r_etf : n;
     const fvAvd = r_avd > 0 ? (Math.pow(1 + r_avd, n) - 1) / r_avd : n;

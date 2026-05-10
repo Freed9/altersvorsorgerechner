@@ -625,6 +625,54 @@
     margin-bottom: 1rem;
   }
 
+  &__avd-return-group {
+    grid-column: 1 / -1;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 0.25rem;
+  }
+
+  &__return-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__return-presets {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__return-preset {
+    padding: 0.35rem 0.75rem;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 999px;
+    background: white;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+    &:hover { border-color: #6366f1; color: #4338ca; }
+
+    &--active {
+      border-color: #6366f1;
+      background: #eef2ff;
+      color: #4338ca;
+      font-weight: 600;
+    }
+  }
+
+  &__return-desc {
+    margin: 0.4rem 0 0;
+    font-size: 0.77rem;
+    color: #64748b;
+    line-height: 1.45;
+  }
+
   &__avd-cost-group--taxrate {
     border-left: 2px solid #e0f2fe;
     padding-left: 1.25rem;
