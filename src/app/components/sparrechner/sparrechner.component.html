@@ -726,13 +726,13 @@
                   <th>= Ins Depot</th>
                   <th>ETF-Rate</th>
                   <th>
-                    Rente AVD netto
+                    Rente AVD brutto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        Depot × {{ avd.kAvd | number:'1.4-4' }}<br>
-                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a.)<br>
-                        Nach {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % ESt (§22 EStG)
+                        Brutto-Monatseinkommen aus dem AVD-Depot vor Einkommensteuer<br>
+                        = Gesamtdepot × {{ avd.kAvd / (1 - avd.avdEffTaxRate) | number:'1.4-4' }}<br>
+                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a., 4 %-Regel)
                       </span>
                     </span>
                   </th>
@@ -741,8 +741,19 @@
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        ESt {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % auf AVD-Bruttoeinkommen<br>
+                        Differenzsteuer §32a EStG: ESt(ZvE_GRV + AVD_Brutto) − ESt(ZvE_GRV)<br>
+                        Effektiver Steuersatz steigt mit höherem AVD-Einkommen (Progression)<br>
                         (§22 Nr. 5 EStG, kein Sparerpauschbetrag)
+                      </span>
+                    </span>
+                  </th>
+                  <th>
+                    Rente AVD netto
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        AVD-Brutto − Steuer (Differenzsteuer)<br>
+                        (AVD-Rendite {{ (5 - avdCost()) | number:'1.2-2' }} % p.a.)
                       </span>
                     </span>
                   </th>
@@ -784,20 +795,25 @@
                 </tr>
               </thead>
               <tbody>
-                @for (pt of tablePoints(); track pt.ownMonth) {
+                @for (pt of (showFullTable() ? avd.chartPoints : tablePoints()); track pt.ownMonth) {
                   <tr [class.spar__avd-table__row--best]="pt.netIncomeMonth === maxIncome"
                       [class.spar__avd-table__row--sweet]="pt.ownMonth === avd.sweetspotOwnMonth && pt.netIncomeMonth !== maxIncome">
                     <td>{{ pt.ownMonth | number:'1.0-0' }} €</td>
                     <td class="spar__avd-table__bonus">+{{ pt.bonusMonth | number:'1.2-2' }} €</td>
                     <td>{{ pt.depotMonth | number:'1.2-2' }} €</td>
                     <td>{{ pt.etfMonth | number:'1.0-0' }} €</td>
-                    <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__avdgross">
+                      @if (pt.avdGrossIncome > 0) { {{ pt.avdGrossIncome | number:'1.2-2' }} € } @else { — }
+                    </td>
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
                       @if (pt.avdTax > 0) {
                         −{{ pt.avdTax | number:'1.2-2' }} €
-                        <span class="spar__avd-table__tax-rate">({{ (pt.avdTax / pt.avdGrossIncome * 100) | number:'1.1-1' }} %)</span>
+                        <span class="spar__avd-table__tax-rate spar__avd-table__tax-rate--bold">
+                          {{ (pt.avdTax / pt.avdGrossIncome * 100) | number:'1.1-1' }} %
+                        </span>
                       } @else { — }
                     </td>
+                    <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
                     <td class="spar__avd-table__etfincome">{{ pt.etfIncome | number:'1.2-2' }} €</td>
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
                       @if (pt.etfTax > 0) {
@@ -825,6 +841,15 @@
               </tbody>
             </table>
           </div>
+          <button type="button" class="spar__avd-table-toggle"
+            (click)="showFullTable.update(v => !v)">
+            @if (showFullTable()) {
+              ▲ Kompaktansicht
+            } @else {
+              ▼ Vollständige Tabelle anzeigen ({{ avd.chartPoints.length }} Einträge, alle 10 €-Schritte)
+            }
+          </button>
+
           <p class="spar__avd-steps-note">
             Auszahlungsfaktor AVD: {{ avd.kAvd | number:'1.4-4' }} €/Mon. je 1 €/Mon. Depot ·
             Auszahlungsfaktor ETF: {{ avd.kEtf | number:'1.4-4' }} €/Mon. je 1 €/Mon. Sparrate

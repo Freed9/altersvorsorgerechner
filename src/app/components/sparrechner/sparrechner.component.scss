@@ -964,6 +964,7 @@
     }
 
     &__bonus { color: #7c3aed; }
+    &__avdgross { color: #6d28d9; font-weight: 500; }
     &__avdincome { color: #7c3aed; font-weight: 500; }
     &__etfincome { color: #2563eb; font-weight: 500; }
 
@@ -982,6 +983,17 @@
       color: #9ca3af;
       font-weight: 400;
       white-space: nowrap;
+
+      &--bold {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #ef4444;
+        background: #fef2f2;
+        border-radius: 0.2rem;
+        padding: 0.05rem 0.3rem;
+        margin-left: 0.15rem;
+      }
     }
 
     &--steps {
@@ -1010,6 +1022,27 @@
       font-weight: 500;
       font-size: 0.8rem;
       white-space: nowrap;
+    }
+  }
+
+  &__avd-table-toggle {
+    display: block;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+      background: var(--bg);
+      color: var(--text);
     }
   }
 }
