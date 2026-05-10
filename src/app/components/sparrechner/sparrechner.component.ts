@@ -26,6 +26,7 @@ export class SparrechnnerComponent {
   sparrateResult = signal<SparrateResult | null>(null);
   kapitalResult = signal<KapitalResult | null>(null);
   avdResult = signal<AvdOptResult | null>(null);
+  showFullTable = signal(false);
 
   children = signal<{ age: number }[]>([]);
   eligibleChildrenCount = computed(() => this.children().filter(c => c.age < 18).length);
@@ -194,9 +195,11 @@ export class SparrechnnerComponent {
     this.kapitalResult.set(null);
     this.avdResult.set(null);
     this.children.set([]);
+    this.showFullTable.set(false);
   }
 
   calculate(): void {
+    this.showFullTable.set(false);
     if (this.mode() === 'sparrate') {
       if (this.sparrateForm.invalid) { this.sparrateForm.markAllAsTouched(); return; }
       const { targetCapital, startingCapital, years, rendite } = this.sparrateForm.getRawValue();
