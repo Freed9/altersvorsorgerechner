@@ -1050,6 +1050,8 @@
     // ── Netto-Spalten-Trennlinien ─────────────────────────────────────────────
     &__netto-part  { border-left: 2px solid #e9d5ff; }
     &__netto-total { border-left: 3px solid #94a3b8; font-weight: 700; }
+    &__grv-net     { color: #059669; font-weight: 500; border-left: 1px solid #d1fae5; }
+    &__total-income { border-left: 2px solid #94a3b8; font-weight: 700; }
 
     // ── Steuer ───────────────────────────────────────────────────────────────
     &__taxcol { color: #dc2626; font-weight: 500; }

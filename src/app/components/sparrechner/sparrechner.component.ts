@@ -259,7 +259,7 @@ export class SparrechnnerComponent {
   onRenditeChange(event: Event): void {
     const val = Math.round(parseFloat((event.target as HTMLInputElement).value) * 10) / 10;
     if (!isNaN(val) && val >= 0.1 && val <= 20) {
-      this.grossMarketReturn.set(val);
+      this.setGrossReturn(val);
     }
   }
 

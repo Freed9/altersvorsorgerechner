@@ -107,6 +107,8 @@
               <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre).</p>
             } @else if (grossMarketReturn() === 3.0) {
               <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt, sicheren Anleihen und einem geringen Anteil schwankungsarmer Aktien-ETF — empfohlen bei &lt; 15 Jahren bis zur Rente.</p>
+            } @else {
+              <p class="spar__return-desc">Eigene Renditeeinschätzung: {{ grossMarketReturn() | number:'1.1-1' }} % p.a. nominal — Realrendite ca. {{ (grossMarketReturn() - 2) | number:'1.1-1' }} % nach 2 % Inflation.</p>
             }
           </div>
         </div>
@@ -183,6 +185,8 @@
               <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre).</p>
             } @else if (grossMarketReturn() === 3.0) {
               <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt, sicheren Anleihen und einem geringen Anteil schwankungsarmer Aktien-ETF — empfohlen bei &lt; 15 Jahren bis zur Rente.</p>
+            } @else {
+              <p class="spar__return-desc">Eigene Renditeeinschätzung: {{ grossMarketReturn() | number:'1.1-1' }} % p.a. nominal — Realrendite ca. {{ (grossMarketReturn() - 2) | number:'1.1-1' }} % nach 2 % Inflation.</p>
             }
           </div>
         </div>
@@ -776,7 +780,7 @@
                   @if (avd.guenstigerActive) {
                     <th class="spar__avd-table__group spar__avd-table__group--bonus">§10a</th>
                   }
-                  <th class="spar__avd-table__group spar__avd-table__group--total">Ergebnis</th>
+                  <th colspan="3" class="spar__avd-table__group spar__avd-table__group--total">Ergebnis</th>
                 </tr>
                 <!-- Spaltenköpfe -->
                 <tr>
@@ -861,7 +865,19 @@
                       </span>
                     </th>
                   }
-                  <th class="spar__avd-table__netto-total">= Nettorente</th>
+                  <th class="spar__avd-table__netto-total">= Netto-Zusatzrente</th>
+                  <th class="spar__avd-table__grv-net">
+                    + Staatl. Nettorente
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        Gesetzliche Rente (GRV) nach Einkommensteuer.<br>
+                        Konstant über alle Zeilen, da die Differenzsteuer das AVD-Einkommen belastet,
+                        nicht die GRV-Rente (§32a EStG).
+                      </span>
+                    </span>
+                  </th>
+                  <th class="spar__avd-table__total-income">= Gesamtrente</th>
                 </tr>
               </thead>
               <tbody>
@@ -903,6 +919,13 @@
                     }
                     <td class="spar__avd-table__income spar__avd-table__netto-total">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
+                    </td>
+                    <td class="spar__avd-table__grv-net">
+                      @if (avd.grvNetMonth > 0) { {{ avd.grvNetMonth | number:'1.2-2' }} € } @else { — }
+                    </td>
+                    <td class="spar__avd-table__total-income">
+                      @if (avd.grvNetMonth > 0) { {{ pt.netIncomeMonth + avd.grvNetMonth | number:'1.2-2' }} € }
+                      @else { {{ pt.netIncomeMonth | number:'1.2-2' }} € }
                       @if (pt.netIncomeMonth === maxIncome) {
                         <span class="spar__avd-table__best-badge">Optimum</span>
                       } @else if (pt.ownMonth === avd.sweetspotOwnMonth) {
