@@ -625,24 +625,18 @@
     margin-bottom: 1rem;
   }
 
-  &__avd-return-group {
+  &__rendite-group {
     grid-column: 1 / -1;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #f1f5f9;
-    margin-bottom: 0.25rem;
-  }
-
-  &__return-input-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
   }
 
   &__return-presets {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+
+    &--form {
+      margin-top: 0.4rem;
+    }
   }
 
   &__return-preset {
@@ -963,77 +957,103 @@
     border-collapse: collapse;
     font-size: 0.82rem;
 
+    // ── Gruppenköpfe ────────────────────────────────────────────────────────
+    &__group-row th {
+      padding: 0.3rem 0.5rem 0.2rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      text-align: center;
+      border-bottom: none;
+    }
+
+    &__group {
+      border-radius: 4px 4px 0 0;
+
+      &--depot {
+        background: #f5f3ff;
+        color: #7c3aed;
+        border-bottom: 2px solid #ddd6fe;
+      }
+      &--avd {
+        background: #ede9fe;
+        color: #6d28d9;
+        border-bottom: 2px solid #c4b5fd;
+      }
+      &--etf {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-bottom: 2px solid #bfdbfe;
+      }
+      &--bonus {
+        background: #f0fdf4;
+        color: #15803d;
+        border-bottom: 2px solid #bbf7d0;
+      }
+      &--total {
+        background: #f1f5f9;
+        color: #475569;
+        border-bottom: 2px solid #cbd5e1;
+      }
+    }
+
+    // ── Trennlinien zwischen Gruppen ─────────────────────────────────────────
+    &__sep--avd {
+      border-left: 2px solid #c4b5fd !important;
+    }
+    &__sep--etf {
+      border-left: 2px solid #bfdbfe !important;
+    }
+
+    // ── Standard-Spaltenköpfe ────────────────────────────────────────────────
     th {
       text-align: left;
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-muted);
-      padding: 0 0.5rem 0.5rem;
-      border-bottom: 1px solid var(--border);
+      padding: 0.35rem 0.5rem 0.5rem;
+      border-bottom: 2px solid var(--border);
     }
 
     td {
-      padding: 0.55rem 0.5rem;
-      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 0.5rem;
+      border-bottom: 1px solid #f1f5f9;
       color: var(--text);
     }
 
     tbody tr:last-child td { border-bottom: none; }
 
+    tbody tr:hover td { background: #f8fafc; }
+
+    // ── Zeilenhervorhebungen ─────────────────────────────────────────────────
     &__row--best {
-      background: #f0fdf4;
-
-      td { font-weight: 600; }
-    }
-
-    &__income {
-      font-weight: 600;
-      white-space: nowrap;
+      td { background: #f0fdf4; font-weight: 600; }
+      &:hover td { background: #dcfce7 !important; }
     }
 
     &__row--sweet {
-      background: #fffbeb;
-      td { color: #92400e; }
+      td { background: #fffbeb; color: #92400e; }
+      &:hover td { background: #fef3c7 !important; }
     }
 
-    &__sweet-badge {
-      display: inline-block;
-      background: #d97706;
-      color: white;
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 0.1rem 0.4rem;
-      border-radius: 0.25rem;
-      margin-left: 0.4rem;
-      vertical-align: middle;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
+    // ── Spaltenfarben ────────────────────────────────────────────────────────
+    &__income { font-weight: 600; white-space: nowrap; }
+    &__bonus   { color: #7c3aed; }
+    &__avdgross  { color: #6d28d9; font-weight: 500; }
+    &__etfgross  { color: #1d4ed8; font-weight: 500; }
+    &__avdincome { color: #7c3aed; font-weight: 600; }
+    &__etfincome { color: #2563eb; font-weight: 600; }
+    &__etfrate   { color: #3b82f6; font-weight: 500; }
 
-    &__bonus { color: #7c3aed; }
-    &__avdgross { color: #6d28d9; font-weight: 500; }
-    &__etfgross { color: #1d4ed8; font-weight: 500; }
-    &__avdincome { color: #7c3aed; font-weight: 500; }
-    &__etfincome { color: #2563eb; font-weight: 500; }
+    // ── Netto-Spalten-Trennlinien ─────────────────────────────────────────────
+    &__netto-part  { border-left: 2px solid #e9d5ff; }
+    &__netto-total { border-left: 3px solid #94a3b8; font-weight: 700; }
 
-    &__netto-part {
-      border-left: 2px solid #e9d5ff;
-    }
-
-    &__netto-total {
-      border-left: 3px solid #6b7280;
-    }
-
-    &__taxcol {
-      color: #dc2626;
-      font-weight: 500;
-    }
-
-    &__tax {
-      font-size: 0.78rem;
-      color: #b91c1c;
-    }
+    // ── Steuer ───────────────────────────────────────────────────────────────
+    &__taxcol { color: #dc2626; font-weight: 500; }
+    &__tax    { font-size: 0.78rem; color: #b91c1c; }
 
     &__tax-rate {
       font-size: 0.7rem;
@@ -1053,18 +1073,34 @@
       }
     }
 
+    // ── Tabellenvariante ─────────────────────────────────────────────────────
     &--steps {
-      min-width: 1020px;
+      min-width: 1100px;
 
       th { white-space: normal; line-height: 1.3; }
       td { white-space: nowrap; }
     }
 
+    // ── Badges ───────────────────────────────────────────────────────────────
     &__best-badge {
       display: inline-block;
       background: #059669;
       color: white;
-      font-size: 0.65rem;
+      font-size: 0.63rem;
+      font-weight: 700;
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    &__sweet-badge {
+      display: inline-block;
+      background: #d97706;
+      color: white;
+      font-size: 0.63rem;
       font-weight: 700;
       padding: 0.1rem 0.4rem;
       border-radius: 0.25rem;
@@ -1076,7 +1112,7 @@
 
     &__gpcol {
       color: #15803d;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 0.8rem;
       white-space: nowrap;
     }
