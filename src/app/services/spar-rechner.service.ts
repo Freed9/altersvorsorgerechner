@@ -104,9 +104,6 @@ export interface AvdOptResult {
   guenstigerAbzugsfaehigYearFull: number;
   guenstigerZulageYearFull: number;
 
-  // GRV-Nettorente (konstant über alle Zeilen, da Differenzsteuer)
-  grvNetMonth: number;
-
   // Sweetspot-Vergleich: ±10 € um das Optimum
   sweetspot: AvdSweetspotPoint[];
 
@@ -438,11 +435,6 @@ export class SparRechnerService {
 
     const guenstigerActive = guenstigerRefundAtFull > 0 || guenstigerRefundAtOpt > 0;
 
-    // GRV-Nettorente: konstant, da Differenzsteuer die GRV-Seite unberührt lässt
-    const grvNetMonth = monthlyPensionGross != null && monthlyPensionGross > 0
-      ? monthlyPensionGross - tax_grv / 12
-      : 0;
-
     return {
       refMonthlyIncome,
       avdEffTaxRate: avdTaxRate,
@@ -457,7 +449,6 @@ export class SparRechnerService {
       guenstigerBreakEvenRateFull, guenstigerAbzugsfaehigYearFull, guenstigerZulageYearFull,
       guenstigerActive, guenstigerCurrentTaxRate: currentMarginalTaxRate,
       guenstigerRefundAtOpt, guenstigerRefundAtFull,
-      grvNetMonth,
       sweetspot: [],
       chartPoints,
     };

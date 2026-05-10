@@ -780,7 +780,7 @@
                   @if (avd.guenstigerActive) {
                     <th class="spar__avd-table__group spar__avd-table__group--bonus">§10a</th>
                   }
-                  <th colspan="3" class="spar__avd-table__group spar__avd-table__group--total">Ergebnis</th>
+                  <th class="spar__avd-table__group spar__avd-table__group--total">Ergebnis</th>
                 </tr>
                 <!-- Spaltenköpfe -->
                 <tr>
@@ -865,19 +865,7 @@
                       </span>
                     </th>
                   }
-                  <th class="spar__avd-table__netto-total">= Netto-Zusatzrente</th>
-                  <th class="spar__avd-table__grv-net">
-                    + Staatl. Nettorente
-                    <span class="info-tip">
-                      <i class="info-tip__icon">i</i>
-                      <span class="info-tip__content">
-                        Gesetzliche Rente (GRV) nach Einkommensteuer.<br>
-                        Konstant über alle Zeilen, da die Differenzsteuer das AVD-Einkommen belastet,
-                        nicht die GRV-Rente (§32a EStG).
-                      </span>
-                    </span>
-                  </th>
-                  <th class="spar__avd-table__total-income">= Gesamtrente</th>
+                  <th class="spar__avd-table__netto-total">= Nettorente</th>
                 </tr>
               </thead>
               <tbody>
@@ -919,13 +907,6 @@
                     }
                     <td class="spar__avd-table__income spar__avd-table__netto-total">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
-                    </td>
-                    <td class="spar__avd-table__grv-net">
-                      @if (avd.grvNetMonth > 0) { {{ avd.grvNetMonth | number:'1.2-2' }} € } @else { — }
-                    </td>
-                    <td class="spar__avd-table__total-income">
-                      @if (avd.grvNetMonth > 0) { {{ pt.netIncomeMonth + avd.grvNetMonth | number:'1.2-2' }} € }
-                      @else { {{ pt.netIncomeMonth | number:'1.2-2' }} € }
                       @if (pt.netIncomeMonth === maxIncome) {
                         <span class="spar__avd-table__best-badge">Optimum</span>
                       } @else if (pt.ownMonth === avd.sweetspotOwnMonth) {
