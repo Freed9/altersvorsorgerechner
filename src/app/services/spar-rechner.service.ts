@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 export const SPAR_CONSTANTS = {
-  DEFAULT_RENDITE: 5,   // % p.a. (7 % historisch − 2 % Inflation)
+  DEFAULT_RENDITE: 7,   // % p.a. nominale Brutto-Marktrendite (Real = Brutto − 2 % Inflation)
   DEFAULT_JAHRE: 30,
 };
 
@@ -91,14 +91,18 @@ export interface AvdOptResult {
 
   sweetspotOwnMonth: number;  // letzter Schritt mit 50 % Tier-1-Zulage (Knick der Kurve)
 
-  // Günstigerprüfung (§10a EStG Ansparphase)
-  guenstigerBreakEvenRate: number;    // Grenzsteuersatz ab dem Steuervorteil > Zulage
-  guenstigerAbzugsfaehigYear: number; // Abzugsfähiger Betrag/Jahr (Eigenbeitrag + Zulage)
+  // Günstigerprüfung (§10a EStG Ansparphase) — Werte für "günstigerer Sparplan" (optAvdOwn)
+  guenstigerBreakEvenRate: number;    // Grenzsteuersatz ab dem Steuervorteil > Zulage (opt)
+  guenstigerAbzugsfaehigYear: number; // Abzugsfähiger Betrag/Jahr (opt)
   guenstigerZulageYear: number;       // Zulageanspruch/Jahr beim opt. Eigenanteil
   guenstigerActive: boolean;          // true wenn aktueller Steuersatz > Break-Even
   guenstigerCurrentTaxRate: number;   // eingegebener Grenzsteuersatz (0 = deaktiviert)
   guenstigerRefundAtOpt: number;      // Jährl. Erstattung beim "weniger sparen"-Optimum
   guenstigerRefundAtFull: number;     // Jährl. Erstattung beim "mehr Rente"-Optimum
+  // Günstigerprüfung-Werte für "mehr Rente" (fullAvdOwn)
+  guenstigerBreakEvenRateFull: number;
+  guenstigerAbzugsfaehigYearFull: number;
+  guenstigerZulageYearFull: number;
 
   // Sweetspot-Vergleich: ±10 € um das Optimum
   sweetspot: AvdSweetspotPoint[];
@@ -391,28 +395,44 @@ export class SparRechnerService {
 
     const guenstigerRefundAtFull = maxPt.guenstigerRefundAnnual;
 
-    // ---- Gleiche Rente, weniger sparen: basierend auf dem globalen Optimum ----
-    // Statt bei 150 € (volle Grundzulage) zu cappen, wird fullAvdOwn als fester
-    // AVD-Eigenanteil verwendet und das minimale ETF-Supplement berechnet.
-    const optAvdOwn = fullAvdOwn;
+    // ---- Gleiche Rente, günstigerer Sparplan: min-Kostenscan ----
+    // Iteriert alle chartPoints und findet den AVD-Eigenanteil, der bei gleichem Rentenziel
+    // die geringste Gesamtsparrate (own + benötigtes ETF) ergibt.
+    let optAvdOwn = 0;
+    let optEtf = monthlyEtfRate;
+    let optTotal = monthlyEtfRate; // Startwert: reiner ETF-Plan
+
+    for (const pt of chartPoints) {
+      const avdOnlyIncome = pt.avdIncome + pt.guenstigerEtfBonus;
+      const neededEtf = avdOnlyIncome >= refMonthlyIncome
+        ? 0
+        : Math.max(0, Math.ceil((refMonthlyIncome - avdOnlyIncome) / K_etf));
+      const total = pt.ownMonth + neededEtf;
+      if (total < optTotal) {
+        optTotal = total;
+        optAvdOwn = pt.ownMonth;
+        optEtf = neededEtf;
+      }
+    }
+
     const optAvdBonus = this.avdMonthlyBonus(optAvdOwn, eligibleChildren);
-    const { etfBonus: gpBonusAtOpt } = guenstigerFor(optAvdOwn, optAvdBonus);
-    const avdOnlyIncome = optAvdOwn > 0 ? avdNetMonth(optAvdOwn) + gpBonusAtOpt : 0;
-    const optEtf = avdOnlyIncome >= refMonthlyIncome
-      ? 0
-      : Math.max(0, Math.ceil((refMonthlyIncome - avdOnlyIncome) / K_etf));
     const optAvdDepot = optAvdOwn + optAvdBonus;
-    const optTotal = optEtf + optAvdOwn;
     const optSaving = monthlyEtfRate - optTotal;
     const optSavingPct = monthlyEtfRate > 0 ? (optSaving / monthlyEtfRate) * 100 : 0;
 
-    // ---- Günstigerprüfung (§10a EStG) ----
+    // ---- Günstigerprüfung (§10a EStG) — opt (günstigerer Sparplan) ----
     const guenstigerZulageYear = optAvdBonus * 12;
     const guenstigerAbzugsfaehigYear = optAvdOwn * 12 + guenstigerZulageYear;
     const guenstigerBreakEvenRate = guenstigerAbzugsfaehigYear > 0
-      ? guenstigerZulageYear / guenstigerAbzugsfaehigYear
-      : 0;
+      ? guenstigerZulageYear / guenstigerAbzugsfaehigYear : 0;
     const guenstigerRefundAtOpt = guenstigerFor(optAvdOwn, optAvdBonus).refundAnnual;
+
+    // ---- Günstigerprüfung — full (mehr Rente) ----
+    const guenstigerZulageYearFull = fullAvdBonus * 12;
+    const guenstigerAbzugsfaehigYearFull = fullAvdOwn * 12 + guenstigerZulageYearFull;
+    const guenstigerBreakEvenRateFull = guenstigerAbzugsfaehigYearFull > 0
+      ? guenstigerZulageYearFull / guenstigerAbzugsfaehigYearFull : 0;
+
     const guenstigerActive = guenstigerRefundAtFull > 0 || guenstigerRefundAtOpt > 0;
 
     return {
@@ -426,6 +446,7 @@ export class SparRechnerService {
       optEtf, optAvdOwn, optAvdBonus, optAvdDepot, optTotal, optSaving, optSavingPct,
       fullEtf, fullAvdOwn, fullAvdBonus, fullAvdDepot, fullMonthlyIncome, fullGainPct,
       guenstigerBreakEvenRate, guenstigerAbzugsfaehigYear, guenstigerZulageYear,
+      guenstigerBreakEvenRateFull, guenstigerAbzugsfaehigYearFull, guenstigerZulageYearFull,
       guenstigerActive, guenstigerCurrentTaxRate: currentMarginalTaxRate,
       guenstigerRefundAtOpt, guenstigerRefundAtFull,
       sweetspot: [],

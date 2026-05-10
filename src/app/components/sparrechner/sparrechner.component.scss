@@ -625,24 +625,18 @@
     margin-bottom: 1rem;
   }
 
-  &__avd-return-group {
+  &__rendite-group {
     grid-column: 1 / -1;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #f1f5f9;
-    margin-bottom: 0.25rem;
-  }
-
-  &__return-input-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
   }
 
   &__return-presets {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+
+    &--form {
+      margin-top: 0.4rem;
+    }
   }
 
   &__return-preset {
