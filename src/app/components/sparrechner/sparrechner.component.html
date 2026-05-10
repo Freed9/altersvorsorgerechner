@@ -747,8 +747,8 @@
                       </span>
                     </span>
                   </th>
-                  <th>
-                    Rente AVD netto
+                  <th class="spar__avd-table__netto-part">
+                    AVD netto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
@@ -758,13 +758,13 @@
                     </span>
                   </th>
                   <th>
-                    Rente ETF netto
+                    ETF brutto
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
-                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a.)<br>
-                        Nach KESt 18,46 % (inkl. 30 % Teilfreistellung)
+                        Brutto-Monatseinkommen aus ETF vor KESt<br>
+                        = ETF-Rate × {{ avd.kEtf / (1 - 0.184625) | number:'1.4-4' }}<br>
+                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a., 4 %-Regel)
                       </span>
                     </span>
                   </th>
@@ -779,19 +779,30 @@
                       </span>
                     </span>
                   </th>
+                  <th class="spar__avd-table__netto-part">
+                    + ETF netto
+                    <span class="info-tip">
+                      <i class="info-tip__icon">i</i>
+                      <span class="info-tip__content">
+                        ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
+                        (ETF-Rendite {{ (sparrateForm.getRawValue().rendite - etfTer()) | number:'1.2-2' }} % p.a.)<br>
+                        Nach KESt 18,46 % (inkl. 30 % Teilfreistellung)
+                      </span>
+                    </span>
+                  </th>
                   @if (avd.guenstigerActive) {
-                    <th class="spar__avd-table__gpcol">
-                      GP-Bonus
+                    <th class="spar__avd-table__gpcol spar__avd-table__netto-part">
+                      + Netto+ Bonus
                       <span class="info-tip">
                         <i class="info-tip__icon">i</i>
                         <span class="info-tip__content">
                           Monatlicher Rentenbonus aus der reinvestierten Günstigerprüfungs-Erstattung.<br><br>
-                          Berechnung: Jährl. Erstattung × ETF-FV-Faktor × 4 %-Regel ÷ 12 × (1 − 18,46 % KESt)
+                          Berechnung: Jährl. Erstattung × ETF-FV-Faktor × 4 %-Regel ÷ 12 × (1 − 18,46 % KeSt)
                         </span>
                       </span>
                     </th>
                   }
-                  <th>Gesamt<br>Nettorente</th>
+                  <th class="spar__avd-table__netto-total">= Nettorente</th>
                 </tr>
               </thead>
               <tbody>
@@ -813,22 +824,25 @@
                         </span>
                       } @else { — }
                     </td>
-                    <td class="spar__avd-table__avdincome">{{ pt.avdIncome | number:'1.2-2' }} €</td>
-                    <td class="spar__avd-table__etfincome">{{ pt.etfIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__avdincome spar__avd-table__netto-part">{{ pt.avdIncome | number:'1.2-2' }} €</td>
+                    <td class="spar__avd-table__etfgross">
+                      @if (pt.etfGrossIncome > 0) { {{ pt.etfGrossIncome | number:'1.2-2' }} € } @else { — }
+                    </td>
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
                       @if (pt.etfTax > 0) {
                         −{{ pt.etfTax | number:'1.2-2' }} €
-                        <span class="spar__avd-table__tax-rate">(18,46 %)</span>
+                        <span class="spar__avd-table__tax-rate spar__avd-table__tax-rate--bold">18,46 %</span>
                       } @else { — }
                     </td>
+                    <td class="spar__avd-table__etfincome spar__avd-table__netto-part">{{ pt.etfIncome | number:'1.2-2' }} €</td>
                     @if (avd.guenstigerActive) {
-                      <td class="spar__avd-table__gpcol">
+                      <td class="spar__avd-table__gpcol spar__avd-table__netto-part">
                         @if (pt.guenstigerEtfBonus > 0) {
                           +{{ pt.guenstigerEtfBonus | number:'1.2-2' }} €
                         } @else { — }
                       </td>
                     }
-                    <td class="spar__avd-table__income">
+                    <td class="spar__avd-table__income spar__avd-table__netto-total">
                       {{ pt.netIncomeMonth | number:'1.2-2' }} €
                       @if (pt.netIncomeMonth === maxIncome) {
                         <span class="spar__avd-table__best-badge">Optimum</span>
