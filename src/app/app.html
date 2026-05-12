@@ -55,7 +55,7 @@
         @if (appState.step1Done()) { <span class="step__check">✓</span> } @else { 1 }
       </div>
       <div class="step__info">
-        <span class="step__title">Rentenlücke berechnen</span>
+        <h2 class="step__title">Rentenlücke berechnen</h2>
         @if (appState.step1Done() && appState.activeStep() !== 1) {
           <span class="step__summary">Lücke: {{ appState.monthlyGap()! | number:'1.0-0' }} €/Monat</span>
         } @else if (!appState.step1Done()) {
@@ -83,7 +83,7 @@
         @if (appState.step2Done()) { <span class="step__check">✓</span> } @else { 2 }
       </div>
       <div class="step__info">
-        <span class="step__title">Kapitalbedarf ermitteln</span>
+        <h2 class="step__title">Kapitalbedarf ermitteln</h2>
         @if (appState.step2Done() && appState.activeStep() !== 2) {
           <span class="step__summary">Wie viel Kapital brauche ich?</span>
         } @else if (!appState.step1Done()) {
@@ -112,11 +112,11 @@
         3
       </div>
       <div class="step__info">
-        <span class="step__title">Sparplan & Altersvorsorgedepot</span>
+        <h2 class="step__title">Altersvorsorgedepot & ETF-Sparplan</h2>
         @if (!appState.step2Done()) {
           <span class="step__subtitle">Erst Schritt 2 abschließen</span>
         } @else {
-          <span class="step__subtitle">Schritt 3 — Wie viel muss ich sparen?</span>
+          <span class="step__subtitle">Optimale AVD/ETF-Aufteilung berechnen</span>
         }
       </div>
       <span class="step__chevron" [class.step__chevron--open]="appState.activeStep() === 3"
