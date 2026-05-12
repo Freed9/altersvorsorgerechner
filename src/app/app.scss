@@ -30,6 +30,9 @@
     font-weight: 700;
     color: var(--text);
     letter-spacing: -0.01em;
+    margin: 0;
+    padding: 0;
+    line-height: inherit;
   }
 
   &__tagline {
@@ -204,6 +207,14 @@
   }
 }
 
+// ── Consent Backdrop (browser-only overlay behind cookie banner) ─────────────
+.consent-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+  background: rgba(0, 0, 0, 0.45);
+}
+
 // ── Cookie / Consent Banner ───────────────────────────────────────────────────
 .cookie-banner {
   position: fixed;
@@ -214,8 +225,6 @@
   background: white;
   border-top: 2px solid var(--primary);
   box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.14);
-  animation: slideUp 0.25s ease;
-
   &__inner {
     max-width: 760px;
     margin: 0 auto;
