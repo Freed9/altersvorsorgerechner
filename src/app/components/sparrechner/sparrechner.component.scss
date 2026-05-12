@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 .mode-tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
@@ -732,6 +736,8 @@
   &__avd-steps-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
+    min-width: 0;
   }
 
   &__avd-steps-note {
@@ -749,6 +755,9 @@
     margin-bottom: 1rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   &__avd-chart-title {
