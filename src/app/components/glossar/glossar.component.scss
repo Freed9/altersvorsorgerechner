@@ -195,4 +195,15 @@
     font-style: italic;
     padding: 0.5rem 0;
   }
+
+  &__outlink {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    color: #60a5fa;
+    text-decoration: none;
+    opacity: 0.85;
+
+    &:hover { opacity: 1; text-decoration: underline; }
+  }
 }
