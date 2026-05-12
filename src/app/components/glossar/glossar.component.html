@@ -43,6 +43,11 @@
                 </div>
                 <div class="glossar__def">
                   {{ entry.definition }}
+                  @if (entry.link) {
+                    <a class="glossar__outlink" [href]="entry.link.url" target="_blank" rel="noopener noreferrer">
+                      ↗ {{ entry.link.text }}
+                    </a>
+                  }
                   @if (entry.table) {
                     <div class="glossar__table-wrap">
                       <table class="glossar__table">

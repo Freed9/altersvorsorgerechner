@@ -6,6 +6,7 @@ export interface GlossarEntry {
   short?: string;
   definition: string;
   table?: { headers: string[]; rows: string[][] };
+  link?: { text: string; url: string };
 }
 
 const ENTRIES: GlossarEntry[] = [
@@ -24,6 +25,7 @@ const ENTRIES: GlossarEntry[] = [
     type: 'abbr', term: 'AVD',
     short: 'Altersvorsorgedepot',
     definition: 'Staatlich gefördertes Wertpapierdepot für die private Altersvorsorge, geplant ab 01.01.2027. Kombiniert Einzahlungen in einen Investmentfonds mit staatlicher Grundzulage und Kinderzulage. Auszahlung als lebenslange Rente ab dem gesetzlichen Rentenalter.',
+    link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
   },
   {
     type: 'abbr', term: 'BBG',
@@ -49,6 +51,7 @@ const ENTRIES: GlossarEntry[] = [
     type: 'abbr', term: 'EStG',
     short: 'Einkommensteuergesetz',
     definition: 'Deutsches Bundesgesetz, das die Einkommensteuer regelt. Enthält u. a. §32a (Grundtarif), §10a (Altersvorsorgeaufwendungen / AVD-Zulage), §20 (Kapitalerträge / KESt), §22 (Rentenbesteuerung).',
+    link: { text: 'EStG – Volltext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/' },
   },
   {
     type: 'abbr', term: 'ETF',
@@ -64,6 +67,7 @@ const ENTRIES: GlossarEntry[] = [
     type: 'abbr', term: 'GRV',
     short: 'Gesetzliche Rentenversicherung',
     definition: 'Pflichtversicherung in Deutschland für Arbeitnehmer. Finanziert nach dem Umlageverfahren: Beiträge der Aktiven finanzieren die laufenden Renten. Rentenalter: 67 Jahre (Geburtsjahrgänge ab 1964).',
+    link: { text: 'Deutsche Rentenversicherung (drv.de)', url: 'https://www.deutsche-rentenversicherung.de' },
   },
   {
     type: 'abbr', term: 'JStG',
@@ -129,6 +133,7 @@ const ENTRIES: GlossarEntry[] = [
     type: 'abbr', term: 'SGB',
     short: 'Sozialgesetzbuch',
     definition: 'Gesamtwerk der deutschen Sozialgesetzgebung. Relevant: SGB VI (Rentenversicherung), SGB V (Krankenversicherung), SGB XI (Pflegeversicherung), SGB III (Arbeitsförderung).',
+    link: { text: 'SGB VI – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/sgb_6/' },
   },
   {
     type: 'abbr', term: 'Soli',
@@ -159,6 +164,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'term', term: 'Altersvorsorgedepot',
     definition: 'Staatlich gefördertes Wertpapierdepot (ab 2027 geplant). Kombination aus privatem ETF-Depot und staatlicher Zulage (Grundzulage max. 540 €/Jahr + Kinderzulage 300 €/Jahr je Kind). Höchstbeitrag: 6.840 €/Jahr Eigenanteil. Auszahlung als lebenslange Rente ab dem gesetzlichen Rentenalter. Besteuerung der Entnahmen als sonstige Einkünfte (§22 Nr. 5 EStG).',
+    link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
   },
   {
     type: 'term', term: 'Anlagehorizont',
@@ -249,6 +255,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'term', term: 'Günstigerprüfung (§10a EStG)',
     definition: 'Prüfung durch das Finanzamt in der Steuererklärung: Sind AVD-Beiträge als Sonderausgaben (§10a EStG) steuerlich günstiger als die direkte Zulage? Falls ja, erstattet das Finanzamt die Differenz (Steuerersparnis − Zulage). Lohnt sich ab dem Break-Even-Steuersatz.',
+    link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
   },
   {
     type: 'term', term: 'Inflation',
@@ -289,6 +296,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'term', term: 'Rentenformel',
     definition: 'Berechnung der monatlichen GRV-Rente: Monatsrente = Entgeltpunkte × Zugangsfaktor × Rentenartfaktor × aktueller Rentenwert. Vereinfacht (Altersrente mit Zugangsfaktor = 1): Monatsrente = EP × Rentenwert (39,32 €, 2024).',
+    link: { text: 'Deutsche Rentenversicherung (drv.de)', url: 'https://www.deutsche-rentenversicherung.de' },
   },
   {
     type: 'term', term: 'Rentenlücke',
