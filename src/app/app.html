@@ -1,4 +1,5 @@
 @if (!consentGiven()) {
+  <div class="consent-backdrop" aria-hidden="true"></div>
   <div class="cookie-banner" role="dialog" aria-label="Zustimmung erforderlich">
     <div class="cookie-banner__inner">
       <div class="cookie-banner__header">
@@ -37,11 +38,10 @@
   </div>
 }
 
-@if (consentGiven()) {
 <header class="app-header">
   <div class="app-header__inner">
-    <span class="app-header__brand">Rentenlückenrechner</span>
-    <span class="app-header__tagline">Private Altersvorsorge planen</span>
+    <h1 class="app-header__brand">Rentenlückenrechner</h1>
+    <span class="app-header__tagline">Kostenloser Altersvorsorgerechner</span>
   </div>
 </header>
 <div class="stepper">
@@ -153,7 +153,6 @@
       </p>
     </div>
   </footer>
-} <!-- end @if consentGiven -->
 
 <!-- Rechtlicher Hinweis Modal -->
 @if (disclaimerOpen()) {
