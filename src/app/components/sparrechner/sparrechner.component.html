@@ -800,8 +800,8 @@
                       <span class="info-tip">
                         <i class="info-tip__icon">i</i>
                         <span class="info-tip__content">
-                          Der gezeigte Wert ist ein <strong>Durchschnitt über {{ sparrateForm.get('years')?.value }} Jahre</strong>, weil die Kinderzulage zeitlich begrenzt ist.<br><br>
-                          Solange alle {{ eligibleChildrenCount() }} {{ eligibleChildrenCount() === 1 ? 'Kind' : 'Kinder' }} unter 18 {{ eligibleChildrenCount() === 1 ? 'ist' : 'sind' }}, beträgt der monatliche Kinderbonus bis zu <strong>{{ eligibleChildrenCount() * avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon.</strong> Sobald ein Kind 18 wird, sinkt die Kinderzulage — bis sie ganz entfällt, wenn kein Kind mehr unter 18 ist.
+                          Gemittelt über {{ sparrateForm.get('years')?.value }} Jahre — Kinderzulage gilt nur bei Kindergeldberechtigung (hier 18 J. angenommen).<br><br>
+                          Bis zu <strong>{{ eligibleChildrenCount() * avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon.</strong> bei {{ eligibleChildrenCount() }} {{ eligibleChildrenCount() === 1 ? 'berechtigtem Kind' : 'berechtigten Kindern' }}. Sobald ein Kind die Berechtigung verliert, sinkt die Zulage.
                         </span>
                       </span>
                     }
