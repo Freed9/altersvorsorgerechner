@@ -163,8 +163,8 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Altersvorsorgedepot',
-    definition: 'Staatlich gefördertes Wertpapierdepot (ab 2027 geplant). Kombination aus privatem ETF-Depot und staatlicher Zulage (Grundzulage max. 540 €/Jahr + Kinderzulage 300 €/Jahr je Kind). Höchstbeitrag: 6.840 €/Jahr Eigenanteil. Auszahlung als lebenslange Rente ab dem gesetzlichen Rentenalter. Besteuerung der Entnahmen als sonstige Einkünfte (§22 Nr. 5 EStG).',
-    link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
+    definition: 'Staatlich gefördertes Wertpapierdepot (Altersvorsorgereformgesetz, ab 01.01.2027). Kombination aus privatem ETF-Depot und staatlicher Förderung: Grundzulage bis 540 €/Jahr + Kinderzulage 1:1-Match bis 300 €/Jahr je Kind. Sonderausgabenabzug nach §10a EStG auf max. 1.800 €/Jahr Eigenanteil + Zulage (Günstigerprüfung). Höchstbeitrag: 6.840 €/Jahr Eigenanteil; Beiträge über 1.800 €/Jahr ins Depot aber ohne Steuerabzug. Auszahlung als lebenslange Rente ab Rentenalter, versteuert als sonstige Einkünfte (§22 Nr. 5 EStG).',
+    link: { text: 'justETF – Altersvorsorgedepot: Chancen & Förderung', url: 'https://www.justetf.com/de/news/etf-news/altersvorsorgedepot-avd-alles-was-du-wissen-musst.html' },
   },
   {
     type: 'term', term: 'Anlagehorizont',
@@ -180,7 +180,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Break-Even-Steuersatz',
-    definition: 'Im Kontext der AVD-Günstigerprüfung: Grenzsteuersatz, ab dem die Steuererstattung des Finanzamts (Sonderausgabenabzug § 10a EStG) den Wert der Staatszulage übersteigt. Formel: Break-Even = Zulage / (Eigenbeitrag + Zulage). Liegt der eigene Grenzsteuersatz über dem Break-Even, lohnt die Günstigerprüfung.',
+    definition: 'Im Kontext der AVD-Günstigerprüfung: Grenzsteuersatz, ab dem die Steuererstattung des Finanzamts (Sonderausgabenabzug §10a EStG) den Wert der Staatszulage übersteigt. Formel: Break-Even = Zulage / (geförderter Eigenanteil + Zulage). Basis ist max. 1.800 €/Jahr Eigenanteil (darüber kein Sonderausgabenabzug). Beispiel Single ohne Kinder: 540 / (1.800 + 540) ≈ 23,1 % – wer darüber liegt, profitiert von der Günstigerprüfung. Mit einem Kind: 840 / (1.800 + 840) ≈ 31,8 %.',
   },
   {
     type: 'term', term: 'Bruttorente',
@@ -254,7 +254,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Günstigerprüfung (§10a EStG)',
-    definition: 'Prüfung durch das Finanzamt in der Steuererklärung: Sind AVD-Beiträge als Sonderausgaben (§10a EStG) steuerlich günstiger als die direkte Zulage? Falls ja, erstattet das Finanzamt die Differenz (Steuerersparnis − Zulage). Lohnt sich ab dem Break-Even-Steuersatz.',
+    definition: 'Automatische Prüfung des Finanzamts in der Veranlagung: Ist der Sonderausgabenabzug nach §10a EStG günstiger als die direkte Zulage? Abzugsfähig: bis zu 1.800 €/Jahr Eigenanteil + voller Zulageanspruch (Grund- und Kinderzulage). Steuerersparnis = Grenzsteuersatz × (geförderter Eigenanteil + Zulage). Falls Steuerersparnis > Zulage, erstattet das Finanzamt die Differenz − Zulage wird dabei auf die Steuerschuld angerechnet, sodass kein Doppelbonus entsteht. Freibeträge (Grundfreibetrag 11.784 €, SV-Abzüge, Arbeitnehmer-Pauschbetrag 1.230 €) fließen bereits in den Grenzsteuersatz ein, der aus dem Bruttoeinkommen abgeleitet wird. Beiträge über 1.800 €/Jahr Eigenanteil können nicht abgezogen werden.',
     link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
   },
   {
@@ -267,7 +267,8 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Kinderzulage (AVD)',
-    definition: 'Zusätzliche staatliche Förderung im Altersvorsorgedepot für Kinder, für die Kindergeld bezogen wird. 300 €/Jahr je kindergeldberechtigtem Kind (i. d. R. bis Vollendung des 18. Lebensjahres). Erhöht den Gesamtförderbetrag im Depot.',
+    definition: 'Staatliche 1:1-Matching-Förderung für Kinder mit Kindergeldanspruch im Altersvorsorgedepot. Für jeden eingezahlten Euro Eigenanteil gibt der Staat einen Euro dazu – maximal 300 €/Jahr (25 €/Monat) je Kind. Mindestvoraussetzung: 10 €/Monat Eigenanteil (kein Anspruch darunter). Gilt nur solange Kindergeldanspruch besteht (i. d. R. bis Vollendung des 18. Lebensjahres). Die volle Kinderzulage ist ab 25 €/Monat Eigenanteil erreicht. Sie erhöht auch den Sonderausgabenabzug im Rahmen der Günstigerprüfung (§10a EStG).',
+    link: { text: 'Altersvorsorgereformgesetz – Bundestag (bundestag.de)', url: 'https://www.bundestag.de/dokumente/textarchiv/2026/kw13-de-altersvorsorge-1156798' },
   },
   {
     type: 'term', term: 'Kirchensteuer (KiSt)',
@@ -316,7 +317,8 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Sonderausgabenabzug',
-    definition: 'Steuermindernd abzugsfähige Aufwendungen, die weder Betriebsausgaben noch Werbungskosten sind. Relevant: §10a EStG (Altersvorsorgebeiträge inkl. AVD). Pauschbetrag für Sonderausgaben (ohne Altersvorsorge): 36 €/Jahr.',
+    definition: 'Steuermindernd abzugsfähige Aufwendungen, die weder Betriebsausgaben noch Werbungskosten sind. Relevant für AVD: §10a EStG erlaubt den Abzug von Eigenanteil (max. 1.800 €/Jahr) + voller Zulage als Sonderausgaben. Beiträge über 1.800 €/Jahr Eigenanteil sind zwar möglich (bis 6.840 €/Jahr), aber steuerlich nicht absetzbar. Pauschbetrag ohne Altersvorsorge: 36 €/Jahr.',
+    link: { text: 'BMF – FAQ Reform der privaten Altersvorsorge', url: 'https://www.bundesfinanzministerium.de/Content/DE/FAQ/reform-der-privaten-altersvorsorge.html' },
   },
   {
     type: 'term', term: 'Sozialversicherungsbeiträge',

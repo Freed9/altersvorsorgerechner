@@ -566,7 +566,7 @@
                   <i class="info-tip__icon">i</i>
                   <span class="info-tip__content">
                     <strong>Abzugsfähig: {{ avd.guenstigerAbzugsfaehigYearFull | number:'1.0-0' }} €/Jahr</strong>
-                    (Eigenbeitrag {{ avd.fullAvdOwn * 12 | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYearFull | number:'1.0-0' }} €)<br><br>
+                    (Eigenanteil {{ avd.guenstigerAbzugsfaehigYearFull - avd.guenstigerZulageYearFull | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYearFull | number:'1.0-0' }} €)<br><br>
                     Erstattung = {{ avd.guenstigerCurrentTaxRate * 100 | number:'1.0-0' }} % × {{ avd.guenstigerAbzugsfaehigYearFull | number:'1.0-0' }} € − {{ avd.guenstigerZulageYearFull | number:'1.0-0' }} € = {{ avd.guenstigerRefundAtFull | number:'1.0-0' }} €/Jahr<br><br>
                     Die Erstattung wird jährlich ins ETF-Depot einbezahlt und wächst
                     dort bis zum Renteneintritt. AVD-Entnahmen im Rentenalter (§22 EStG) bleiben davon unberührt.
@@ -585,7 +585,7 @@
                   <i class="info-tip__icon">i</i>
                   <span class="info-tip__content">
                     <strong>Abzugsfähig: {{ avd.guenstigerAbzugsfaehigYearFull | number:'1.0-0' }} €/Jahr</strong>
-                    (Eigenbeitrag {{ avd.fullAvdOwn * 12 | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYearFull | number:'1.0-0' }} €)<br><br>
+                    (Eigenanteil {{ avd.guenstigerAbzugsfaehigYearFull - avd.guenstigerZulageYearFull | number:'1.0-0' }} € + Zulage {{ avd.guenstigerZulageYearFull | number:'1.0-0' }} €)<br><br>
                     Erstattung = Steuersatz × {{ avd.guenstigerAbzugsfaehigYearFull | number:'1.0-0' }} € − {{ avd.guenstigerZulageYearFull | number:'1.0-0' }} €<br><br>
                     Gilt nur für die Ansparphase. AVD-Entnahmen im Rentenalter werden als sonstige Einkünfte (§22 EStG) besteuert — kein Sparerpauschbetrag.
                   </span>
