@@ -735,7 +735,7 @@
   }
 
   &__avd-steps-scroll {
-    overflow-x: auto;
+    overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
     width: 100%;
     min-width: 0;
