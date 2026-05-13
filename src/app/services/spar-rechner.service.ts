@@ -73,7 +73,8 @@ export interface AvdOptResult {
   // Gleiche Rente, weniger sparen
   optEtf: number;
   optAvdOwn: number;
-  optAvdBonus: number;
+  optAvdBonus: number;       // Zulage (effektiv gemittelt, für Einkommensberechnung)
+  optAvdBonusCurrent: number;// Zulage aktueller Monat (integer Kinder jetzt, für Anzeige)
   optAvdDepot: number;
   optTotal: number;
   optSaving: number;
@@ -82,7 +83,8 @@ export interface AvdOptResult {
   // Gleiche Sparrate, mehr Rente
   fullEtf: number;
   fullAvdOwn: number;
-  fullAvdBonus: number;
+  fullAvdBonus: number;       // Zulage (effektiv gemittelt)
+  fullAvdBonusCurrent: number;// Zulage aktueller Monat (für Anzeige)
   fullAvdDepot: number;
   fullMonthlyIncome: number;
   fullGainPct: number;
@@ -190,7 +192,7 @@ export class SparRechnerService {
 
   // ── AVD-Förderung ─────────────────────────────────────────────────────────
 
-  private avdMonthlyBonus(monthlyOwn: number, eligibleChildren: number): number {
+  avdMonthlyBonus(monthlyOwn: number, eligibleChildren: number): number {
     if (monthlyOwn < AVD_CONSTANTS.MIN_OWN_MONTH) return 0;
     const yearlyOwn = Math.min(monthlyOwn * 12, 1800);
     const tier1 = Math.min(yearlyOwn, AVD_CONSTANTS.TIER1_CAP_YEAR) * AVD_CONSTANTS.TIER1_RATE;
@@ -240,6 +242,7 @@ export class SparRechnerService {
     years: number,
     etfAnnualRatePct: number,
     eligibleChildren: number,
+    eligibleChildrenNow: number,
     monthlyPensionGross: number | null = null,
     currentAge: number | null = null,
     etfTerPct: number = 0.25,
@@ -396,8 +399,6 @@ export class SparRechnerService {
     const fullGainPct = refMonthlyIncome > 0
       ? ((fullMonthlyIncome - refMonthlyIncome) / refMonthlyIncome) * 100 : 0;
 
-    const guenstigerRefundAtFull = maxPt.guenstigerRefundAnnual;
-
     // ---- Gleiche Rente, günstigerer Sparplan: min-Kostenscan ----
     // Iteriert alle chartPoints und findet den AVD-Eigenanteil, der bei gleichem Rentenziel
     // die geringste Gesamtsparrate (own + benötigtes ETF) ergibt.
@@ -419,25 +420,29 @@ export class SparRechnerService {
     }
 
     const optAvdBonus = this.avdMonthlyBonus(optAvdOwn, eligibleChildren);
+    const optAvdBonusCurrent = this.avdMonthlyBonus(optAvdOwn, eligibleChildrenNow);
     const optAvdDepot = optAvdOwn + optAvdBonus;
     const optSaving = monthlyEtfRate - optTotal;
     const optSavingPct = monthlyEtfRate > 0 ? (optSaving / monthlyEtfRate) * 100 : 0;
 
     // ---- Günstigerprüfung (§10a EStG) — opt (günstigerer Sparplan) ----
+    // Basis: aktuelle Zulage dieses Jahres (eligibleChildrenNow), nicht der gemittelte Wert
     // Sonderausgabenabzug max. 1.800 €/Jahr Eigenanteil + volle Zulage
-    const guenstigerZulageYear = optAvdBonus * 12;
+    const guenstigerZulageYear = optAvdBonusCurrent * 12;
     const guenstigerAbzugsfaehigYear =
       Math.min(optAvdOwn * 12, AVD_CONSTANTS.MAX_SONDERAUSGABEN_OWN_YEAR) + guenstigerZulageYear;
     const guenstigerBreakEvenRate = guenstigerAbzugsfaehigYear > 0
       ? guenstigerZulageYear / guenstigerAbzugsfaehigYear : 0;
-    const guenstigerRefundAtOpt = guenstigerFor(optAvdOwn, optAvdBonus).refundAnnual;
+    const guenstigerRefundAtOpt = guenstigerFor(optAvdOwn, optAvdBonusCurrent).refundAnnual;
 
     // ---- Günstigerprüfung — full (mehr Rente) ----
-    const guenstigerZulageYearFull = fullAvdBonus * 12;
+    const fullAvdBonusCurrent = this.avdMonthlyBonus(fullAvdOwn, eligibleChildrenNow);
+    const guenstigerZulageYearFull = fullAvdBonusCurrent * 12;
     const guenstigerAbzugsfaehigYearFull =
       Math.min(fullAvdOwn * 12, AVD_CONSTANTS.MAX_SONDERAUSGABEN_OWN_YEAR) + guenstigerZulageYearFull;
     const guenstigerBreakEvenRateFull = guenstigerAbzugsfaehigYearFull > 0
       ? guenstigerZulageYearFull / guenstigerAbzugsfaehigYearFull : 0;
+    const guenstigerRefundAtFull = guenstigerFor(fullAvdOwn, fullAvdBonusCurrent).refundAnnual;
 
     const guenstigerActive = guenstigerRefundAtFull > 0 || guenstigerRefundAtOpt > 0;
 
@@ -449,8 +454,8 @@ export class SparRechnerService {
       kAvd: K_avd,
       kEtf: K_etf,
       sweetspotOwnMonth,
-      optEtf, optAvdOwn, optAvdBonus, optAvdDepot, optTotal, optSaving, optSavingPct,
-      fullEtf, fullAvdOwn, fullAvdBonus, fullAvdDepot, fullMonthlyIncome, fullGainPct,
+      optEtf, optAvdOwn, optAvdBonus, optAvdBonusCurrent, optAvdDepot, optTotal, optSaving, optSavingPct,
+      fullEtf, fullAvdOwn, fullAvdBonus, fullAvdBonusCurrent, fullAvdDepot, fullMonthlyIncome, fullGainPct,
       guenstigerBreakEvenRate, guenstigerAbzugsfaehigYear, guenstigerZulageYear,
       guenstigerBreakEvenRateFull, guenstigerAbzugsfaehigYearFull, guenstigerZulageYearFull,
       guenstigerActive, guenstigerCurrentTaxRate: currentMarginalTaxRate,

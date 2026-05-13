@@ -223,6 +223,7 @@ export class SparrechnnerComponent {
       this.avdResult.set(this.service.calculateAvdOptimization(
         sr.finalCapital, sr.monthlyRate, years, realRendite,
         this.getEffectiveEligibleChildren(years),
+        this.eligibleChildrenCount(),
         this.appState.monthlyPensionGross(),
         this.appState.currentAge(),
         this.etfTer(),
@@ -247,6 +248,7 @@ export class SparrechnnerComponent {
     this.avdResult.set(this.service.calculateAvdOptimization(
       sr.finalCapital, sr.monthlyRate, years, realRendite,
       this.getEffectiveEligibleChildren(years),
+      this.eligibleChildrenCount(),
       this.appState.monthlyPensionGross(),
       this.appState.currentAge(),
       this.etfTer(),

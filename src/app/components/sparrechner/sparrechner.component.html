@@ -417,15 +417,16 @@
                     <i class="info-tip__icon">i</i>
                     <span class="info-tip__content">
                       <strong>Grundzulage:</strong> 50 % auf erste 360 €/J. (max. 180 €) + 25 % auf weitere 1.440 €/J. (max. 360 €) = max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr<br>
-                      <strong>Kinderzulage:</strong> 1 € je eingezahltem € Eigenanteil, max. {{ avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon. je Kind mit Kindergeldanspruch
+                      <strong>Kinderzulage:</strong> 1 € je eingezahltem € Eigenanteil, max. {{ avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon. je Kind mit Kindergeldanspruch<br><br>
+                      Angezeigt wird die <strong>aktuelle monatliche Zulage</strong>. Die langfristige Einkommensberechnung berücksichtigt, dass Kinderzulage nur bis zum 18. Lebensjahr des Kindes gezahlt wird.
                     </span>
                   </span>
                 </span>
-                <span class="spar__avd-split-value">+ {{ avd.optAvdBonus | number:'1.2-2' }} €/Monat</span>
+                <span class="spar__avd-split-value">+ {{ avd.optAvdBonusCurrent | number:'1.2-2' }} €/Monat</span>
               </div>
               <div class="spar__avd-split-row spar__avd-split-row--depot">
                 <span class="spar__avd-split-label">Ins Altersvorsorgedepot gesamt</span>
-                <span class="spar__avd-split-value">{{ avd.optAvdDepot | number:'1.2-2' }} €/Monat</span>
+                <span class="spar__avd-split-value">{{ avd.optAvdOwn + avd.optAvdBonusCurrent | number:'1.2-2' }} €/Monat</span>
               </div>
             </div>
 
@@ -511,15 +512,16 @@
                     <i class="info-tip__icon">i</i>
                     <span class="info-tip__content">
                       <strong>Grundzulage:</strong> 50 % auf erste 360 €/J. + 25 % auf weitere Beiträge – max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr<br>
-                      <strong>Kinderzulage:</strong> 1 € je eingezahltem € Eigenanteil, max. {{ avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon. je kindergeldberechtigtes Kind
+                      <strong>Kinderzulage:</strong> 1 € je eingezahltem € Eigenanteil, max. {{ avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon. je kindergeldberechtigtes Kind<br><br>
+                      Angezeigt wird die <strong>aktuelle monatliche Zulage</strong>. Die langfristige Einkommensberechnung berücksichtigt, dass Kinderzulage nur bis zum 18. Lebensjahr des Kindes gezahlt wird.
                     </span>
                   </span>
                 </span>
-                <span class="spar__avd-split-value">+ {{ avd.fullAvdBonus | number:'1.2-2' }} €/Monat</span>
+                <span class="spar__avd-split-value">+ {{ avd.fullAvdBonusCurrent | number:'1.2-2' }} €/Monat</span>
               </div>
               <div class="spar__avd-split-row spar__avd-split-row--depot">
                 <span class="spar__avd-split-label">Ins Altersvorsorgedepot gesamt</span>
-                <span class="spar__avd-split-value">{{ avd.fullAvdDepot | number:'1.2-2' }} €/Monat</span>
+                <span class="spar__avd-split-value">{{ avd.fullAvdOwn + avd.fullAvdBonusCurrent | number:'1.2-2' }} €/Monat</span>
               </div>
             </div>
 
