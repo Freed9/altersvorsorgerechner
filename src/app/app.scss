@@ -360,7 +360,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #64748b;
+    color: #566070;
     margin: 0 0 0.5rem;
   }
 
@@ -377,7 +377,7 @@
     padding: 0;
     font: inherit;
     font-size: inherit;
-    color: #64748b;
+    color: #566070;
     cursor: pointer;
     text-decoration: underline;
     text-underline-offset: 2px;
@@ -447,9 +447,14 @@
     font-size: 1rem;
     color: var(--text-muted);
     cursor: pointer;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 0.75rem;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
     border-radius: 0.375rem;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition: background 0.15s, color 0.15s;
 
     &:hover {
