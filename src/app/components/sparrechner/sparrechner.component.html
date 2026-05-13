@@ -325,7 +325,7 @@
                   Dein aktueller Grenzsteuersatz während der Ansparphase.<br><br>
                   Liegt er über dem Break-Even, erstattet das Finanzamt die Differenz
                   (Steuerersparnis − Zulage) jährlich zurück. Diese Erstattung
-                  wird ins ETF reinvestiert und erhöht deine spätere Nettorente.<br><br>
+                  wird in der Modellrechnung im Folgejahr ins ETF Depot eingezahlt.<br><br>
                   <strong>0 = Günstigerprüfung deaktivieren</strong>
                 </span>
               </span>
@@ -348,14 +348,14 @@
                 <i class="info-tip__icon">i</i>
                 <span class="info-tip__content">
                   Kinder, für die du Kindergeld beziehst (i.d.R. bis Vollendung des 18. Lebensjahres).
-                  Jedes Kind bringt {{ avdConst.KINDERZULAGE_YEAR | number }} €/Jahr zusätzliche Kinderzulage ins Depot.
+                  Jedes Kind bringt 1 € Kinderzulage je eingezahltem € Eigenanteil – maximal 30 €/Monat je Kind (gilt nur bei mind. 10 €/Monat Eigenanteil).
                 </span>
               </span>
             </label>
             @if (eligibleChildrenCount() > 0) {
               <span class="spar__children-summary">
                 {{ eligibleChildrenCount() }} kindergeldberechtigt ·
-                {{ eligibleChildrenCount() * avdConst.KINDERZULAGE_YEAR | number }} €/Jahr Kinderzulage
+                bis {{ eligibleChildrenCount() * avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon. Kinderzulage
               </span>
             }
           </div>
@@ -417,7 +417,7 @@
                     <i class="info-tip__icon">i</i>
                     <span class="info-tip__content">
                       <strong>Grundzulage:</strong> 50 % auf erste 360 €/J. (max. 180 €) + 25 % auf weitere 1.440 €/J. (max. 360 €) = max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr<br>
-                      <strong>Kinderzulage:</strong> {{ avdConst.KINDERZULAGE_YEAR | number }} €/Jahr je Kind mit Kindergeldanspruch
+                      <strong>Kinderzulage:</strong> 1 € je eingezahltem € Eigenanteil, max. {{ avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon. je Kind mit Kindergeldanspruch
                     </span>
                   </span>
                 </span>
@@ -511,7 +511,7 @@
                     <i class="info-tip__icon">i</i>
                     <span class="info-tip__content">
                       <strong>Grundzulage:</strong> 50 % auf erste 360 €/J. + 25 % auf weitere Beiträge – max. {{ avdConst.MAX_GRUNDZULAGE_YEAR | number }} €/Jahr<br>
-                      <strong>Kinderzulage:</strong> {{ avdConst.KINDERZULAGE_YEAR | number }} €/Jahr je kindergeldberechtigtes Kind
+                      <strong>Kinderzulage:</strong> 1 € je eingezahltem € Eigenanteil, max. {{ avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon. je kindergeldberechtigtes Kind
                     </span>
                   </span>
                 </span>

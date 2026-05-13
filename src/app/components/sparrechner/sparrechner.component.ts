@@ -31,6 +31,13 @@ export class SparrechnnerComponent {
   children = signal<{ age: number }[]>([]);
   eligibleChildrenCount = computed(() => this.children().filter(c => c.age < 18).length);
 
+  getEffectiveEligibleChildren(years: number): number {
+    return this.children().reduce((sum, c) => {
+      const remainingYears = Math.max(0, 18 - c.age);
+      return sum + Math.min(years, remainingYears) / years;
+    }, 0);
+  }
+
   highVolatilityRisk = computed(() => {
     const age = this.appState.currentAge();
     return age !== null && age > 52;
@@ -215,7 +222,7 @@ export class SparrechnnerComponent {
       this.sparrateResult.set(sr);
       this.avdResult.set(this.service.calculateAvdOptimization(
         sr.finalCapital, sr.monthlyRate, years, realRendite,
-        this.eligibleChildrenCount(),
+        this.getEffectiveEligibleChildren(years),
         this.appState.monthlyPensionGross(),
         this.appState.currentAge(),
         this.etfTer(),
@@ -239,7 +246,7 @@ export class SparrechnnerComponent {
     const realRendite = Math.max(0.1, rendite - 2.0);
     this.avdResult.set(this.service.calculateAvdOptimization(
       sr.finalCapital, sr.monthlyRate, years, realRendite,
-      this.eligibleChildrenCount(),
+      this.getEffectiveEligibleChildren(years),
       this.appState.monthlyPensionGross(),
       this.appState.currentAge(),
       this.etfTer(),

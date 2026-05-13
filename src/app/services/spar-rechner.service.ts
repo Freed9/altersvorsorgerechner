@@ -14,7 +14,7 @@ export const AVD_CONSTANTS = {
   TIER1_RATE: 0.50,              // → max 180 €/Jahr
   TIER2_RATE: 0.25,              // 361–1.800 €/Jahr zu 25 % → max 360 €/Jahr
   MAX_GRUNDZULAGE_YEAR: 540,     // 180 + 360 = 540 €/Jahr Grundzulage
-  KINDERZULAGE_YEAR: 300,        // 300 €/Jahr pro Kind mit Kindergeldanspruch
+  MAX_KINDERZULAGE_MONTH: 30,    // max. 30 €/Monat je Kind (1:1-Match auf Eigenanteil, §10a EStG)
   FALLBACK_STEUERSATZ: 0.20,     // Fallback wenn keine Rentendaten vorhanden
   ENTNAHMERATE: 0.04,            // 4 %-Regel
 };
@@ -195,8 +195,8 @@ export class SparRechnerService {
     const tier1 = Math.min(yearlyOwn, AVD_CONSTANTS.TIER1_CAP_YEAR) * AVD_CONSTANTS.TIER1_RATE;
     const tier2 = Math.max(0, yearlyOwn - AVD_CONSTANTS.TIER1_CAP_YEAR) * AVD_CONSTANTS.TIER2_RATE;
     const grundzulageYear = Math.min(tier1 + tier2, AVD_CONSTANTS.MAX_GRUNDZULAGE_YEAR);
-    const kinderzulageYear = eligibleChildren * AVD_CONSTANTS.KINDERZULAGE_YEAR;
-    return (grundzulageYear + kinderzulageYear) / 12;
+    const kinderzulageMonth = eligibleChildren * Math.min(monthlyOwn, AVD_CONSTANTS.MAX_KINDERZULAGE_MONTH);
+    return grundzulageYear / 12 + kinderzulageMonth;
   }
 
   calculateSparrate(
