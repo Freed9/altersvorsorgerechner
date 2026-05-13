@@ -768,6 +768,13 @@
             deutlich weniger Zulage, sodass das ETF häufig effizienter wird.
             Das Optimum kann dennoch über dem Sweetspot liegen, wenn die Gesamtförderung die niedrigere Rendite
             noch überwiegt.
+            @if (eligibleChildrenCount() > 0) {
+              Außerdem greift bei <strong>{{ avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon.</strong> Eigenanteil
+              bereits die <strong>volle Kinderzulage</strong>
+              ({{ eligibleChildrenCount() * avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon.
+              für {{ eligibleChildrenCount() }} {{ eligibleChildrenCount() === 1 ? 'Kind' : 'Kinder' }}) —
+              das liegt innerhalb des Sweetspot-Bereichs.
+            }
           </div>
 
           @let maxIncome = avd.chartPoints.reduce((m, p) => p.netIncomeMonth > m ? p.netIncomeMonth : m, 0);
@@ -787,7 +794,18 @@
                 <!-- Spaltenköpfe -->
                 <tr>
                   <th>AVD<br>Eigenanteil</th>
-                  <th>+ Zulage</th>
+                  <th>
+                    + mittlere Zulage
+                    @if (eligibleChildrenCount() > 0) {
+                      <span class="info-tip">
+                        <i class="info-tip__icon">i</i>
+                        <span class="info-tip__content">
+                          Der gezeigte Wert ist ein <strong>Durchschnitt über {{ sparrateForm.get('years')?.value }} Jahre</strong>, weil die Kinderzulage zeitlich begrenzt ist.<br><br>
+                          Solange alle {{ eligibleChildrenCount() }} {{ eligibleChildrenCount() === 1 ? 'Kind' : 'Kinder' }} unter 18 {{ eligibleChildrenCount() === 1 ? 'ist' : 'sind' }}, beträgt der monatliche Kinderbonus bis zu <strong>{{ eligibleChildrenCount() * avdConst.MAX_KINDERZULAGE_MONTH | number }} €/Mon.</strong> Sobald ein Kind 18 wird, sinkt die Kinderzulage — bis sie ganz entfällt, wenn kein Kind mehr unter 18 ist.
+                        </span>
+                      </span>
+                    }
+                  </th>
                   <th>= Ins Depot</th>
                   <th class="spar__avd-table__sep--avd">
                     AVD brutto
