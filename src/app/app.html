@@ -130,7 +130,11 @@
 </div>
   <footer class="app-footer">
     <div class="app-footer__inner">
-      <app-glossar />
+      @defer (on viewport) {
+        <app-glossar />
+      } @placeholder {
+        <div></div>
+      }
       <p class="app-footer__copy">
         © {{ currentYear }} Rentenlückenrechner &nbsp;·&nbsp; Keine Anlageberatung
         &nbsp;·&nbsp; Nur zur Information

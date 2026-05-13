@@ -605,10 +605,15 @@
     color: var(--text-muted);
     cursor: pointer;
     font-size: 1.1rem;
-    padding: 0.2rem 0.4rem;
+    padding: 0.5rem 0.75rem;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
     border-radius: 0.3rem;
     line-height: 1;
     margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover { background: #fef2f2; color: #dc2626; }
   }
@@ -668,7 +673,7 @@
   &__return-desc {
     margin: 0.4rem 0 0;
     font-size: 0.77rem;
-    color: #64748b;
+    color: #566070;
     line-height: 1.45;
   }
 
