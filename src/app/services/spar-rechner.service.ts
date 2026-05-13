@@ -14,7 +14,8 @@ export const AVD_CONSTANTS = {
   TIER1_RATE: 0.50,              // → max 180 €/Jahr
   TIER2_RATE: 0.25,              // 361–1.800 €/Jahr zu 25 % → max 360 €/Jahr
   MAX_GRUNDZULAGE_YEAR: 540,     // 180 + 360 = 540 €/Jahr Grundzulage
-  KINDERZULAGE_YEAR: 300,        // 300 €/Jahr pro Kind mit Kindergeldanspruch
+  MAX_KINDERZULAGE_MONTH: 25,    // max. 25 €/Monat = 300 €/Jahr je Kind (1:1-Match auf Eigenanteil, §10a EStG)
+  MAX_SONDERAUSGABEN_OWN_YEAR: 1800, // Sonderausgabenabzug §10a EStG nur auf max. 1.800 €/Jahr Eigenanteil
   FALLBACK_STEUERSATZ: 0.20,     // Fallback wenn keine Rentendaten vorhanden
   ENTNAHMERATE: 0.04,            // 4 %-Regel
 };
@@ -195,8 +196,8 @@ export class SparRechnerService {
     const tier1 = Math.min(yearlyOwn, AVD_CONSTANTS.TIER1_CAP_YEAR) * AVD_CONSTANTS.TIER1_RATE;
     const tier2 = Math.max(0, yearlyOwn - AVD_CONSTANTS.TIER1_CAP_YEAR) * AVD_CONSTANTS.TIER2_RATE;
     const grundzulageYear = Math.min(tier1 + tier2, AVD_CONSTANTS.MAX_GRUNDZULAGE_YEAR);
-    const kinderzulageYear = eligibleChildren * AVD_CONSTANTS.KINDERZULAGE_YEAR;
-    return (grundzulageYear + kinderzulageYear) / 12;
+    const kinderzulageMonth = eligibleChildren * Math.min(monthlyOwn, AVD_CONSTANTS.MAX_KINDERZULAGE_MONTH);
+    return grundzulageYear / 12 + kinderzulageMonth;
   }
 
   calculateSparrate(
@@ -289,11 +290,13 @@ export class SparRechnerService {
     };
 
     // Günstigerprüfung §10a EStG: Steuererstattung = max(0, Steuersatz × Abzug − Zulage)
+    // Sonderausgabenabzug ist auf max. 1.800 €/Jahr Eigenanteil begrenzt (§10a Abs.1 EStG).
     // Die Erstattung wird jährlich ins ETF reinvestiert → zusätzl. monatl. Nettorente
     const guenstigerFor = (own: number, bonus: number): { refundAnnual: number; etfBonus: number } => {
       if (currentMarginalTaxRate <= 0 || own <= 0) return { refundAnnual: 0, etfBonus: 0 };
       const zulageAnnual = bonus * 12;
-      const abzugAnnual = own * 12 + zulageAnnual;
+      const eligibleOwnAnnual = Math.min(own * 12, AVD_CONSTANTS.MAX_SONDERAUSGABEN_OWN_YEAR);
+      const abzugAnnual = eligibleOwnAnnual + zulageAnnual;
       const refundAnnual = Math.max(0, currentMarginalTaxRate * abzugAnnual - zulageAnnual);
       const etfBonus = refundAnnual * fvEtfAnnual * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
       return { refundAnnual, etfBonus };
@@ -421,15 +424,18 @@ export class SparRechnerService {
     const optSavingPct = monthlyEtfRate > 0 ? (optSaving / monthlyEtfRate) * 100 : 0;
 
     // ---- Günstigerprüfung (§10a EStG) — opt (günstigerer Sparplan) ----
+    // Sonderausgabenabzug max. 1.800 €/Jahr Eigenanteil + volle Zulage
     const guenstigerZulageYear = optAvdBonus * 12;
-    const guenstigerAbzugsfaehigYear = optAvdOwn * 12 + guenstigerZulageYear;
+    const guenstigerAbzugsfaehigYear =
+      Math.min(optAvdOwn * 12, AVD_CONSTANTS.MAX_SONDERAUSGABEN_OWN_YEAR) + guenstigerZulageYear;
     const guenstigerBreakEvenRate = guenstigerAbzugsfaehigYear > 0
       ? guenstigerZulageYear / guenstigerAbzugsfaehigYear : 0;
     const guenstigerRefundAtOpt = guenstigerFor(optAvdOwn, optAvdBonus).refundAnnual;
 
     // ---- Günstigerprüfung — full (mehr Rente) ----
     const guenstigerZulageYearFull = fullAvdBonus * 12;
-    const guenstigerAbzugsfaehigYearFull = fullAvdOwn * 12 + guenstigerZulageYearFull;
+    const guenstigerAbzugsfaehigYearFull =
+      Math.min(fullAvdOwn * 12, AVD_CONSTANTS.MAX_SONDERAUSGABEN_OWN_YEAR) + guenstigerZulageYearFull;
     const guenstigerBreakEvenRateFull = guenstigerAbzugsfaehigYearFull > 0
       ? guenstigerZulageYearFull / guenstigerAbzugsfaehigYearFull : 0;
 
