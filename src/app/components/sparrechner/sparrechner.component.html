@@ -1049,38 +1049,49 @@
               Für die Auszahlung stehen drei Optionen zur Wahl (Angaben brutto, vor Einkommensteuer):
             </p>
             <div class="spar__auszahlung-cards">
+              <!-- Auszahlungsplan: Annuität 25 Jahre, 2 % real (Kapital aufgezehrt) → Faktor ≈ 0,00424 -->
               <div class="spar__auszahlung-card">
                 <div class="spar__auszahlung-card-label">Auszahlungsplan</div>
                 <div class="spar__auszahlung-card-value">
-                  {{ avd.avdCapitalAtOpt * 0.04 / 12 | number:'1.0-0' }} €/Mon.
-                </div>
-                <div class="spar__auszahlung-card-desc">
-                  Feste monatliche Zahlung aus eigenem Kapital. Depot bis mind. Alter 85 garantiert, danach Leibrente.
-                </div>
-              </div>
-              <div class="spar__auszahlung-card">
-                <div class="spar__auszahlung-card-label">Lebenslange Leibrente</div>
-                <div class="spar__auszahlung-card-value">
-                  {{ avd.avdCapitalAtOpt * 0.005060 | number:'1.0-0' }} €/Mon.
+                  {{ avd.avdCapitalAtOpt * 0.004242 | number:'1.0-0' }} €/Mon.
                   <span class="info-tip">
                     <i class="info-tip__icon">i</i>
                     <span class="info-tip__content">
-                      Schätzwert: Annuität über 20 Jahre bei 2 % Realrendite in der Entnahmephase.<br>
-                      Tatsächliche Leibrentenhöhe hängt vom Rentenversicherungsvertrag ab.
+                      Annuität: Kapital wird über 25 Jahre aufgezehrt (2 % Realrendite im Depot).<br>
+                      Bei Erschöpfung vor Alter 85 greift automatisch eine Mindestleibrente.
                     </span>
                   </span>
                 </div>
                 <div class="spar__auszahlung-card-desc">
-                  Garantierte monatliche Zahlung lebenslang, unabhängig davon, wie alt du wirst.
+                  Kapital bleibt im eigenen Depot (ETF), Auszahlung bis Alter ca. 92. Höchster Monatsbetrag.
                 </div>
               </div>
+              <!-- Leibrente: Versicherungsprodukt, Faktor konservativ ≈ 0,0035 (25 J. bei 0,5 % real + Verwaltung) -->
+              <div class="spar__auszahlung-card">
+                <div class="spar__auszahlung-card-label">Lebenslange Leibrente</div>
+                <div class="spar__auszahlung-card-value">
+                  {{ avd.avdCapitalAtOpt * 0.003500 | number:'1.0-0' }} €/Mon.
+                  <span class="info-tip">
+                    <i class="info-tip__icon">i</i>
+                    <span class="info-tip__content">
+                      Schätzwert: Der Versicherer trägt das Langlebigkeitsrisiko und kalkuliert konservativ
+                      (25–30 Jahre Lebenserwartung, Sicherheits- und Verwaltungsaufschlag).<br>
+                      Tatsächliche Leibrentenhöhe hängt vom Anbieter und Rentenfaktor ab.
+                    </span>
+                  </span>
+                </div>
+                <div class="spar__auszahlung-card-desc">
+                  Garantiert lebenslang, egal wie alt du wirst — aber Kapital geht an den Versicherer.
+                </div>
+              </div>
+              <!-- Hybrid: 30 % Einmalzahlung + Auszahlungsplan auf 70 % -->
               <div class="spar__auszahlung-card spar__auszahlung-card--hybrid">
                 <div class="spar__auszahlung-card-label">Hybrid: 30 % Einmalzahlung</div>
                 <div class="spar__auszahlung-card-value">
-                  {{ avd.avdCapitalAtOpt * 0.30 | number:'1.0-0' }} € + {{ avd.avdCapitalAtOpt * 0.70 * 0.04 / 12 | number:'1.0-0' }} €/Mon.
+                  {{ avd.avdCapitalAtOpt * 0.30 | number:'1.0-0' }} € + {{ avd.avdCapitalAtOpt * 0.70 * 0.004242 | number:'1.0-0' }} €/Mon.
                 </div>
                 <div class="spar__auszahlung-card-desc">
-                  Bis zu 30 % als Einmalbetrag bei Rentenbeginn, der Rest als monatlicher Auszahlungsplan.
+                  Bis zu 30 % einmalig bei Rentenbeginn, der Rest als 25-jähriger Auszahlungsplan.
                 </div>
               </div>
             </div>
