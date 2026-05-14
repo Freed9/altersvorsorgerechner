@@ -270,8 +270,8 @@ const ENTRIES: GlossarEntry[] = [
     definition: 'Allgemeiner Anstieg des Preisniveaus über Zeit. Vermindert die Kaufkraft des Geldes. Historischer Durchschnitt in Deutschland: ~2 % p.a. In dieser App: Nominalrendite − 2 % Inflation = Realrendite. Beispiel: 7 % nominale ETF-Rendite → 5 % Realrendite.',
   },
   {
-    type: 'term', term: 'Jungsparer-Bonus (AVD)',
-    definition: 'Einmalige staatliche Zulage von 200 € für Personen, die ihr Altersvorsorgedepot vor dem 25. Geburtstag eröffnen. Der Betrag wird sofort ins AVD-Depot eingezahlt und wächst dort über die gesamte Ansparphase mit der Depot-Rendite. Beispiel: 200 € bei 25 Jahren Anlagehorizont und 4 % Realrendite → ~533 € Endkapital → ca. 1,78 €/Monat zusätzliche Bruttorente. Der Bonus ist steuerpflichtig (Einkommensteuer auf AVD-Einkommen in der Rentenphase) und wird in dieser App automatisch berücksichtigt, wenn das eingegebene Alter unter 25 liegt.',
+    type: 'term', term: 'Jungsparer-Bonus / Berufseinsteiger-Bonus (AVD)',
+    definition: 'Gesetzliche Bezeichnung: Berufseinsteiger-Bonus (§ 10a EStG i. d. F. pAV-RefG). Einmalige staatliche Zulage von 200 € für Personen, die ihr Altersvorsorgedepot vor dem 25. Geburtstag eröffnen. Der Betrag wird sofort ins AVD-Depot eingezahlt und wächst dort über die gesamte Ansparphase mit der Depot-Rendite. Beispiel: 200 € bei 25 Jahren Anlagehorizont und 4 % Realrendite → ~533 € Endkapital → ca. 1,78 €/Monat zusätzliche Bruttorente. Der Bonus ist steuerpflichtig (Einkommensteuer auf AVD-Einkommen in der Rentenphase) und wird in dieser App automatisch berücksichtigt, wenn das eingegebene Alter unter 25 liegt.',
   },
   {
     type: 'term', term: 'Kapitalertragsteuer (KESt)',
