@@ -360,7 +360,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #566070;
+    color: #cbd5e1;
     margin: 0 0 0.5rem;
   }
 
@@ -374,24 +374,38 @@
   &__impressum-btn {
     background: none;
     border: none;
-    padding: 0;
+    padding: 0.625rem 0.5rem;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
     font: inherit;
     font-size: inherit;
-    color: #566070;
+    color: #94a3b8;
     cursor: pointer;
     text-decoration: underline;
     text-underline-offset: 2px;
 
-    &:hover { color: #94a3b8; }
+    &:hover { color: #cbd5e1; }
   }
 
   &__copy {
     margin: 0;
     font-size: 0.72rem;
-    color: #475569;
+    color: #94a3b8;
     text-align: center;
-    border-top: 1px solid #1e293b;
+    border-top: 1px solid #334155;
     padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.125rem;
   }
 }
 
