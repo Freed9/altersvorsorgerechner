@@ -1372,3 +1372,63 @@
     .spar__child-remove { margin-left: 0; }
   }
 }
+
+// ── Produktvergleich AVD vs ETF ──────────────────────────────────────────────
+
+.spar__compare-section {
+  margin-bottom: 1rem;
+}
+
+.spar__compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.79rem;
+  margin-bottom: 0.5rem;
+  table-layout: fixed;
+}
+
+.spar__compare-th {
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border);
+
+  &--feature { width: 28%; color: var(--text-muted); }
+  &--avd { width: 36%; background: #f5f3ff; color: #5b21b6; border-radius: 0.4rem 0.4rem 0 0; }
+  &--etf { width: 36%; background: #eff6ff; color: #1e40af; border-radius: 0.4rem 0.4rem 0 0; }
+}
+
+.spar__compare-td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.45;
+
+  &--feature {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  &--avd { background: #faf8ff; }
+  &--etf { background: #f8faff; }
+
+  &--yes {
+    color: #166534;
+    &::before { content: '✓ '; font-weight: 700; }
+  }
+
+  &--no {
+    color: #6b7280;
+    &::before { content: '– '; }
+  }
+}
+
+.spar__compare-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
