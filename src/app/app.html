@@ -135,26 +135,15 @@
       } @placeholder {
         <div></div>
       }
-      <p class="app-footer__copy">
-        © {{ currentYear }} Rentenlückenrechner &nbsp;·&nbsp; Keine Anlageberatung
-        &nbsp;·&nbsp; Nur zur Information
-        &nbsp;·&nbsp;
-        <button class="app-footer__impressum-btn" type="button" (click)="disclaimerOpen.set(true)">
-          Rechtlicher Hinweis
-        </button>
-        &nbsp;·&nbsp;
-        <button class="app-footer__impressum-btn" type="button" (click)="impressumOpen.set(true)">
-          Impressum
-        </button>
-        &nbsp;·&nbsp;
-        <button class="app-footer__impressum-btn" type="button" (click)="licenseOpen.set(true)">
-          MIT Lizenz
-        </button>
-        &nbsp;·&nbsp;
-        <button class="app-footer__impressum-btn" type="button" (click)="datenschutzOpen.set(true)">
-          Datenschutz
-        </button>
-      </p>
+      <div class="app-footer__copy">
+        <span>© {{ currentYear }} Rentenlückenrechner &nbsp;·&nbsp; Keine Anlageberatung &nbsp;·&nbsp; Nur zur Information</span>
+        <div class="app-footer__links">
+          <button class="app-footer__impressum-btn" type="button" (click)="disclaimerOpen.set(true)">Rechtlicher Hinweis</button>
+          <button class="app-footer__impressum-btn" type="button" (click)="impressumOpen.set(true)">Impressum</button>
+          <button class="app-footer__impressum-btn" type="button" (click)="licenseOpen.set(true)">MIT Lizenz</button>
+          <button class="app-footer__impressum-btn" type="button" (click)="datenschutzOpen.set(true)">Datenschutz</button>
+        </div>
+      </div>
     </div>
   </footer>
 
