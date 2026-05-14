@@ -162,6 +162,10 @@ const ENTRIES: GlossarEntry[] = [
     definition: 'Faustregel zur Entnahme aus einem Kapitalstock im Ruhestand: Entnimm jährlich maximal 4 % des Anfangsvermögens, dann reicht das Depot statistisch für mindestens 30 Jahre. Herkunft: Trinity-Studie (1998, USA-Aktienmarkt). In dieser App als Entnahmemodell verwendet: Monatliche Nettorente = Kapital × 4 % / 12 × (1 − Steuersatz).',
   },
   {
+    type: 'term', term: 'Auszahlungsplan (AVD)',
+    definition: 'Auszahlungsoption des Altersvorsorgedepots: Das Depot-Kapital verbleibt im eigenen Depot und wird über einen festen Zeitraum (typisch ~25 Jahre, bis ca. Alter 92) monatlich ausgezahlt. Während der Entnahmephase wird das Restkapital weiter investiert, was die monatliche Rate erhöht. Unterschied zur 4 %-Regel: Das Kapital wird vollständig aufgezehrt, nicht dauerhaft erhalten. Garantie: Die monatliche Rate ist mindestens bis Alter 85 gesichert — reicht das Kapital nicht aus, greift automatisch eine Mindestleibrente. Von den drei AVD-Auszahlungsoptionen liefert der Auszahlungsplan den höchsten Monatsbetrag.',
+  },
+  {
     type: 'term', term: 'Altersvorsorgedepot',
     definition: 'Staatlich gefördertes Wertpapierdepot (Altersvorsorgereformgesetz, ab 01.01.2027). Kombination aus privatem ETF-Depot und staatlicher Förderung: Grundzulage bis 540 €/Jahr + Kinderzulage 1:1-Match bis 300 €/Jahr je Kind. Sonderausgabenabzug nach §10a EStG auf max. 1.800 €/Jahr Eigenanteil + Zulage (Günstigerprüfung). Höchstbeitrag: 6.840 €/Jahr Eigenanteil; Beiträge über 1.800 €/Jahr ins Depot aber ohne Steuerabzug. Auszahlung als lebenslange Rente ab Rentenalter, versteuert als sonstige Einkünfte (§22 Nr. 5 EStG).',
     link: { text: 'justETF – Altersvorsorgedepot: Chancen & Förderung', url: 'https://www.justetf.com/de/news/etf-news/altersvorsorgedepot-avd-alles-was-du-wissen-musst.html' },
@@ -262,10 +266,16 @@ const ENTRIES: GlossarEntry[] = [
     link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
   },
   {
+    type: 'term', term: 'Hybrid-Auszahlung (AVD)',
+    definition: 'Auszahlungsoption des Altersvorsorgedepots: Bis zu 30 % des akkumulierten Depot-Kapitals werden einmalig bei Rentenbeginn als Einmalbetrag ausgezahlt — die verbleibenden 70 % fließen in einen monatlichen Auszahlungsplan. Besonderheit: Diese Möglichkeit einer Teilkapitalauszahlung ist bei einem regulären ETF-Depot jederzeit möglich, beim AVD aber explizit gesetzlich vorgesehen und kann direkt mit dem Anbieter vereinbart werden. Sinnvoll für größere Anschaffungen bei Rentenbeginn (z. B. Tilgung einer Restschuld, größere Reise). Monatliche Rate auf die verbleibenden 70 % entspricht dem Auszahlungsplan auf diesen Anteil.',
+  },
+  {
     type: 'term', term: 'Inflation',
     definition: 'Allgemeiner Anstieg des Preisniveaus über Zeit. Vermindert die Kaufkraft des Geldes. Historischer Durchschnitt in Deutschland: ~2 % p.a. In dieser App: Nominalrendite − 2 % Inflation = Realrendite. Beispiel: 7 % nominale ETF-Rendite → 5 % Realrendite.',
   },
   {
+    type: 'term', term: 'Jungsparer-Bonus / Berufseinsteiger-Bonus (AVD)',
+    definition: 'Gesetzliche Bezeichnung: Berufseinsteiger-Bonus (§ 10a EStG i. d. F. pAV-RefG). Einmalige staatliche Zulage von 200 € für Personen, die ihr Altersvorsorgedepot vor dem 25. Geburtstag eröffnen. Der Betrag wird sofort ins AVD-Depot eingezahlt und wächst dort über die gesamte Ansparphase mit der Depot-Rendite. Beispiel: 200 € bei 25 Jahren Anlagehorizont und 4 % Realrendite → ~533 € Endkapital → ca. 1,78 €/Monat zusätzliche Bruttorente. Der Bonus ist steuerpflichtig (Einkommensteuer auf AVD-Einkommen in der Rentenphase) und wird in dieser App automatisch berücksichtigt, wenn das eingegebene Alter unter 25 liegt.',
     type: 'term', term: 'Kapitalverzehr',
     definition: 'Entnahmestrategie, bei der im Alter sowohl Kapitalerträge als auch das angesparte Kapital selbst aufgebraucht werden. Das Vermögen wird bis zum Lebensende vollständig verbraucht. Gegensatz: die 4-Prozent-Regel, die auf einem nachhaltigen Entnahmeplan beruht und das Kapital statistisch nicht erschöpft. Kapitalverzehr kann sinnvoll sein, wenn das Kapital gezielt bis zu einem bestimmten Lebensalter reichen soll.',
   },
@@ -287,6 +297,10 @@ const ENTRIES: GlossarEntry[] = [
     definition: 'Gesetzliche Pflichtversicherung. AN-Anteil 2024: 8,15 % (Basisbeitrag 7,3 % + Ø Zusatzbeitrag 0,85 %) des Bruttolohns bis BBG. Rentnerbeitrag: 7,3 % der Bruttorente (kein AG-Anteil, Rentner tragen den vollen Basisbeitrag selbst).',
   },
   {
+    type: 'term', term: 'Leibrente (AVD)',
+    definition: 'Auszahlungsoption des Altersvorsorgedepots: Das akkumulierte Kapital wird an einen Versicherer übertragen, der dafür eine garantierte monatliche Zahlung lebenslang auszahlt — unabhängig davon, wie alt man wird. Vorteil: kein Langlebigkeitsrisiko (man kann das Kapital nicht „überleben"). Nachteil: Das Kapital ist weg (kein Erbe möglich) und der Versicherer kalkuliert konservativ (Sicherheitsaufschlag + Verwaltungskosten), was zu einer niedrigeren monatlichen Rate führt als beim Auszahlungsplan. Schätzwert in dieser App: konservative Annuität über ~25–30 Jahre bei niedrigem Realzins — tatsächliche Beträge hängen vom Anbieter und dem Rentenfaktor zum Abschlusszeitpunkt ab.',
+  },
+  {
     type: 'term', term: 'Nettorendite',
     definition: 'Tatsächliche Rendite nach Abzug aller Kosten (TER, Transaktionskosten) und Steuern. Bei einem Aktien-ETF: Nominalrendite − TER − KESt (18,46 % effektiv auf Kursgewinne). Beispiel: 7 % − 0,2 % TER − ~1 % Steuereffekt ≈ 5,8 % Nettorendite.',
   },
@@ -297,6 +311,10 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'term', term: 'Pflegeversicherung (PV)',
     definition: 'Gesetzliche Pflichtversicherung. AN-Anteil 2024: 1,8 % des Bruttolohns bis BBG. Rentnerbeitrag: 1,8 % der Bruttorente.',
+  },
+  {
+    type: 'term', term: 'Risikoprofil (Renditepreset)',
+    definition: 'Vordefinierte Kombination aus Renditeannahme und Anlagestrategie, um den Einstieg in die Berechnung zu erleichtern. In dieser App drei Profile: Wachstum (7 % nominal) für globale Aktien-ETF und langen Anlagehorizont > 15 Jahre — historische Durchschnittsrendite, hohes Schwankungsrisiko. Ausgewogen (5 % nominal) für gemischte Portfolios aus Aktien- und Anleihe-ETF, geeignet bei 10–15 Jahren Restlaufzeit oder moderater Risikobereitschaft. Konservativ (3 % nominal) für sicherheitsorientierte Anlagen (Tagesgeld, Geldmarkt, Anleihen), empfohlen bei weniger als 10 Jahren bis zur Rente. Eigene Werte können jederzeit manuell eingetragen werden.',
   },
   {
     type: 'term', term: 'Realrendite',

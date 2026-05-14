@@ -18,6 +18,7 @@ export const AVD_CONSTANTS = {
   MAX_SONDERAUSGABEN_OWN_YEAR: 1800, // Sonderausgabenabzug §10a EStG nur auf max. 1.800 €/Jahr Eigenanteil
   FALLBACK_STEUERSATZ: 0.20,     // Fallback wenn keine Rentendaten vorhanden
   ENTNAHMERATE: 0.04,            // 4 %-Regel
+  JUNGSPARER_BONUS: 200,         // Einmalige Zulage für Kontoöffnung vor dem 25. Lebensjahr (§10a EStG)
 };
 
 // §32a EStG 2024 — Rentenbesteuerung
@@ -106,6 +107,12 @@ export interface AvdOptResult {
   guenstigerBreakEvenRateFull: number;
   guenstigerAbzugsfaehigYearFull: number;
   guenstigerZulageYearFull: number;
+
+  // Jungsparer-Bonus: monatl. Zusatzrente aus einmaliger Zahlung von 200 € (0 wenn Alter ≥ 25)
+  jungsparerBonusMonthly: number;
+
+  // AVD-Depot-Kapital am Rentenbeginn beim Optimum (fullAvdOwn + Zulage, angespart, vor Steuer)
+  avdCapitalAtOpt: number;
 
   // Sweetspot-Vergleich: ±10 € um das Optimum
   sweetspot: AvdSweetspotPoint[];
@@ -254,6 +261,7 @@ export class SparRechnerService {
     // Effektive Renditen nach Kosten: ETF = Brutto − TER; AVD = Markt − 2 % Infl. − AVD-Kosten
     const r_etf = Math.max(0, etfAnnualRatePct - etfTerPct) / 100 / 12;
     const r_avd = Math.max(0, grossMarketReturnPct - 2.0 - avdCostPct) / 100 / 12;
+    const r_avd_annual = Math.max(0, grossMarketReturnPct - 2.0 - avdCostPct) / 100;
 
     const fvEtf = r_etf > 0 ? (Math.pow(1 + r_etf, n) - 1) / r_etf : n;
     const fvAvd = r_avd > 0 ? (Math.pow(1 + r_avd, n) - 1) / r_avd : n;
@@ -269,6 +277,14 @@ export class SparRechnerService {
     const avdTaxRate = taxInfo.rate;   // Grenzrate bei ZvE_GRV (für kAvd-Referenzanzeige)
     const zvE_grv = taxInfo.zvE;       // ZvE nur aus GRV — Basis für Differenzsteuer
     const tax_grv = this.einkStBetrag(zvE_grv);
+
+    // Jungsparer-Bonus: einmalige 200 € für Kontoöffnung vor dem 25. Lebensjahr
+    // Wächst als Einmalzahlung im AVD, erzeugt Zusatzrente (nach Differenzsteuer approximiert)
+    const jungsparerRaw = (currentAge !== null && currentAge < 25)
+      ? AVD_CONSTANTS.JUNGSPARER_BONUS : 0;
+    const jungsparerCapital = jungsparerRaw * Math.pow(1 + r_avd_annual, years);
+    const jungsparerGrossMonth = jungsparerCapital * AVD_CONSTANTS.ENTNAHMERATE / 12;
+    const jungsparerBonusMonthly = jungsparerGrossMonth * (1 - avdTaxRate);
 
     // Brutto-Faktoren je 1 € monatl. investiert (4 %-Regel, vor Steuer)
     const K_etf_gross = fvEtf * AVD_CONSTANTS.ENTNAHMERATE / 12;
@@ -308,7 +324,7 @@ export class SparRechnerService {
     const incomeFor = (own: number, etf: number): number => {
       if (own <= 0) return etf * K_etf;
       const bonus = this.avdMonthlyBonus(own, eligibleChildren);
-      return avdNetMonth(own) + etf * K_etf + guenstigerFor(own, bonus).etfBonus;
+      return avdNetMonth(own) + etf * K_etf + guenstigerFor(own, bonus).etfBonus + jungsparerBonusMonthly;
     };
 
     // ---- Vollständige Kurve: alle Schritte mit Differenzsteuer ----
@@ -340,7 +356,7 @@ export class SparRechnerService {
         avdGrossIncome: avdGrossMonth, avdTax: avdTaxMonth, avdIncome: avdIncomeMonth,
         etfGrossIncome: etfGross, etfTax: etfGross - etf * K_etf, etfIncome: etf * K_etf,
         guenstigerRefundAnnual: gpRefund, guenstigerEtfBonus: gpEtfBonus,
-        netIncomeMonth: avdIncomeMonth + etf * K_etf + gpEtfBonus,
+        netIncomeMonth: avdIncomeMonth + etf * K_etf + gpEtfBonus + jungsparerBonusMonthly,
       });
     }
 
@@ -407,7 +423,8 @@ export class SparRechnerService {
     let optTotal = monthlyEtfRate; // Startwert: reiner ETF-Plan
 
     for (const pt of chartPoints) {
-      const avdOnlyIncome = pt.avdIncome + pt.guenstigerEtfBonus;
+      const avdOnlyIncome = pt.avdIncome + pt.guenstigerEtfBonus
+        + (pt.ownMonth > 0 ? jungsparerBonusMonthly : 0);
       const neededEtf = avdOnlyIncome >= refMonthlyIncome
         ? 0
         : Math.max(0, Math.ceil((refMonthlyIncome - avdOnlyIncome) / K_etf));
@@ -446,6 +463,11 @@ export class SparRechnerService {
 
     const guenstigerActive = guenstigerRefundAtFull > 0 || guenstigerRefundAtOpt > 0;
 
+    // AVD-Depot-Kapital beim Optimum: monatl. Depot × FV-Faktor + Jungsparer-Einmalzahlung
+    const avdCapitalAtOpt = maxPt.avdGrossIncome > 0
+      ? (maxPt.avdGrossIncome * 12 / AVD_CONSTANTS.ENTNAHMERATE) + jungsparerCapital
+      : jungsparerCapital;
+
     return {
       refMonthlyIncome,
       avdEffTaxRate: avdTaxRate,
@@ -454,6 +476,8 @@ export class SparRechnerService {
       kAvd: K_avd,
       kEtf: K_etf,
       sweetspotOwnMonth,
+      jungsparerBonusMonthly,
+      avdCapitalAtOpt,
       optEtf, optAvdOwn, optAvdBonus, optAvdBonusCurrent, optAvdDepot, optTotal, optSaving, optSavingPct,
       fullEtf, fullAvdOwn, fullAvdBonus, fullAvdBonusCurrent, fullAvdDepot, fullMonthlyIncome, fullGainPct,
       guenstigerBreakEvenRate, guenstigerAbzugsfaehigYear, guenstigerZulageYear,

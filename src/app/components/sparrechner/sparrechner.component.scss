@@ -1372,3 +1372,156 @@
     .spar__child-remove { margin-left: 0; }
   }
 }
+
+// ── Jungsparer-Bonus Badge ───────────────────────────────────────────────────
+
+.spar__jungsparer-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-left: 4px solid #16a34a;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #14532d;
+}
+
+.spar__jungsparer-badge-icon {
+  font-size: 1rem;
+  color: #16a34a;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.spar__jungsparer-badge-text {
+  flex: 1;
+}
+
+// ── Produktvergleich AVD vs ETF ──────────────────────────────────────────────
+
+.spar__compare-section {
+  margin-bottom: 1rem;
+}
+
+.spar__compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.79rem;
+  margin-bottom: 0.5rem;
+  table-layout: fixed;
+}
+
+.spar__compare-th {
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border);
+
+  &--feature { width: 28%; color: var(--text-muted); }
+  &--avd { width: 36%; background: #f5f3ff; color: #5b21b6; border-radius: 0.4rem 0.4rem 0 0; }
+  &--etf { width: 36%; background: #eff6ff; color: #1e40af; border-radius: 0.4rem 0.4rem 0 0; }
+}
+
+.spar__compare-td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.45;
+
+  &--feature {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  &--avd { background: #faf8ff; }
+  &--etf { background: #f8faff; }
+
+  &--yes {
+    color: #166534;
+    &::before { content: '✓ '; font-weight: 700; }
+  }
+
+  &--no {
+    color: #6b7280;
+    &::before { content: '– '; }
+  }
+}
+
+.spar__compare-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
+
+// ── Auszahlungsszenarien ─────────────────────────────────────────────────────
+
+.spar__auszahlung-section {
+  margin-bottom: 1rem;
+}
+
+.spar__auszahlung-intro {
+  font-size: 0.84rem;
+  color: var(--text);
+  margin: 0 0 0.875rem;
+  line-height: 1.5;
+}
+
+.spar__auszahlung-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.625rem;
+}
+
+.spar__auszahlung-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &--hybrid {
+    border-color: #e0f2fe;
+    background: #f0f9ff;
+  }
+}
+
+.spar__auszahlung-card-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.spar__auszahlung-card-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.spar__auszahlung-card-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: 0.1rem;
+}
+
+.spar__auszahlung-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+  line-height: 1.45;
+}

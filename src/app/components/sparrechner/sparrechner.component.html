@@ -98,15 +98,20 @@
             <div class="spar__return-presets spar__return-presets--form">
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 7.0"
-                (click)="setGrossReturn(7.0)">7 % · Langer Horizont</button>
+                (click)="setGrossReturn(7.0)">7 % · Wachstum</button>
+              <button type="button" class="spar__return-preset"
+                [class.spar__return-preset--active]="grossMarketReturn() === 5.0"
+                (click)="setGrossReturn(5.0)">5 % · Ausgewogen</button>
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 3.0"
                 (click)="setGrossReturn(3.0)">3 % · Konservativ</button>
             </div>
             @if (grossMarketReturn() === 7.0) {
-              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre).</p>
+              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre). Hohes Schwankungsrisiko.</p>
+            } @else if (grossMarketReturn() === 5.0) {
+              <p class="spar__return-desc">Ausgewogenes Portfolio aus Aktien- und Anleihe-ETF — realistisch bei mittlerem Horizont (10–15 Jahre) oder gemischter Risikobereitschaft.</p>
             } @else if (grossMarketReturn() === 3.0) {
-              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt, sicheren Anleihen und einem geringen Anteil schwankungsarmer Aktien-ETF — empfohlen bei &lt; 15 Jahren bis zur Rente.</p>
+              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt und schwankungsarmen Anleihe-ETF — empfohlen bei &lt; 10 Jahren bis zur Rente.</p>
             } @else {
               <p class="spar__return-desc">Eigene Renditeeinschätzung: {{ grossMarketReturn() | number:'1.1-1' }} % p.a. nominal — Realrendite ca. {{ (grossMarketReturn() - 2) | number:'1.1-1' }} % nach 2 % Inflation.</p>
             }
@@ -176,15 +181,20 @@
             <div class="spar__return-presets spar__return-presets--form">
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 7.0"
-                (click)="setGrossReturn(7.0)">7 % · Langer Horizont</button>
+                (click)="setGrossReturn(7.0)">7 % · Wachstum</button>
+              <button type="button" class="spar__return-preset"
+                [class.spar__return-preset--active]="grossMarketReturn() === 5.0"
+                (click)="setGrossReturn(5.0)">5 % · Ausgewogen</button>
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 3.0"
                 (click)="setGrossReturn(3.0)">3 % · Konservativ</button>
             </div>
             @if (grossMarketReturn() === 7.0) {
-              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre).</p>
+              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre). Hohes Schwankungsrisiko.</p>
+            } @else if (grossMarketReturn() === 5.0) {
+              <p class="spar__return-desc">Ausgewogenes Portfolio aus Aktien- und Anleihe-ETF — realistisch bei mittlerem Horizont (10–15 Jahre) oder gemischter Risikobereitschaft.</p>
             } @else if (grossMarketReturn() === 3.0) {
-              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt, sicheren Anleihen und einem geringen Anteil schwankungsarmer Aktien-ETF — empfohlen bei &lt; 15 Jahren bis zur Rente.</p>
+              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt und schwankungsarmen Anleihe-ETF — empfohlen bei &lt; 10 Jahren bis zur Rente.</p>
             } @else {
               <p class="spar__return-desc">Eigene Renditeeinschätzung: {{ grossMarketReturn() | number:'1.1-1' }} % p.a. nominal — Realrendite ca. {{ (grossMarketReturn() - 2) | number:'1.1-1' }} % nach 2 % Inflation.</p>
             }
@@ -276,6 +286,58 @@
             Das staatlich geförderte Altersvorsorgedepot (ab 2027) kann deine Sparrate senken oder deine Rente erhöhen — je nachdem, wie du dein Budget aufteilst.
           </p>
         </div>
+
+        <!-- Produktvergleich AVD vs. klassisches ETF-Depot -->
+        <details class="spar__avd-detail-section spar__compare-section">
+          <summary class="spar__avd-detail-toggle">Produktvergleich: AVD vs. klassisches ETF-Depot</summary>
+          <table class="spar__compare-table">
+            <thead>
+              <tr>
+                <th class="spar__compare-th spar__compare-th--feature">Merkmal</th>
+                <th class="spar__compare-th spar__compare-th--avd">Altersvorsorgedepot</th>
+                <th class="spar__compare-th spar__compare-th--etf">ETF-Depot (klassisch)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="spar__compare-td spar__compare-td--feature">Staatszulage</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Ja — bis 540 €/Jahr + 300 €/Kind</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Nein</td>
+              </tr>
+              <tr>
+                <td class="spar__compare-td spar__compare-td--feature">Steuer: Ansparphase</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Steuerfrei (Kursgewinne, Dividenden)</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">KESt 26,375 % auf Ausschüttungen &amp; Verkäufe</td>
+              </tr>
+              <tr>
+                <td class="spar__compare-td spar__compare-td--feature">Steuer: Entnahme</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Einkommensteuer (als Rente versteuert)</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">KESt 18,46 % effektiv (Teilfreistellung)</td>
+              </tr>
+              <tr>
+                <td class="spar__compare-td spar__compare-td--feature">Produktfreiheit</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Nur zertifizierte Fonds (TER ≤ 1 %)</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Freie Wahl: jeder ETF, Aktie, Anleihe</td>
+              </tr>
+              <tr>
+                <td class="spar__compare-td spar__compare-td--feature">Kostenobergrenze</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Gesetzlich max. 1 % TER p.a.</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Keine Begrenzung</td>
+              </tr>
+              <tr>
+                <td class="spar__compare-td spar__compare-td--feature">Vorzeitige Verfügung</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Eingeschränkt — Zulagen müssen zurückgezahlt werden</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Jederzeit ohne Strafe</td>
+              </tr>
+              <tr>
+                <td class="spar__compare-td spar__compare-td--feature">KV-Beitrag im Alter</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Krankenkassenbeiträge auf AVD-Rente möglich</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Keine Beiträge auf Kapitalerträge</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="spar__compare-hint">Basierend auf dem pAV-RefG Referentenentwurf (Stand 2026). Gesetzesänderungen vorbehalten.</p>
+        </details>
 
         <!-- Kostenparameter -->
         <div class="spar__avd-costs">
@@ -390,6 +452,29 @@
             </button>
           }
         </div>
+
+        <!-- Jungsparer-Bonus: Einmalzulage für Sparer unter 25 -->
+        @if (avd.jungsparerBonusMonthly > 0) {
+          <div class="spar__jungsparer-badge">
+            <span class="spar__jungsparer-badge-icon">★</span>
+            <span class="spar__jungsparer-badge-text">
+              <strong>Jungsparer-Bonus:</strong> Du erhältst einmalig <strong>{{ avdConst.JUNGSPARER_BONUS | number }} € Startzulage</strong>
+              für die Depoteröffnung vor dem 25. Lebensjahr — entspricht ca.
+              <strong>+{{ avd.jungsparerBonusMonthly | number:'1.2-2' }} €/Monat</strong> mehr Rente.
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  Die <strong>einmalige Jungsparer-Zulage</strong> von {{ avdConst.JUNGSPARER_BONUS | number }} €
+                  wird bei Kontoeröffnung vor dem 25. Geburtstag ins AVD-Depot eingezahlt.<br><br>
+                  Sie wächst bis zur Rente bei {{ avdRealReturn() | number:'1.1-1' }} % Realrendite p.a.
+                  und erzeugt eine geschätzte zusätzliche monatliche Rente von
+                  <strong>{{ avd.jungsparerBonusMonthly | number:'1.2-2' }} €</strong>
+                  (nach Einkommensteuer, Basis: {{ avd.avdEffTaxRate * 100 | number:'1.0-0' }} % Grenzsteuersatz).
+                </span>
+              </span>
+            </span>
+          </div>
+        }
 
         <div class="spar__avd-cards">
 
@@ -954,6 +1039,68 @@
         </div>
 
         </details><!-- end spar__avd-detail-section -->
+
+        <!-- Auszahlungsszenarien bei Rentenbeginn -->
+        @if (avd.avdCapitalAtOpt > 0) {
+          <details class="spar__avd-detail-section spar__auszahlung-section">
+            <summary class="spar__avd-detail-toggle">Auszahlungsphase: Optionen bei Rentenbeginn</summary>
+            <p class="spar__auszahlung-intro">
+              Beim Optimum akkumulierst du ca. <strong>{{ avd.avdCapitalAtOpt | number:'1.0-0' }} €</strong> AVD-Kapital.
+              Für die Auszahlung stehen drei Optionen zur Wahl (Angaben brutto, vor Einkommensteuer):
+            </p>
+            <div class="spar__auszahlung-cards">
+              <!-- Auszahlungsplan: Annuität 25 Jahre, 2 % real (Kapital aufgezehrt) → Faktor ≈ 0,00424 -->
+              <div class="spar__auszahlung-card">
+                <div class="spar__auszahlung-card-label">Auszahlungsplan</div>
+                <div class="spar__auszahlung-card-value">
+                  {{ avd.avdCapitalAtOpt * 0.004242 | number:'1.0-0' }} €/Mon.
+                  <span class="info-tip">
+                    <i class="info-tip__icon">i</i>
+                    <span class="info-tip__content">
+                      Annuität: Kapital wird über 25 Jahre aufgezehrt (2 % Realrendite im Depot).<br>
+                      Bei Erschöpfung vor Alter 85 greift automatisch eine Mindestleibrente.
+                    </span>
+                  </span>
+                </div>
+                <div class="spar__auszahlung-card-desc">
+                  Kapital bleibt im eigenen Depot (ETF), Auszahlung bis Alter ca. 92. Höchster Monatsbetrag.
+                </div>
+              </div>
+              <!-- Leibrente: Versicherungsprodukt, Faktor konservativ ≈ 0,0035 (25 J. bei 0,5 % real + Verwaltung) -->
+              <div class="spar__auszahlung-card">
+                <div class="spar__auszahlung-card-label">Lebenslange Leibrente</div>
+                <div class="spar__auszahlung-card-value">
+                  {{ avd.avdCapitalAtOpt * 0.003500 | number:'1.0-0' }} €/Mon.
+                  <span class="info-tip">
+                    <i class="info-tip__icon">i</i>
+                    <span class="info-tip__content">
+                      Schätzwert: Der Versicherer trägt das Langlebigkeitsrisiko und kalkuliert konservativ
+                      (25–30 Jahre Lebenserwartung, Sicherheits- und Verwaltungsaufschlag).<br>
+                      Tatsächliche Leibrentenhöhe hängt vom Anbieter und Rentenfaktor ab.
+                    </span>
+                  </span>
+                </div>
+                <div class="spar__auszahlung-card-desc">
+                  Garantiert lebenslang, egal wie alt du wirst — aber Kapital geht an den Versicherer.
+                </div>
+              </div>
+              <!-- Hybrid: 30 % Einmalzahlung + Auszahlungsplan auf 70 % -->
+              <div class="spar__auszahlung-card spar__auszahlung-card--hybrid">
+                <div class="spar__auszahlung-card-label">Hybrid: 30 % Einmalzahlung</div>
+                <div class="spar__auszahlung-card-value">
+                  {{ avd.avdCapitalAtOpt * 0.30 | number:'1.0-0' }} € + {{ avd.avdCapitalAtOpt * 0.70 * 0.004242 | number:'1.0-0' }} €/Mon.
+                </div>
+                <div class="spar__auszahlung-card-desc">
+                  Bis zu 30 % einmalig bei Rentenbeginn, der Rest als 25-jähriger Auszahlungsplan.
+                </div>
+              </div>
+            </div>
+            <p class="spar__auszahlung-hint">
+              Alle Beträge brutto vor Einkommensteuer (Differenzsteuer auf AVD-Einkommen).
+              Leibrente ist ein Näherungswert — der Versicherungsanbieter legt den genauen Rentenfaktor fest.
+            </p>
+          </details>
+        }
 
         <p class="spar__avd-disclaimer">
           Modellrechnung — keine Anlageberatung. AVD ab 01.01.2027 geplant.
