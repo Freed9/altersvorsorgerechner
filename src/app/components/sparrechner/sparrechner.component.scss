@@ -1460,3 +1460,68 @@
   margin: 0;
   font-style: italic;
 }
+
+// ── Auszahlungsszenarien ─────────────────────────────────────────────────────
+
+.spar__auszahlung-section {
+  margin-bottom: 1rem;
+}
+
+.spar__auszahlung-intro {
+  font-size: 0.84rem;
+  color: var(--text);
+  margin: 0 0 0.875rem;
+  line-height: 1.5;
+}
+
+.spar__auszahlung-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.625rem;
+}
+
+.spar__auszahlung-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &--hybrid {
+    border-color: #e0f2fe;
+    background: #f0f9ff;
+  }
+}
+
+.spar__auszahlung-card-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.spar__auszahlung-card-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.spar__auszahlung-card-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: 0.1rem;
+}
+
+.spar__auszahlung-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+  line-height: 1.45;
+}

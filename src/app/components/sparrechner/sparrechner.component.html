@@ -1040,6 +1040,57 @@
 
         </details><!-- end spar__avd-detail-section -->
 
+        <!-- Auszahlungsszenarien bei Rentenbeginn -->
+        @if (avd.avdCapitalAtOpt > 0) {
+          <details class="spar__avd-detail-section spar__auszahlung-section">
+            <summary class="spar__avd-detail-toggle">Auszahlungsphase: Optionen bei Rentenbeginn</summary>
+            <p class="spar__auszahlung-intro">
+              Beim Optimum akkumulierst du ca. <strong>{{ avd.avdCapitalAtOpt | number:'1.0-0' }} €</strong> AVD-Kapital.
+              Für die Auszahlung stehen drei Optionen zur Wahl (Angaben brutto, vor Einkommensteuer):
+            </p>
+            <div class="spar__auszahlung-cards">
+              <div class="spar__auszahlung-card">
+                <div class="spar__auszahlung-card-label">Auszahlungsplan</div>
+                <div class="spar__auszahlung-card-value">
+                  {{ avd.avdCapitalAtOpt * 0.04 / 12 | number:'1.0-0' }} €/Mon.
+                </div>
+                <div class="spar__auszahlung-card-desc">
+                  Feste monatliche Zahlung aus eigenem Kapital. Depot bis mind. Alter 85 garantiert, danach Leibrente.
+                </div>
+              </div>
+              <div class="spar__auszahlung-card">
+                <div class="spar__auszahlung-card-label">Lebenslange Leibrente</div>
+                <div class="spar__auszahlung-card-value">
+                  {{ avd.avdCapitalAtOpt * 0.005060 | number:'1.0-0' }} €/Mon.
+                  <span class="info-tip">
+                    <i class="info-tip__icon">i</i>
+                    <span class="info-tip__content">
+                      Schätzwert: Annuität über 20 Jahre bei 2 % Realrendite in der Entnahmephase.<br>
+                      Tatsächliche Leibrentenhöhe hängt vom Rentenversicherungsvertrag ab.
+                    </span>
+                  </span>
+                </div>
+                <div class="spar__auszahlung-card-desc">
+                  Garantierte monatliche Zahlung lebenslang, unabhängig davon, wie alt du wirst.
+                </div>
+              </div>
+              <div class="spar__auszahlung-card spar__auszahlung-card--hybrid">
+                <div class="spar__auszahlung-card-label">Hybrid: 30 % Einmalzahlung</div>
+                <div class="spar__auszahlung-card-value">
+                  {{ avd.avdCapitalAtOpt * 0.30 | number:'1.0-0' }} € + {{ avd.avdCapitalAtOpt * 0.70 * 0.04 / 12 | number:'1.0-0' }} €/Mon.
+                </div>
+                <div class="spar__auszahlung-card-desc">
+                  Bis zu 30 % als Einmalbetrag bei Rentenbeginn, der Rest als monatlicher Auszahlungsplan.
+                </div>
+              </div>
+            </div>
+            <p class="spar__auszahlung-hint">
+              Alle Beträge brutto vor Einkommensteuer (Differenzsteuer auf AVD-Einkommen).
+              Leibrente ist ein Näherungswert — der Versicherungsanbieter legt den genauen Rentenfaktor fest.
+            </p>
+          </details>
+        }
+
         <p class="spar__avd-disclaimer">
           Modellrechnung — keine Anlageberatung. AVD ab 01.01.2027 geplant.
           <span class="info-tip">
