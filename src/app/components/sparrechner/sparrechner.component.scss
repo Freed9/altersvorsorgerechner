@@ -1373,6 +1373,34 @@
   }
 }
 
+// ── Jungsparer-Bonus Badge ───────────────────────────────────────────────────
+
+.spar__jungsparer-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-left: 4px solid #16a34a;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #14532d;
+}
+
+.spar__jungsparer-badge-icon {
+  font-size: 1rem;
+  color: #16a34a;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+.spar__jungsparer-badge-text {
+  flex: 1;
+}
+
 // ── Produktvergleich AVD vs ETF ──────────────────────────────────────────────
 
 .spar__compare-section {

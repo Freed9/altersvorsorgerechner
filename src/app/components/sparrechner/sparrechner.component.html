@@ -453,6 +453,29 @@
           }
         </div>
 
+        <!-- Jungsparer-Bonus: Einmalzulage für Sparer unter 25 -->
+        @if (avd.jungsparerBonusMonthly > 0) {
+          <div class="spar__jungsparer-badge">
+            <span class="spar__jungsparer-badge-icon">★</span>
+            <span class="spar__jungsparer-badge-text">
+              <strong>Jungsparer-Bonus:</strong> Du erhältst einmalig <strong>{{ avdConst.JUNGSPARER_BONUS | number }} € Startzulage</strong>
+              für die Depoteröffnung vor dem 25. Lebensjahr — entspricht ca.
+              <strong>+{{ avd.jungsparerBonusMonthly | number:'1.2-2' }} €/Monat</strong> mehr Rente.
+              <span class="info-tip">
+                <i class="info-tip__icon">i</i>
+                <span class="info-tip__content">
+                  Die <strong>einmalige Jungsparer-Zulage</strong> von {{ avdConst.JUNGSPARER_BONUS | number }} €
+                  wird bei Kontoeröffnung vor dem 25. Geburtstag ins AVD-Depot eingezahlt.<br><br>
+                  Sie wächst bis zur Rente bei {{ avdRealReturn() | number:'1.1-1' }} % Realrendite p.a.
+                  und erzeugt eine geschätzte zusätzliche monatliche Rente von
+                  <strong>{{ avd.jungsparerBonusMonthly | number:'1.2-2' }} €</strong>
+                  (nach Einkommensteuer, Basis: {{ avd.avdEffTaxRate * 100 | number:'1.0-0' }} % Grenzsteuersatz).
+                </span>
+              </span>
+            </span>
+          </div>
+        }
+
         <div class="spar__avd-cards">
 
           <!-- Gleiche Rente, weniger sparen -->
