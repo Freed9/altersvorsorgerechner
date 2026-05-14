@@ -46,11 +46,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-  <!-- Fonts (non-blocking) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
 
   <!-- Structured Data: WebApplication -->
   <script type="application/ld+json">
@@ -69,6 +64,43 @@
       "price": "0",
       "priceCurrency": "EUR"
     }
+  }
+  </script>
+
+  <!-- Structured Data: DefinedTermSet (Glossar) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    "name": "Altersvorsorge-Glossar",
+    "url": "https://www.altersvorsorgerechner.org/#glossar",
+    "hasDefinedTerm": [
+      {
+        "@type": "DefinedTerm",
+        "name": "Altersvorsorgedepot (AVD)",
+        "description": "Staatlich gefördertes Wertpapierdepot ab 01.01.2027. Grundzulage bis 540 €/Jahr, Kinderzulage 1:1-Match bis 300 €/Jahr je Kind, Sonderausgabenabzug nach §10a EStG auf max. 1.800 €/Jahr Eigenanteil. Auszahlung als lebenslange Rente."
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Rentenlücke",
+        "description": "Differenz zwischen dem aktuellen monatlichen Nettoeinkommen und der erwarteten gesetzlichen Nettorente. Zeigt den Betrag, den private Vorsorge monatlich ausgleichen muss."
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Günstigerprüfung (§10a EStG)",
+        "description": "Automatische Prüfung des Finanzamts: Ist der Sonderausgabenabzug günstiger als die direkte Zulage? Abzugsfähig: bis 1.800 €/Jahr Eigenanteil + voller Zulageanspruch. Falls Steuerersparnis > Zulage, erstattet das Finanzamt die Differenz."
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Grundzulage (AVD)",
+        "description": "Staatliche Förderung im Altersvorsorgedepot: 50 % auf die ersten 360 €/Jahr Eigenanteil (max. 180 €) + 25 % auf weitere 1.440 €/Jahr (max. 360 €). Maximale Grundzulage: 540 €/Jahr ab 1.800 €/Jahr Eigenanteil."
+      },
+      {
+        "@type": "DefinedTerm",
+        "name": "Break-Even-Steuersatz",
+        "description": "Grenzsteuersatz, ab dem die Steuererstattung den Zulagenwert übersteigt. Formel: Zulage / (Eigenanteil + Zulage). Beispiel Single: 540 / (1.800 + 540) ≈ 23,1 %."
+      }
+    ]
   }
   </script>
 
