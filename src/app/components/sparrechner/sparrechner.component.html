@@ -98,15 +98,20 @@
             <div class="spar__return-presets spar__return-presets--form">
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 7.0"
-                (click)="setGrossReturn(7.0)">7 % · Langer Horizont</button>
+                (click)="setGrossReturn(7.0)">7 % · Wachstum</button>
+              <button type="button" class="spar__return-preset"
+                [class.spar__return-preset--active]="grossMarketReturn() === 5.0"
+                (click)="setGrossReturn(5.0)">5 % · Ausgewogen</button>
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 3.0"
                 (click)="setGrossReturn(3.0)">3 % · Konservativ</button>
             </div>
             @if (grossMarketReturn() === 7.0) {
-              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre).</p>
+              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre). Hohes Schwankungsrisiko.</p>
+            } @else if (grossMarketReturn() === 5.0) {
+              <p class="spar__return-desc">Ausgewogenes Portfolio aus Aktien- und Anleihe-ETF — realistisch bei mittlerem Horizont (10–15 Jahre) oder gemischter Risikobereitschaft.</p>
             } @else if (grossMarketReturn() === 3.0) {
-              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt, sicheren Anleihen und einem geringen Anteil schwankungsarmer Aktien-ETF — empfohlen bei &lt; 15 Jahren bis zur Rente.</p>
+              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt und schwankungsarmen Anleihe-ETF — empfohlen bei &lt; 10 Jahren bis zur Rente.</p>
             } @else {
               <p class="spar__return-desc">Eigene Renditeeinschätzung: {{ grossMarketReturn() | number:'1.1-1' }} % p.a. nominal — Realrendite ca. {{ (grossMarketReturn() - 2) | number:'1.1-1' }} % nach 2 % Inflation.</p>
             }
@@ -176,15 +181,20 @@
             <div class="spar__return-presets spar__return-presets--form">
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 7.0"
-                (click)="setGrossReturn(7.0)">7 % · Langer Horizont</button>
+                (click)="setGrossReturn(7.0)">7 % · Wachstum</button>
+              <button type="button" class="spar__return-preset"
+                [class.spar__return-preset--active]="grossMarketReturn() === 5.0"
+                (click)="setGrossReturn(5.0)">5 % · Ausgewogen</button>
               <button type="button" class="spar__return-preset"
                 [class.spar__return-preset--active]="grossMarketReturn() === 3.0"
                 (click)="setGrossReturn(3.0)">3 % · Konservativ</button>
             </div>
             @if (grossMarketReturn() === 7.0) {
-              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre).</p>
+              <p class="spar__return-desc">Historische Durchschnittsrendite global gestreuter Aktien-ETF über langen Horizont (&gt; 15 Jahre). Hohes Schwankungsrisiko.</p>
+            } @else if (grossMarketReturn() === 5.0) {
+              <p class="spar__return-desc">Ausgewogenes Portfolio aus Aktien- und Anleihe-ETF — realistisch bei mittlerem Horizont (10–15 Jahre) oder gemischter Risikobereitschaft.</p>
             } @else if (grossMarketReturn() === 3.0) {
-              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt, sicheren Anleihen und einem geringen Anteil schwankungsarmer Aktien-ETF — empfohlen bei &lt; 15 Jahren bis zur Rente.</p>
+              <p class="spar__return-desc">Konservative Mischrendite aus Tagesgeld, Geldmarkt und schwankungsarmen Anleihe-ETF — empfohlen bei &lt; 10 Jahren bis zur Rente.</p>
             } @else {
               <p class="spar__return-desc">Eigene Renditeeinschätzung: {{ grossMarketReturn() | number:'1.1-1' }} % p.a. nominal — Realrendite ca. {{ (grossMarketReturn() - 2) | number:'1.1-1' }} % nach 2 % Inflation.</p>
             }
