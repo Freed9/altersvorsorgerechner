@@ -191,6 +191,10 @@ const ENTRIES: GlossarEntry[] = [
     definition: 'Gesetzliche Rente vor Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie vor Einkommensteuer. Berechnung: Entgeltpunkte × aktueller Rentenwert. Vom Bruttobetrag werden KV (7,3 %) und PV (1,8 %) abgezogen, um zur Nettorente zu gelangen.',
   },
   {
+    type: 'term', term: 'Bruttorendite',
+    definition: 'Rendite vor Abzug von Inflation und Kosten (z. B. TER, AVD-Gebühren). Im Rechner entspricht dies der eingegebenen nominalen Jahresrendite (Standard: 7 % p.a.). Davon werden 2 % Inflation und die jeweiligen Produktkosten abgezogen, um die Realrendite zu ermitteln, die tatsächlich der Kaufkraft entspricht.',
+  },
+  {
     type: 'term', term: 'Differenzsteuer',
     definition: 'Steuerberechnungsmethode für AVD-Einkünfte: Steuerlast auf das AVD-Einkommen = ESt(ZvE_GRV + AVD_Jahresbrutto) − ESt(ZvE_GRV). Verhindert eine Doppelbesteuerung und berechnet den marginalen Steuerbetrag korrekt nach dem progressiven Tarif.',
   },
@@ -272,6 +276,8 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'term', term: 'Jungsparer-Bonus / Berufseinsteiger-Bonus (AVD)',
     definition: 'Gesetzliche Bezeichnung: Berufseinsteiger-Bonus (§ 10a EStG i. d. F. pAV-RefG). Einmalige staatliche Zulage von 200 € für Personen, die ihr Altersvorsorgedepot vor dem 25. Geburtstag eröffnen. Der Betrag wird sofort ins AVD-Depot eingezahlt und wächst dort über die gesamte Ansparphase mit der Depot-Rendite. Beispiel: 200 € bei 25 Jahren Anlagehorizont und 4 % Realrendite → ~533 € Endkapital → ca. 1,78 €/Monat zusätzliche Bruttorente. Der Bonus ist steuerpflichtig (Einkommensteuer auf AVD-Einkommen in der Rentenphase) und wird in dieser App automatisch berücksichtigt, wenn das eingegebene Alter unter 25 liegt.',
+    type: 'term', term: 'Kapitalverzehr',
+    definition: 'Entnahmestrategie, bei der im Alter sowohl Kapitalerträge als auch das angesparte Kapital selbst aufgebraucht werden. Das Vermögen wird bis zum Lebensende vollständig verbraucht. Gegensatz: die 4-Prozent-Regel, die auf einem nachhaltigen Entnahmeplan beruht und das Kapital statistisch nicht erschöpft. Kapitalverzehr kann sinnvoll sein, wenn das Kapital gezielt bis zu einem bestimmten Lebensalter reichen soll.',
   },
   {
     type: 'term', term: 'Kapitalertragsteuer (KESt)',
