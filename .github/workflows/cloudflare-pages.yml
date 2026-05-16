@@ -27,9 +27,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Create Pages project (first run only)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create rentenluecke --production-branch=main
+        continue-on-error: true
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist/rentenluecke/browser --project-name=rentenluecke
+          command: pages deploy dist/rentenluecke/browser --project-name=rentenluecke --commit-dirty=true
