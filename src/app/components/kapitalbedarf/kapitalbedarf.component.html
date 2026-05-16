@@ -178,6 +178,7 @@
           <div class="variant-card__info variant-card__info--blue">
             4 % p.a. Brutto-Rendite. Steuer nur auf Renditeanteil mit 30&nbsp;% Teilfreistellung
             (effektiv {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }}&nbsp;%).
+            Sparerpauschbetrag {{ constants.SPARERPAUSCHBETRAG | number:'1.0-0' }}&nbsp;€/Jahr steuerfreigestellt — KESt nur auf den Überschuss.
             Steuerbetrag sinkt mit abnehmendem Kapital — hier als Durchschnitt angegeben.
             Nach 28 Jahren ist das Kapital vollständig verbraucht.
           </div>
@@ -275,7 +276,7 @@
           <div class="variant-card__info variant-card__info--green">
             4 % des Kapitals werden jährlich entnommen. Gesamte Entnahme gilt als Kapitalertrag —
             Teilfreistellung 30&nbsp;% greift voll: effektiv {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }}&nbsp;%.
-            Sparerpauschbetrag (1.000&nbsp;€/Jahr) nicht eingerechnet. Kapital bleibt dauerhaft erhalten.
+            Sparerpauschbetrag {{ constants.SPARERPAUSCHBETRAG | number:'1.0-0' }}&nbsp;€/Jahr steuerfreigestellt — KESt nur auf den Überschuss. Kapital bleibt dauerhaft erhalten.
           </div>
 
           @if ((form.get('existingCapital')?.value ?? 0) > 0) {
