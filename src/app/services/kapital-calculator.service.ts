@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
+import { JAHRESWERTE as JW } from '../constants/jahreswerte';
 
 export const KAPITAL_CONSTANTS = {
-  ENTNAHMEPLAN_RATE: 0.04,        // 4 % p.a.
+  ENTNAHMEPLAN_RATE: 0.04,
   ENTNAHMEPLAN_YEARS: 28,
   VIER_PROZENT_RATE: 0.04,
-  KEST_SOLI_RATE: 0.26375,        // 25 % KESt + 5,5 % Soli = 26,375 %
-  TEILFREISTELLUNG_ETF: 0.30,     // 30 % Teilfreistellung Aktien-ETF (≥ 51 % Aktienquote)
+  KEST_SOLI_RATE:       JW.KEST_SOLI,
+  TEILFREISTELLUNG_ETF: JW.TEILFREISTELLUNG_ETF,
   INFLATION_RATE: 0.02,
-  SPARERPAUSCHBETRAG: 1000,       // §20 Abs. 9 EStG — gilt nur für ETF-Depot, NICHT für AVD
+  SPARERPAUSCHBETRAG:   JW.SPARERPAUSCHBETRAG,
 };
 
 // Effektiver Steuersatz auf Kursgewinne/Ausschüttungen im ETF
-const EFFEKTIVER_STEUERSATZ = KAPITAL_CONSTANTS.KEST_SOLI_RATE * (1 - KAPITAL_CONSTANTS.TEILFREISTELLUNG_ETF);
+const EFFEKTIVER_STEUERSATZ = JW.KEST_ETF_EFFEKTIV;
 
 export interface EntnahmeplanResult {
   requiredCapital: number;
@@ -46,7 +47,7 @@ export class KapitalCalculatorService {
     const pvFactor = (1 - Math.pow(1 + r, -n)) / r;
     const gainFraction = 1 - pvFactor / n;
     const t = EFFEKTIVER_STEUERSATZ;
-    const freibetragMonth = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG / 12; // 83,33 €/Mon.
+    const freibetragMonth = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG / 12;
 
     let monthlyGross: number;
     let monthlyTax: number;
@@ -71,7 +72,7 @@ export class KapitalCalculatorService {
 
   calculateVierProzent(monthlyNetTarget: number): VierProzentResult {
     const annualNetNeeded = monthlyNetTarget * 12;
-    const F = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG; // 1.000 €/Jahr
+    const F = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG;
     const t = EFFEKTIVER_STEUERSATZ;
 
     let annualGross: number;

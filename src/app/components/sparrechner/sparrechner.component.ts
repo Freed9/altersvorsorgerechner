@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, effect, untracked } from '@angular
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { SparRechnerService, SparrateResult, KapitalResult, AvdOptResult, SPAR_CONSTANTS, AVD_CONSTANTS } from '../../services/spar-rechner.service';
+import { JAHRESWERTE } from '../../constants/jahreswerte';
 import { AppStateService } from '../../services/app-state.service';
 import { InfoTipDirective } from '../../directives/info-tip.directive';
 
@@ -21,6 +22,7 @@ export class SparrechnnerComponent {
 
   readonly defaults = SPAR_CONSTANTS;
   readonly avdConst = AVD_CONSTANTS;
+  readonly jw = JAHRESWERTE;
 
   mode = signal<Mode>('sparrate');
   sparrateResult = signal<SparrateResult | null>(null);

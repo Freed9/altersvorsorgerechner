@@ -1,23 +1,21 @@
 import { Injectable } from '@angular/core';
+import { JAHRESWERTE as JW } from '../constants/jahreswerte';
 
 export const RENTEN_CONSTANTS = {
-  DURCHSCHNITTSENTGELT: 51944,
-  RENTENWERT: 39.32,
-  BEITRAGSBEMESSUNGSGRENZE: 90600,
-  RENTENALTER: 67,
-  // Grundsicherung im Alter für Alleinstehende 2025: Regelsatz 563 € + ø KdU 370 €
-  GRUNDSICHERUNG_SCHWELLE: 933,
-  // Abzüge auf die Rente
-  KV_BEITRAGSSATZ: 0.073,
-  PV_BEITRAGSSATZ: 0.018,
-  // Nettolohn-Berechnung: Steuerklasse 1, keine Kirchensteuer (Werte 2024)
-  KV_AN: 0.0815,   // 7,3 % Basisbeitrag + Ø 0,85 % Zusatzbeitrag (AN-Anteil)
-  PV_AN: 0.018,    // Arbeitnehmeranteil Pflegeversicherung
-  RV_AN: 0.093,    // 18,6 % / 2
-  AV_AN: 0.013,    // 2,6 % / 2
-  WERBUNGSKOSTEN_PAUSCHBETRAG: 1230,
-  SONDERAUSGABEN_PAUSCHBETRAG: 36,
-  GRUNDFREIBETRAG: 11784,  // 2024
+  DURCHSCHNITTSENTGELT:      JW.DURCHSCHNITTSENTGELT,
+  RENTENWERT:                JW.RENTENWERT,
+  BEITRAGSBEMESSUNGSGRENZE:  JW.BBG,
+  RENTENALTER:               JW.RENTENALTER,
+  GRUNDSICHERUNG_SCHWELLE:   JW.GRUNDSICHERUNG_SCHWELLE,
+  KV_BEITRAGSSATZ:           JW.KV_RENTNER,
+  PV_BEITRAGSSATZ:           JW.PV_RENTNER_ELTERNTEIL,
+  KV_AN:                     JW.KV_AN,
+  PV_AN:                     JW.PV_AN_ELTERNTEIL,
+  RV_AN:                     JW.RV_AN,
+  AV_AN:                     JW.AV_AN,
+  WERBUNGSKOSTEN_PAUSCHBETRAG: JW.WERBUNGSKOSTEN_AN,
+  SONDERAUSGABEN_PAUSCHBETRAG: JW.SONDERAUSGABEN_PAUSCHBETRAG,
+  GRUNDFREIBETRAG:           JW.GRUNDFREIBETRAG,
 };
 
 export interface RentenResult {
@@ -104,8 +102,7 @@ export class RentenCalculatorService {
   }
 
   calcCurrentNetIncome(annualGross: number): number {
-    const bbg = RENTEN_CONSTANTS.BEITRAGSBEMESSUNGSGRENZE;
-    const capped = Math.min(annualGross, bbg);
+    const capped = Math.min(annualGross, RENTEN_CONSTANTS.BEITRAGSBEMESSUNGSGRENZE);
     const sv =
       capped * RENTEN_CONSTANTS.KV_AN +
       capped * RENTEN_CONSTANTS.PV_AN +
@@ -118,20 +115,19 @@ export class RentenCalculatorService {
     return annualGross - sv - this.calcEinkommensteuer(zvE);
   }
 
-  // §32a EStG 2024 — Grundtabelle, kein Soli (ab 2021 für die meisten entfallen), keine KiSt
+  // §32a EStG — Grundtabelle, kein Soli (ab 2021 für die meisten entfallen), keine KiSt
   private calcEinkommensteuer(zvE: number): number {
-    if (zvE <= RENTEN_CONSTANTS.GRUNDFREIBETRAG) return 0;
-    if (zvE <= 17005) {
-      const y = (zvE - RENTEN_CONSTANTS.GRUNDFREIBETRAG) / 10000;
-      return Math.floor((979.18 * y + 1400) * y);
+    const { GRUNDFREIBETRAG: GF, ESTG: e } = JW;
+    if (zvE <= GF) return 0;
+    if (zvE <= e.ZONE1_BIS) {
+      const y = (zvE - GF) / 10000;
+      return Math.floor((e.Z1_A * y + e.Z1_B) * y);
     }
-    if (zvE <= 66760) {
-      const z = (zvE - 17005) / 10000;
-      return Math.floor((192.59 * z + 2397) * z + 966);
+    if (zvE <= e.ZONE2_BIS) {
+      const z = (zvE - e.ZONE1_BIS) / 10000;
+      return Math.floor((e.Z2_A * z + e.Z2_B) * z + e.Z2_C);
     }
-    if (zvE <= 277826) {
-      return Math.floor(0.42 * zvE - 10602);
-    }
-    return Math.floor(0.45 * zvE - 18936);
+    if (zvE <= e.ZONE3_BIS) return Math.floor(0.42 * zvE - e.Z3_OFFSET);
+    return Math.floor(0.45 * zvE - e.Z4_OFFSET);
   }
 }
