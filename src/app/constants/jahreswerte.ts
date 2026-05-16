@@ -39,8 +39,13 @@ export const JAHRESWERTE = {
   KV_ZUSATZBEITRAG_AN: 0.0145,
   /** KV AN-Anteil gesamt = KV_BASISSATZ + KV_ZUSATZBEITRAG_AN */
   KV_AN: 0.0875,
-  /** KV-Beitragssatz auf die Rente (Basissatz; DRV trägt Zuschuss wie AG) */
-  KV_RENTNER: 0.073,
+  /**
+   * KV-Beitragssatz auf die Rente (§249a SGB V):
+   * Rentner zahlen KV_BASISSATZ (7,3 %) + vollen KV_ZUSATZBEITRAG_GESAMT (2,9 %).
+   * DRV übernimmt die andere Hälfte des Basissatzes (7,3 %) direkt an die KK.
+   */
+  KV_ZUSATZBEITRAG_GESAMT: 0.029,
+  KV_RENTNER: 0.102,
   /** PV AN-Anteil Elternteil (Beitragssatz 3,6 % / 2) */
   PV_AN_ELTERNTEIL: 0.018,
   /** PV AN-Anteil kinderlos (3,6 % + 0,6 % Kinderlosenzuschlag − AG-Anteil 1,8 %) */

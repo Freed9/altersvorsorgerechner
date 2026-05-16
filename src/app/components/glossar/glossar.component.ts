@@ -115,7 +115,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'KV',
     short: 'Krankenversicherung',
-    definition: `Gesetzliche Pflichtversicherung zur Absicherung von Krankheitskosten. AN-Anteil ${JW.JAHR}: ${pct(JW.KV_AN, 2)} des Bruttolohns (bis BBG) inkl. Ø Zusatzbeitrag ${pct(JW.KV_ZUSATZBEITRAG_AN, 2)}. Auf Rentenbezüge: ${pct(JW.KV_RENTNER, 1)} Basissatz (kein AG-Anteil, Rentner tragen vollen Zusatzbeitrag selbst).`,
+    definition: `Gesetzliche Pflichtversicherung zur Absicherung von Krankheitskosten. AN-Anteil ${JW.JAHR}: ${pct(JW.KV_AN, 2)} des Bruttolohns (bis BBG) inkl. Ø Zusatzbeitrag ${pct(JW.KV_ZUSATZBEITRAG_AN, 2)}. Auf Rentenbezüge: ${pct(JW.KV_RENTNER, 1)} gesamt (${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} voller Zusatzbeitrag; kein AG-Anteil).`,
   },
   {
     type: 'abbr', term: 'n',
@@ -206,7 +206,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Bruttorente',
-    definition: `Gesetzliche Rente vor Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie vor Einkommensteuer. Berechnung: Entgeltpunkte × aktueller Rentenwert. Vom Bruttobetrag werden KV (${pct(JW.KV_RENTNER, 1)} Basissatz) und PV (${pct(JW.PV_RENTNER_ELTERNTEIL, 1)} Elternteil / ${pct(JW.PV_RENTNER_KINDERLOS, 1)} kinderlos) abgezogen, um zur Nettorente zu gelangen.`,
+    definition: `Gesetzliche Rente vor Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie vor Einkommensteuer. Berechnung: Entgeltpunkte × aktueller Rentenwert. Vom Bruttobetrag werden KV (${pct(JW.KV_RENTNER, 1)} gesamt: ${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} voller Zusatzbeitrag) und PV (${pct(JW.PV_RENTNER_ELTERNTEIL, 1)} Elternteil / ${pct(JW.PV_RENTNER_KINDERLOS, 1)} kinderlos) abgezogen, um zur Nettorente zu gelangen.`,
   },
   {
     type: 'term', term: 'Bruttorendite',
@@ -314,7 +314,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Krankenversicherung (KV)',
-    definition: `Gesetzliche Pflichtversicherung. AN-Anteil ${JW.JAHR}: ${pct(JW.KV_AN, 2)} (Basisbeitrag ${pct(JW.KV_BASISSATZ, 1)} + Ø Zusatzbeitrag ${pct(JW.KV_ZUSATZBEITRAG_AN, 2)}) des Bruttolohns bis BBG. Rentnerbeitrag: ${pct(JW.KV_RENTNER, 1)} der Bruttorente + voller Zusatzbeitrag (kein AG-Anteil).`,
+    definition: `Gesetzliche Pflichtversicherung. AN-Anteil ${JW.JAHR}: ${pct(JW.KV_AN, 2)} (Basisbeitrag ${pct(JW.KV_BASISSATZ, 1)} + Ø Zusatzbeitrag ${pct(JW.KV_ZUSATZBEITRAG_AN, 2)}) des Bruttolohns bis BBG. Rentnerbeitrag: ${pct(JW.KV_RENTNER, 1)} der Bruttorente (${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} voller Zusatzbeitrag, kein AG-Anteil).`,
   },
   {
     type: 'term', term: 'Leibrente (AVD)',
@@ -326,7 +326,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Nettorente',
-    definition: `Gesetzliche Rente nach Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie nach Einkommensteuer. Berechnung in dieser App: Bruttorente × (1 − KV-Beitrag ${pct(JW.KV_RENTNER, 1)} − PV-Beitrag ${pct(JW.PV_RENTNER_ELTERNTEIL, 1)}) = Nettorente (ohne Steuern, da GRV-Rente oft unter Grundfreibetrag).`,
+    definition: `Gesetzliche Rente nach Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie nach Einkommensteuer. Berechnung in dieser App: Bruttorente × (1 − KV ${pct(JW.KV_RENTNER, 1)} − PV ${pct(JW.PV_RENTNER_ELTERNTEIL, 1)}) = Nettorente (ohne Steuern, da GRV-Rente oft unter Grundfreibetrag). KV umfasst ${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} vollen Zusatzbeitrag.`,
   },
   {
     type: 'term', term: 'Pflegeversicherung (PV)',
