@@ -47,6 +47,7 @@ export class KapitalCalculatorService {
     const pvFactor = (1 - Math.pow(1 + r, -n)) / r;
     const gainFraction = 1 - pvFactor / n;
     const t = EFFEKTIVER_STEUERSATZ;
+    const kest = KAPITAL_CONSTANTS.KEST_SOLI_RATE;
     const freibetragMonth = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG / 12;
 
     let monthlyGross: number;
@@ -54,9 +55,11 @@ export class KapitalCalculatorService {
 
     if (monthlyNetTarget > freibetragMonth / gainFraction) {
       // Freibetrag kleiner als monatlicher Gewinnanteil: Steuer auf Überschuss
-      // net = gross × (1 − g×t) + F×t  →  gross = (net − F×t) / (1 − g×t)
-      monthlyGross = (monthlyNetTarget - freibetragMonth * t) / (1 - gainFraction * t);
-      monthlyTax = (monthlyGross * gainFraction - freibetragMonth) * t;
+      // tax  = gross × g × t  −  (SPB/12) × KEST_SOLI
+      // net  = gross × (1 − g×t) + (SPB/12) × KEST_SOLI
+      // →  gross = (net − (SPB/12) × KEST_SOLI) / (1 − g×t)
+      monthlyGross = (monthlyNetTarget - freibetragMonth * kest) / (1 - gainFraction * t);
+      monthlyTax = monthlyGross * gainFraction * t - freibetragMonth * kest;
     } else {
       // Gewinnanteil vollständig durch Freibetrag gedeckt → keine Steuer
       monthlyGross = monthlyNetTarget;
@@ -74,14 +77,20 @@ export class KapitalCalculatorService {
     const annualNetNeeded = monthlyNetTarget * 12;
     const F = KAPITAL_CONSTANTS.SPARERPAUSCHBETRAG;
     const t = EFFEKTIVER_STEUERSATZ;
+    const kest = KAPITAL_CONSTANTS.KEST_SOLI_RATE;
+    const tf = KAPITAL_CONSTANTS.TEILFREISTELLUNG_ETF;
+    // Steuerfreie Schwelle: gain × (1−TF) ≤ SPB → net ≤ SPB / (1−TF)
+    const noTaxThreshold = F / (1 - tf);
 
     let annualGross: number;
     let annualTax: number;
 
-    if (annualNetNeeded > F) {
-      // net = gross × (1−t) + F×t  →  gross = (net − F×t) / (1−t)
-      annualGross = (annualNetNeeded - F * t) / (1 - t);
-      annualTax = (annualGross - F) * t;
+    if (annualNetNeeded > noTaxThreshold) {
+      // tax  = gross × t  −  F × KEST_SOLI
+      // net  = gross × (1−t) + F × KEST_SOLI
+      // →  gross = (net − F × KEST_SOLI) / (1−t)
+      annualGross = (annualNetNeeded - F * kest) / (1 - t);
+      annualTax = annualGross * t - F * kest;
     } else {
       // Entnahme vollständig durch Freibetrag steuerfreigestellt
       annualGross = annualNetNeeded;
