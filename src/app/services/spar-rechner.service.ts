@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { JAHRESWERTE as JW } from '../constants/jahreswerte';
 
 export const SPAR_CONSTANTS = {
   DEFAULT_RENDITE: 7,   // % p.a. nominale Brutto-Marktrendite (Real = Brutto − 2 % Inflation)
@@ -14,20 +15,18 @@ export const AVD_CONSTANTS = {
   TIER1_RATE: 0.50,              // → max 180 €/Jahr
   TIER2_RATE: 0.25,              // 361–1.800 €/Jahr zu 25 % → max 360 €/Jahr
   MAX_GRUNDZULAGE_YEAR: 540,     // 180 + 360 = 540 €/Jahr Grundzulage
-  MAX_KINDERZULAGE_MONTH: 25,    // max. 25 €/Monat = 300 €/Jahr je Kind (1:1-Match auf Eigenanteil, §10a EStG)
+  MAX_KINDERZULAGE_MONTH: 25,    // 25 €/Monat = 300 €/Jahr je Kind; wird ab Mindesteigenbeitrag 25 €/Mon. gezahlt (§10a EStG)
   MAX_SONDERAUSGABEN_OWN_YEAR: 1800, // Sonderausgabenabzug §10a EStG nur auf max. 1.800 €/Jahr Eigenanteil
   FALLBACK_STEUERSATZ: 0.20,     // Fallback wenn keine Rentendaten vorhanden
   ENTNAHMERATE: 0.04,            // 4 %-Regel
   JUNGSPARER_BONUS: 200,         // Einmalige Zulage für Kontoöffnung vor dem 25. Lebensjahr (§10a EStG)
 };
 
-// §32a EStG 2024 — Rentenbesteuerung
-const GRUNDFREIBETRAG = 11784;
-const WERBUNGSKOSTEN_RENTNER = 102;   // §9a S.1 Nr.3 EStG
-const SONDERAUSGABEN_PAUSCH = 36;
-
-const KEST_SOLI = 0.26375;
-const ETF_STEUERSATZ_EFFEKTIV = KEST_SOLI * (1 - 0.30); // 18,4625 % mit 30 % Teilfreistellung
+// §32a EStG — Rentenbesteuerung (Werte aus JAHRESWERTE)
+const GRUNDFREIBETRAG        = JW.GRUNDFREIBETRAG;
+const WERBUNGSKOSTEN_RENTNER = JW.WERBUNGSKOSTEN_RENTNER;
+const SONDERAUSGABEN_PAUSCH  = JW.SONDERAUSGABEN_PAUSCHBETRAG;
+const ETF_STEUERSATZ_EFFEKTIV = JW.KEST_ETF_EFFEKTIV;
 
 export interface SparrateResult {
   monthlyRate: number;
@@ -126,9 +125,9 @@ export class SparRechnerService {
 
   // ── Rentensteuer-Hilfsmethoden ────────────────────────────────────────────
 
-  // Besteuerungsanteil nach JStG 2022: 83 % in 2023, +0,5 %/Jahr bis 100 % in 2058
+  // Besteuerungsanteil nach JStG 2022 i.d.F. Wachstumschancengesetz 2024: 82,5 % in 2023, +0,5 %/Jahr bis 100 % in 2058
   private besteuerungsanteil(retirementYear: number): number {
-    return Math.min(1.0, 0.83 + 0.005 * Math.max(0, retirementYear - 2023));
+    return Math.min(1.0, 0.825 + 0.005 * Math.max(0, retirementYear - 2023));
   }
 
   // Zu versteuerndes Einkommen aus GRV-Rente (§22 Nr. 1 EStG)
@@ -137,34 +136,35 @@ export class SparRechnerService {
     return Math.max(0, annualGrossRente * ratio - WERBUNGSKOSTEN_RENTNER - SONDERAUSGABEN_PAUSCH);
   }
 
-  // §32a EStG 2024 — absoluter Steuerbetrag
-  // Zonenkonstanten für Zonenübergänge berechnet (Stetigkeit sichergestellt)
+  // §32a EStG — absoluter Steuerbetrag (Koeffizienten aus JAHRESWERTE.ESTG)
   private einkStBetrag(zvE: number): number {
+    const e = JW.ESTG;
     if (zvE <= GRUNDFREIBETRAG) return 0;
-    if (zvE <= 17005) {
+    if (zvE <= e.ZONE1_BIS) {
       const y = (zvE - GRUNDFREIBETRAG) / 10000;
-      return (979.18 * y + 1400) * y;
+      return Math.floor((e.Z1_A * y + e.Z1_B) * y);
     }
-    if (zvE <= 66760) {
-      const z = (zvE - 17005) / 10000;
-      return (192.59 * z + 2397) * z + 966.53;
+    if (zvE <= e.ZONE2_BIS) {
+      const z = (zvE - e.ZONE1_BIS) / 10000;
+      return Math.floor((e.Z2_A * z + e.Z2_B) * z + e.Z2_C);
     }
-    if (zvE <= 277826) return 0.42 * zvE - 10378.72;
-    return 0.45 * zvE - 18713.50;
+    if (zvE <= e.ZONE3_BIS) return Math.floor(0.42 * zvE - e.Z3_OFFSET);
+    return Math.floor(0.45 * zvE - e.Z4_OFFSET);
   }
 
-  // §32a EStG 2024 — analytischer Grenzsteuersatz
+  // §32a EStG — analytischer Grenzsteuersatz
   private marginalTaxRate(zvE: number): number {
+    const e = JW.ESTG;
     if (zvE <= GRUNDFREIBETRAG) return 0;
-    if (zvE <= 17005) {
+    if (zvE <= e.ZONE1_BIS) {
       const y = (zvE - GRUNDFREIBETRAG) / 10000;
-      return Math.min(0.42, (2 * 979.18 * y + 1400) / 10000);
+      return Math.min(0.42, (2 * e.Z1_A * y + e.Z1_B) / 10000);
     }
-    if (zvE <= 66760) {
-      const z = (zvE - 17005) / 10000;
-      return Math.min(0.42, (2 * 192.59 * z + 2397) / 10000);
+    if (zvE <= e.ZONE2_BIS) {
+      const z = (zvE - e.ZONE1_BIS) / 10000;
+      return Math.min(0.42, (2 * e.Z2_A * z + e.Z2_B) / 10000);
     }
-    if (zvE <= 277826) return 0.42;
+    if (zvE <= e.ZONE3_BIS) return 0.42;
     return 0.45;
   }
 
@@ -190,10 +190,9 @@ export class SparRechnerService {
   }
 
   computeWorkingMarginalTaxRate(annualGross: number): number {
-    const bbg = 90600;
-    const capped = Math.min(annualGross, bbg);
-    const sv = capped * (0.0815 + 0.018 + 0.093 + 0.013);
-    const zvE = Math.max(0, annualGross - sv - 1230 - SONDERAUSGABEN_PAUSCH);
+    const capped = Math.min(annualGross, JW.BBG);
+    const sv = capped * (JW.KV_AN + JW.PV_AN_ELTERNTEIL + JW.RV_AN + JW.AV_AN);
+    const zvE = Math.max(0, annualGross - sv - JW.WERBUNGSKOSTEN_AN - SONDERAUSGABEN_PAUSCH);
     return this.marginalTaxRate(zvE);
   }
 
@@ -290,14 +289,31 @@ export class SparRechnerService {
     const K_etf_gross = fvEtf * AVD_CONSTANTS.ENTNAHMERATE / 12;
     const K_avd_gross = fvAvd * AVD_CONSTANTS.ENTNAHMERATE / 12;
 
-    // Netto-ETF-Faktor: KESt ist unabhängig vom Gesamteinkommen → konstant
-    const K_etf = K_etf_gross * (1 - ETF_STEUERSATZ_EFFEKTIV);
+    // Gewinn-Anteil des ETF-Corpus (Wertzuwachs vs. Einzahlungen)
+    const gainFraction_etf = fvEtf > 0 && n > 0 ? Math.max(0, 1 - n / fvEtf) : 0;
+
+    // Netto ETF-Monatseinkommen mit Sparerpauschbetrag (§20 Abs. 9 EStG)
+    // Steuerfrei: Teilfreistellung + Sparerpauschbetrag auf den verbleibenden Gewinnanteil
+    const etfNetIncome = (etf: number): number => {
+      const gross = etf * K_etf_gross;
+      const annualTax = Math.max(0, gross * gainFraction_etf * (1 - JW.TEILFREISTELLUNG_ETF) * 12 - JW.SPARERPAUSCHBETRAG) * JW.KEST_SOLI;
+      return gross - annualTax / 12;
+    };
+
+    // Inverse: ETF-Monatsbeitrag für gegebenes Ziel-Nettoeinkommen
+    const etfForTarget = (target: number): number => {
+      const a = gainFraction_etf * (1 - JW.TEILFREISTELLUNG_ETF) * JW.KEST_SOLI;
+      const b = JW.SPARERPAUSCHBETRAG * JW.KEST_SOLI / 12;
+      const grossNoTax = target;
+      if (grossNoTax * gainFraction_etf * (1 - JW.TEILFREISTELLUNG_ETF) * 12 <= JW.SPARERPAUSCHBETRAG) return Math.ceil(grossNoTax / K_etf_gross);
+      return Math.ceil((target - b) / ((1 - a) * K_etf_gross));
+    };
 
     // K_avd nur für Referenzanzeige (kAvd-Feld); Berechnungen nutzen Differenzsteuer
     const K_avd = K_avd_gross * (1 - avdTaxRate);
 
     // Referenz: reiner ETF-Sparplan (nur aus der monatlichen Sparrate, ohne Startkapital)
-    const refMonthlyIncome = monthlyEtfRate * K_etf;
+    const refMonthlyIncome = etfNetIncome(monthlyEtfRate);
 
     // Netto-AVD-Monatseinkommen für einen gegebenen Eigenanteil:
     // Differenzsteuer §32a(ZvE_GRV + AVD_Jahresbrutto) − §32a(ZvE_GRV)
@@ -317,14 +333,14 @@ export class SparRechnerService {
       const eligibleOwnAnnual = Math.min(own * 12, AVD_CONSTANTS.MAX_SONDERAUSGABEN_OWN_YEAR);
       const abzugAnnual = eligibleOwnAnnual + zulageAnnual;
       const refundAnnual = Math.max(0, currentMarginalTaxRate * abzugAnnual - zulageAnnual);
-      const etfBonus = refundAnnual * fvEtfAnnual * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - ETF_STEUERSATZ_EFFEKTIV);
+      const etfBonus = refundAnnual * fvEtfAnnual * AVD_CONSTANTS.ENTNAHMERATE / 12 * (1 - gainFraction_etf * ETF_STEUERSATZ_EFFEKTIV);
       return { refundAnnual, etfBonus };
     };
 
     const incomeFor = (own: number, etf: number): number => {
-      if (own <= 0) return etf * K_etf;
+      if (own <= 0) return etfNetIncome(etf);
       const bonus = this.avdMonthlyBonus(own, eligibleChildren);
-      return avdNetMonth(own) + etf * K_etf + guenstigerFor(own, bonus).etfBonus + jungsparerBonusMonthly;
+      return avdNetMonth(own) + etfNetIncome(etf) + guenstigerFor(own, bonus).etfBonus + jungsparerBonusMonthly;
     };
 
     // ---- Vollständige Kurve: alle Schritte mit Differenzsteuer ----
@@ -332,8 +348,8 @@ export class SparRechnerService {
     const chartPoints: AvdChartPoint[] = [{
       ownMonth: 0, etfMonth: monthlyEtfRate, bonusMonth: 0, depotMonth: 0,
       avdGrossIncome: 0, avdTax: 0, avdIncome: 0,
-      etfGrossIncome: etfGross0, etfTax: etfGross0 - monthlyEtfRate * K_etf,
-      etfIncome: monthlyEtfRate * K_etf,
+      etfGrossIncome: etfGross0, etfTax: etfGross0 - etfNetIncome(monthlyEtfRate),
+      etfIncome: etfNetIncome(monthlyEtfRate),
       guenstigerRefundAnnual: 0, guenstigerEtfBonus: 0,
       netIncomeMonth: incomeFor(0, monthlyEtfRate),
     }];
@@ -354,9 +370,9 @@ export class SparRechnerService {
       chartPoints.push({
         ownMonth: own, etfMonth: etf, bonusMonth: bonus, depotMonth: depot,
         avdGrossIncome: avdGrossMonth, avdTax: avdTaxMonth, avdIncome: avdIncomeMonth,
-        etfGrossIncome: etfGross, etfTax: etfGross - etf * K_etf, etfIncome: etf * K_etf,
+        etfGrossIncome: etfGross, etfTax: etfGross - etfNetIncome(etf), etfIncome: etfNetIncome(etf),
         guenstigerRefundAnnual: gpRefund, guenstigerEtfBonus: gpEtfBonus,
-        netIncomeMonth: avdIncomeMonth + etf * K_etf + gpEtfBonus + jungsparerBonusMonthly,
+        netIncomeMonth: avdIncomeMonth + etfNetIncome(etf) + gpEtfBonus + jungsparerBonusMonthly,
       });
     }
 
@@ -399,7 +415,7 @@ export class SparRechnerService {
       chartPoints.splice(insertIdx < 0 ? chartPoints.length : insertIdx, 0, {
         ownMonth: own, etfMonth: etf, bonusMonth: bonus, depotMonth: depot,
         avdGrossIncome: avdGrossMonth, avdTax: avdTaxMonth, avdIncome: avdIncomeMonth,
-        etfGrossIncome: etfGross, etfTax: etfGross - etf * K_etf, etfIncome: etf * K_etf,
+        etfGrossIncome: etfGross, etfTax: etfGross - etfNetIncome(etf), etfIncome: etfNetIncome(etf),
         guenstigerRefundAnnual: gpRefund, guenstigerEtfBonus: gpEtfBonus,
         netIncomeMonth: exactIncome,
       });
@@ -427,7 +443,7 @@ export class SparRechnerService {
         + (pt.ownMonth > 0 ? jungsparerBonusMonthly : 0);
       const neededEtf = avdOnlyIncome >= refMonthlyIncome
         ? 0
-        : Math.max(0, Math.ceil((refMonthlyIncome - avdOnlyIncome) / K_etf));
+        : etfForTarget(refMonthlyIncome - avdOnlyIncome);
       const total = pt.ownMonth + neededEtf;
       if (total < optTotal) {
         optTotal = total;
@@ -474,7 +490,7 @@ export class SparRechnerService {
       avdRetirementYear: taxInfo.retirementYear,
       avdBesteuerungsanteil: taxInfo.besteuerungsanteil,
       kAvd: K_avd,
-      kEtf: K_etf,
+      kEtf: monthlyEtfRate > 0 ? etfNetIncome(monthlyEtfRate) / monthlyEtfRate : K_etf_gross * (1 - gainFraction_etf * ETF_STEUERSATZ_EFFEKTIV),
       sweetspotOwnMonth,
       jungsparerBonusMonthly,
       avdCapitalAtOpt,

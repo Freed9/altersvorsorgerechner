@@ -1,4 +1,5 @@
 import { Component, signal, computed } from '@angular/core';
+import { JAHRESWERTE as JW } from '../../constants/jahreswerte';
 
 export interface GlossarEntry {
   type: 'abbr' | 'term';
@@ -7,6 +8,23 @@ export interface GlossarEntry {
   definition: string;
   table?: { headers: string[]; rows: string[][] };
   link?: { text: string; url: string };
+}
+
+function de(n: number, d = 0): string {
+  const str = n.toFixed(d);
+  const [int, dec] = str.split('.');
+  const formatted = int.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return dec !== undefined ? `${formatted},${dec}` : formatted;
+}
+function pct(v: number, d = 1): string { return `${de(v * 100, d)} %`; }
+function approxPct(rate: number): string { return `≈ ${Math.round(rate * 100)} %`; }
+function margRate(zvE: number): number {
+  const { GRUNDFREIBETRAG: GF, ESTG: e } = JW;
+  if (zvE <= GF) return 0;
+  if (zvE <= e.ZONE1_BIS) { const y = (zvE - GF) / 10000; return (2 * e.Z1_A * y + e.Z1_B) / 10000; }
+  if (zvE <= e.ZONE2_BIS) { const z = (zvE - e.ZONE1_BIS) / 10000; return (2 * e.Z2_A * z + e.Z2_B) / 10000; }
+  if (zvE <= e.ZONE3_BIS) return 0.42;
+  return 0.45;
 }
 
 const ENTRIES: GlossarEntry[] = [
@@ -19,18 +37,18 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'AV',
     short: 'Arbeitslosenversicherung',
-    definition: 'Pflichtversicherung im Rahmen der gesetzlichen Sozialversicherung. Sichert Arbeitnehmer bei Arbeitslosigkeit ab. AN-Anteil 2024: 1,3 % des Bruttolohns (bis BBG).',
+    definition: `Pflichtversicherung im Rahmen der gesetzlichen Sozialversicherung. Sichert Arbeitnehmer bei Arbeitslosigkeit ab. AN-Anteil ${JW.JAHR}: ${pct(JW.AV_AN)} des Bruttolohns (bis BBG).`,
   },
   {
     type: 'abbr', term: 'AVD',
     short: 'Altersvorsorgedepot',
-    definition: 'Staatlich gefördertes Wertpapierdepot für die private Altersvorsorge, geplant ab 01.01.2027. Kombiniert Einzahlungen in einen Investmentfonds mit staatlicher Grundzulage und Kinderzulage. Auszahlung als lebenslange Rente ab dem gesetzlichen Rentenalter.',
+    definition: `Staatlich gefördertes Wertpapierdepot für die private Altersvorsorge, geplant ab 01.01.${JW.AVD_STARTJAHR}. Kombiniert Einzahlungen in einen Investmentfonds mit staatlicher Grundzulage und Kinderzulage. Auszahlung als lebenslange Rente ab dem gesetzlichen Rentenalter.`,
     link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
   },
   {
     type: 'abbr', term: 'BBG',
     short: 'Beitragsbemessungsgrenze',
-    definition: 'Einkommensgrenze in der gesetzlichen Sozialversicherung, bis zu der Beiträge berechnet werden. Einkommensteile oberhalb der BBG sind beitragsfrei. BBG 2024 (GRV/AV West): 90.600 €/Jahr.',
+    definition: `Einkommensgrenze in der gesetzlichen Sozialversicherung, bis zu der Beiträge berechnet werden. Einkommensteile oberhalb der BBG sind beitragsfrei. BBG ${JW.JAHR} (GRV/AV, bundeseinheitlich): ${de(JW.BBG)} €/Jahr.`,
   },
   {
     type: 'abbr', term: 'DSGVO',
@@ -40,7 +58,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'EP',
     short: 'Entgeltpunkt(e)',
-    definition: 'Berechnungseinheit der gesetzlichen Rentenversicherung. Ein Entgeltpunkt (EP) entspricht einem Jahresbruttoverdienst in Höhe des Durchschnittsentgelts (2024: 45.358 €). Die Summe aller EP × aktueller Rentenwert ergibt die monatliche Bruttorente.',
+    definition: `Berechnungseinheit der gesetzlichen Rentenversicherung. Ein Entgeltpunkt (EP) entspricht einem Jahresbruttoverdienst in Höhe des Durchschnittsentgelts (${JW.JAHR}: ${de(JW.DURCHSCHNITTSENTGELT)} €). Die Summe aller EP × aktueller Rentenwert ergibt die monatliche Bruttorente.`,
   },
   {
     type: 'abbr', term: 'ESt',
@@ -66,7 +84,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'GRV',
     short: 'Gesetzliche Rentenversicherung',
-    definition: 'Pflichtversicherung in Deutschland für Arbeitnehmer. Finanziert nach dem Umlageverfahren: Beiträge der Aktiven finanzieren die laufenden Renten. Rentenalter: 67 Jahre (Geburtsjahrgänge ab 1964).',
+    definition: `Pflichtversicherung in Deutschland für Arbeitnehmer. Finanziert nach dem Umlageverfahren: Beiträge der Aktiven finanzieren die laufenden Renten. Rentenalter: ${JW.RENTENALTER} Jahre (Geburtsjahrgänge ab 1964).`,
     link: { text: 'Deutsche Rentenversicherung (drv.de)', url: 'https://www.deutsche-rentenversicherung.de' },
   },
   {
@@ -87,7 +105,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'KESt',
     short: 'Kapitalertragsteuer',
-    definition: 'Abgeltungsteuer auf Kapitalerträge (Zinsen, Dividenden, realisierte Kursgewinne). Steuersatz: 25 % + 5,5 % Solidaritätszuschlag = 26,375 %. Bei Aktien-ETF mit 30 % Teilfreistellung effektiv 18,4625 %. Abzug direkt durch die depotführende Bank (Quellensteuer).',
+    definition: `Abgeltungsteuer auf Kapitalerträge (Zinsen, Dividenden, realisierte Kursgewinne). Steuersatz: 25 % + 5,5 % Solidaritätszuschlag = ${pct(JW.KEST_SOLI, 3)}. Bei Aktien-ETF mit ${pct(JW.TEILFREISTELLUNG_ETF, 0)} Teilfreistellung effektiv ${pct(JW.KEST_ETF_EFFEKTIV, 4)}. Abzug direkt durch die depotführende Bank (Quellensteuer).`,
   },
   {
     type: 'abbr', term: 'KiSt',
@@ -97,7 +115,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'KV',
     short: 'Krankenversicherung',
-    definition: 'Gesetzliche Pflichtversicherung zur Absicherung von Krankheitskosten. AN-Anteil 2024: 8,15 % des Bruttolohns (bis BBG) inklusive durchschnittlicher Zusatzbeitrag. Auf Rentenbezüge: 7,3 % Beitrag (kein AG-Anteil für Rentner).',
+    definition: `Gesetzliche Pflichtversicherung zur Absicherung von Krankheitskosten. AN-Anteil ${JW.JAHR}: ${pct(JW.KV_AN, 2)} des Bruttolohns (bis BBG) inkl. Ø Zusatzbeitrag ${pct(JW.KV_ZUSATZBEITRAG_AN, 2)}. Auf Rentenbezüge: ${pct(JW.KV_RENTNER, 1)} gesamt (${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} voller Zusatzbeitrag; kein AG-Anteil).`,
   },
   {
     type: 'abbr', term: 'n',
@@ -117,7 +135,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'PV',
     short: 'Pflegeversicherung',
-    definition: 'Gesetzliche Pflichtversicherung zur Absicherung von Pflegebedürftigkeit. AN-Anteil 2024: 1,8 % des Bruttolohns (bis BBG). Auf Rentenbezüge: 1,8 % Beitrag.',
+    definition: `Gesetzliche Pflichtversicherung zur Absicherung von Pflegebedürftigkeit. AN-Anteil ${JW.JAHR - 1}/${JW.JAHR}: ${pct(JW.PV_AN_ELTERNTEIL, 1)} (Elternteil) / ${pct(JW.PV_AN_KINDERLOS, 1)} (kinderlos) des Bruttolohns (bis BBG). Rentner zahlen den vollen Beitragssatz allein (kein AG-Anteil): ${pct(JW.PV_RENTNER_ELTERNTEIL, 1)} (Elternteil) / ${pct(JW.PV_RENTNER_KINDERLOS, 1)} (kinderlos).`,
   },
   {
     type: 'abbr', term: 'r',
@@ -127,7 +145,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'RV',
     short: 'Rentenversicherung',
-    definition: 'Gesetzliche Pflichtversicherung zur Altersvorsorge. AN-Anteil 2024: 9,3 % des Bruttolohns (bis BBG). Beitragssatz gesamt: 18,6 % (je 9,3 % AN und AG).',
+    definition: `Gesetzliche Pflichtversicherung zur Altersvorsorge. AN-Anteil ${JW.JAHR}: ${pct(JW.RV_AN, 1)} des Bruttolohns (bis BBG). Beitragssatz gesamt: ${pct(JW.RV_AN * 2, 1)} (je ${pct(JW.RV_AN, 1)} AN und AG).`,
   },
   {
     type: 'abbr', term: 'SGB',
@@ -153,7 +171,7 @@ const ENTRIES: GlossarEntry[] = [
   {
     type: 'abbr', term: 'ZvE',
     short: 'Zu versteuerndes Einkommen',
-    definition: 'Bemessungsgrundlage der Einkommensteuer. Berechnung vereinfacht: Bruttoeinkommen − Sozialversicherungsbeiträge − Werbungskostenpauschbetrag (1.230 €) − Sonderausgabenpauschbetrag (36 €) − sonstige Abzüge. Auf ZvE wird der Einkommensteuertarif (§32a EStG) angewendet.',
+    definition: `Bemessungsgrundlage der Einkommensteuer. Berechnung vereinfacht: Bruttoeinkommen − Sozialversicherungsbeiträge − Werbungskostenpauschbetrag (${de(JW.WERBUNGSKOSTEN_AN)} €) − Sonderausgabenpauschbetrag (${JW.SONDERAUSGABEN_PAUSCHBETRAG} €) − sonstige Abzüge. Auf ZvE wird der Einkommensteuertarif (§32a EStG) angewendet.`,
   },
 
   // ── Fachbegriffe ─────────────────────────────────────────────────────────────
@@ -167,7 +185,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Altersvorsorgedepot',
-    definition: 'Staatlich gefördertes Wertpapierdepot (Altersvorsorgereformgesetz, ab 01.01.2027). Kombination aus privatem ETF-Depot und staatlicher Förderung: Grundzulage bis 540 €/Jahr + Kinderzulage 1:1-Match bis 300 €/Jahr je Kind. Sonderausgabenabzug nach §10a EStG auf max. 1.800 €/Jahr Eigenanteil + Zulage (Günstigerprüfung). Höchstbeitrag: 6.840 €/Jahr Eigenanteil; Beiträge über 1.800 €/Jahr ins Depot aber ohne Steuerabzug. Auszahlung als lebenslange Rente ab Rentenalter, versteuert als sonstige Einkünfte (§22 Nr. 5 EStG).',
+    definition: `Staatlich gefördertes Wertpapierdepot (Altersvorsorgereformgesetz, ab 01.01.${JW.AVD_STARTJAHR}). Kombination aus privatem ETF-Depot und staatlicher Förderung: Grundzulage bis 540 €/Jahr + Kinderzulage 1:1-Match bis 300 €/Jahr je Kind. Sonderausgabenabzug nach §10a EStG auf max. 1.800 €/Jahr Eigenanteil + Zulage (Günstigerprüfung). Höchstbeitrag: 6.840 €/Jahr Eigenanteil; Beiträge über 1.800 €/Jahr ins Depot aber ohne Steuerabzug. Auszahlung als lebenslange Rente ab Rentenalter, versteuert als sonstige Einkünfte (§22 Nr. 5 EStG).`,
     link: { text: 'justETF – Altersvorsorgedepot: Chancen & Förderung', url: 'https://www.justetf.com/de/news/etf-news/altersvorsorgedepot-avd-alles-was-du-wissen-musst.html' },
   },
   {
@@ -176,11 +194,11 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Beitragsbemessungsgrenze',
-    definition: 'Einkommensgrenze in der Sozialversicherung. Einkommensanteile oberhalb der Grenze sind beitragsfrei; gleichzeitig werden auch keine höheren Rentenansprüche erworben. GRV/AV 2024 (West): 90.600 €/Jahr (7.550 €/Monat).',
+    definition: `Einkommensgrenze in der Sozialversicherung. Einkommensanteile oberhalb der Grenze sind beitragsfrei; gleichzeitig werden auch keine höheren Rentenansprüche erworben. GRV/AV ${JW.JAHR} (bundeseinheitlich): ${de(JW.BBG)} €/Jahr (${de(JW.BBG / 12)} €/Monat).`,
   },
   {
     type: 'term', term: 'Besteuerungsanteil',
-    definition: 'Anteil der gesetzlichen Rente, der der Einkommensteuer unterliegt. Gilt nur für die GRV-Rente nach §22 Nr. 1 EStG. Basiert auf dem Jahr des Rentenbeginns: 2023 → 83 %, steigt jährlich um 0,5 % bis 100 % im Jahr 2058 (JStG 2022). Der steuerpflichtige Anteil = Bruttorente × Besteuerungsanteil − Werbungskostenpauschbetrag (102 €) − Sonderausgabenpauschbetrag (36 €).',
+    definition: `Anteil der gesetzlichen Rente, der der Einkommensteuer unterliegt. Gilt nur für die GRV-Rente nach §22 Nr. 1 EStG. Basiert auf dem Jahr des Rentenbeginns: 2023 → 82,5 %, steigt jährlich um 0,5 % bis 100 % im Jahr 2058 (JStG 2022 i.d.F. Wachstumschancengesetz 2024). ${JW.JAHR} → ${JW.BESTEUERUNGSANTEIL_GRV} %. Der steuerpflichtige Anteil = Bruttorente × Besteuerungsanteil − Werbungskostenpauschbetrag (${JW.WERBUNGSKOSTEN_RENTNER} €) − Sonderausgabenpauschbetrag (${JW.SONDERAUSGABEN_PAUSCHBETRAG} €).`,
   },
   {
     type: 'term', term: 'Break-Even-Steuersatz',
@@ -188,7 +206,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Bruttorente',
-    definition: 'Gesetzliche Rente vor Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie vor Einkommensteuer. Berechnung: Entgeltpunkte × aktueller Rentenwert. Vom Bruttobetrag werden KV (7,3 %) und PV (1,8 %) abgezogen, um zur Nettorente zu gelangen.',
+    definition: `Gesetzliche Rente vor Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie vor Einkommensteuer. Berechnung: Entgeltpunkte × aktueller Rentenwert. Vom Bruttobetrag werden KV (${pct(JW.KV_RENTNER, 1)} gesamt: ${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} voller Zusatzbeitrag) und PV (${pct(JW.PV_RENTNER_ELTERNTEIL, 1)} Elternteil / ${pct(JW.PV_RENTNER_KINDERLOS, 1)} kinderlos) abgezogen, um zur Nettorente zu gelangen.`,
   },
   {
     type: 'term', term: 'Bruttorendite',
@@ -200,7 +218,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Durchschnittsentgelt',
-    definition: 'Durchschnittlicher Jahresbruttoverdienst aller Versicherten in der GRV. Dient als Referenzgröße für die Entgeltpunktberechnung. 2024: 45.358 € (vorläufig), in dieser App vereinfacht: 51.944 €. Wer genau das Durchschnittsentgelt verdient, sammelt 1,0 EP pro Jahr.',
+    definition: `Durchschnittlicher Jahresbruttoverdienst aller Versicherten in der GRV. Dient als Referenzgröße für die Entgeltpunktberechnung. ${JW.JAHR} (vorläufig): ${de(JW.DURCHSCHNITTSENTGELT)} € (SVBezGrV ${JW.JAHR}). Wer genau das Durchschnittsentgelt verdient, sammelt 1,0 EP pro Jahr.`,
   },
   {
     type: 'term', term: 'Dynamisierung',
@@ -208,21 +226,21 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Einkommensteuer (§32a EStG)',
-    definition: 'Deutsche Einkommensteuer auf das zu versteuernde Einkommen (ZvE). Progressiver Tarif 2024 (Grundtabelle):',
+    definition: `Deutsche Einkommensteuer auf das zu versteuernde Einkommen (ZvE). Progressiver Tarif ${JW.JAHR} (Grundtabelle):`,
     table: {
-      headers: ['ZvE-Bereich (2024)', 'Grenzsteuersatz'],
+      headers: [`ZvE-Bereich (${JW.JAHR})`, 'Grenzsteuersatz'],
       rows: [
-        ['bis 11.784 €', '0 % (Grundfreibetrag)'],
-        ['11.785 – 17.005 €', '14 % – 24 % (progressiv)'],
-        ['17.006 – 66.760 €', '24 % – 42 % (progressiv)'],
-        ['66.761 – 277.826 €', '42 % (erste Proportionalzone)'],
-        ['über 277.826 €', '45 % (Reichensteuer)'],
+        [`bis ${de(JW.GRUNDFREIBETRAG)} €`, '0 % (Grundfreibetrag)'],
+        [`${de(JW.GRUNDFREIBETRAG + 1)} – ${de(JW.ESTG.ZONE1_BIS)} €`, '14 % – 24 % (progressiv)'],
+        [`${de(JW.ESTG.ZONE1_BIS + 1)} – ${de(JW.ESTG.ZONE2_BIS)} €`, '24 % – 42 % (progressiv)'],
+        [`${de(JW.ESTG.ZONE2_BIS + 1)} – ${de(JW.ESTG.ZONE3_BIS)} €`, '42 % (erste Proportionalzone)'],
+        [`über ${de(JW.ESTG.ZONE3_BIS)} €`, '45 % (Reichensteuer)'],
       ],
     },
   },
   {
     type: 'term', term: 'Entgeltpunkte',
-    definition: 'Maßeinheit für erworbene Rentenansprüche. Entgeltpunkte pro Jahr = Bruttolohn / Durchschnittsentgelt (max. 1 EP bei Einkommen = Durchschnitt). Gesamtrente = Summe aller Entgeltpunkte × aktueller Rentenwert (39,32 €/Monat, 2024).',
+    definition: `Maßeinheit für erworbene Rentenansprüche. Entgeltpunkte pro Jahr = Bruttolohn / Durchschnittsentgelt (max. 1 EP bei Einkommen = Durchschnitt). Gesamtrente = Summe aller Entgeltpunkte × aktueller Rentenwert (${de(JW.RENTENWERT, 2)} €/Monat, ${JW.JAHR - 1}/${JW.JAHR}).`,
   },
   {
     type: 'term', term: 'Entnahmerate',
@@ -234,11 +252,11 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Grundfreibetrag',
-    definition: 'Steuerfreies Existenzminimum in der Einkommensteuer. 2024: 11.784 €/Jahr. Auf Einkommen bis zu dieser Grenze wird keine Einkommensteuer erhoben. Wird jährlich angepasst.',
+    definition: `Steuerfreies Existenzminimum in der Einkommensteuer. ${JW.JAHR}: ${de(JW.GRUNDFREIBETRAG)} €/Jahr. Auf Einkommen bis zu dieser Grenze wird keine Einkommensteuer erhoben. Wird jährlich angepasst.`,
   },
   {
     type: 'term', term: 'Grundsicherung im Alter',
-    definition: 'Staatliche Mindestleistung nach SGB XII für Personen ab 65 Jahren mit geringem Einkommen/Vermögen. 2025 (Richtwert Alleinstehend): ca. 933 €/Monat (Regelsatz 563 € + durchschnittliche Kosten der Unterkunft 370 €). Liegt die Nettorente darunter, besteht ggf. Anspruch auf Aufstockung.',
+    definition: `Staatliche Mindestleistung nach SGB XII für Personen ab 65 Jahren mit geringem Einkommen/Vermögen. ${JW.JAHR - 1} (Richtwert Alleinstehend): ca. ${JW.GRUNDSICHERUNG_SCHWELLE} €/Monat (Regelsatz 563 € + durchschnittliche Kosten der Unterkunft 370 €). Liegt die Nettorente darunter, besteht ggf. Anspruch auf Aufstockung.`,
   },
   {
     type: 'term', term: 'Grundzulage (AVD)',
@@ -248,21 +266,21 @@ const ENTRIES: GlossarEntry[] = [
     type: 'term', term: 'Grenzsteuersatz',
     definition: 'Steuersatz, der auf den letzten hinzuverdienten Euro anfällt. Durch den progressiven Einkommensteuertarif steigt der Grenzsteuersatz mit dem Einkommen. Im Gegensatz zum Durchschnittssteuersatz bestimmt er, wie viel von einer zusätzlichen Einnahme effektiv versteuert wird.',
     table: {
-      headers: ['ZvE (2024)', 'Grenzsteuersatz'],
+      headers: [`ZvE (${JW.JAHR})`, 'Grenzsteuersatz'],
       rows: [
-        ['≤ 11.784 €', '0 %'],
-        ['15.000 €', '≈ 18 %'],
-        ['20.000 €', '≈ 26 %'],
-        ['30.000 €', '≈ 33 %'],
-        ['40.000 €', '≈ 38 %'],
-        ['≥ 66.761 €', '42 %'],
-        ['> 277.826 €', '45 %'],
+        [`≤ ${de(JW.GRUNDFREIBETRAG)} €`, '0 %'],
+        ['15.000 €', approxPct(margRate(15_000))],
+        ['20.000 €', approxPct(margRate(20_000))],
+        ['30.000 €', approxPct(margRate(30_000))],
+        ['40.000 €', approxPct(margRate(40_000))],
+        [`≥ ${de(JW.ESTG.ZONE2_BIS + 1)} €`, '42 %'],
+        [`> ${de(JW.ESTG.ZONE3_BIS)} €`, '45 %'],
       ],
     },
   },
   {
     type: 'term', term: 'Günstigerprüfung (§10a EStG)',
-    definition: 'Automatische Prüfung des Finanzamts in der Veranlagung: Ist der Sonderausgabenabzug nach §10a EStG günstiger als die direkte Zulage? Abzugsfähig: bis zu 1.800 €/Jahr Eigenanteil + voller Zulageanspruch (Grund- und Kinderzulage). Steuerersparnis = Grenzsteuersatz × (geförderter Eigenanteil + Zulage). Falls Steuerersparnis > Zulage, erstattet das Finanzamt die Differenz − Zulage wird dabei auf die Steuerschuld angerechnet, sodass kein Doppelbonus entsteht. Freibeträge (Grundfreibetrag 11.784 €, SV-Abzüge, Arbeitnehmer-Pauschbetrag 1.230 €) fließen bereits in den Grenzsteuersatz ein, der aus dem Bruttoeinkommen abgeleitet wird. Beiträge über 1.800 €/Jahr Eigenanteil können nicht abgezogen werden.',
+    definition: `Automatische Prüfung des Finanzamts in der Veranlagung: Ist der Sonderausgabenabzug nach §10a EStG günstiger als die direkte Zulage? Abzugsfähig: bis zu 1.800 €/Jahr Eigenanteil + voller Zulageanspruch (Grund- und Kinderzulage). Steuerersparnis = Grenzsteuersatz × (geförderter Eigenanteil + Zulage). Falls Steuerersparnis > Zulage, erstattet das Finanzamt die Differenz − Zulage wird dabei auf die Steuerschuld angerechnet, sodass kein Doppelbonus entsteht. Freibeträge (Grundfreibetrag ${de(JW.GRUNDFREIBETRAG)} €, SV-Abzüge, Arbeitnehmer-Pauschbetrag ${de(JW.WERBUNGSKOSTEN_AN)} €) fließen bereits in den Grenzsteuersatz ein, der aus dem Bruttoeinkommen abgeleitet wird. Beiträge über 1.800 €/Jahr Eigenanteil können nicht abgezogen werden.`,
     link: { text: '§ 10a EStG – Gesetzestext (gesetze-im-internet.de)', url: 'https://www.gesetze-im-internet.de/estg/__10a.html' },
   },
   {
@@ -283,7 +301,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Kapitalertragsteuer (KESt)',
-    definition: 'Abgeltungsteuer auf Kapitalerträge: 25 % + 5,5 % Soli = 26,375 %. Bei Aktien-ETF gilt 30 % Teilfreistellung → effektiv 18,4625 %. Sparerpauschbetrag: 1.000 €/Jahr (gilt für ETF-Depot, nicht für AVD). Abzug direkt durch die Bank.',
+    definition: `Abgeltungsteuer auf Kapitalerträge: 25 % + 5,5 % Soli = ${pct(JW.KEST_SOLI, 3)}. Bei Aktien-ETF gilt ${pct(JW.TEILFREISTELLUNG_ETF, 0)} Teilfreistellung → effektiv ${pct(JW.KEST_ETF_EFFEKTIV, 4)}. Sparerpauschbetrag: ${de(JW.SPARERPAUSCHBETRAG)} €/Jahr (gilt für ETF-Depot, nicht für AVD). Abzug direkt durch die Bank.`,
   },
   {
     type: 'term', term: 'Kinderzulage (AVD)',
@@ -296,7 +314,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Krankenversicherung (KV)',
-    definition: 'Gesetzliche Pflichtversicherung. AN-Anteil 2024: 8,15 % (Basisbeitrag 7,3 % + Ø Zusatzbeitrag 0,85 %) des Bruttolohns bis BBG. Rentnerbeitrag: 7,3 % der Bruttorente (kein AG-Anteil, Rentner tragen den vollen Basisbeitrag selbst).',
+    definition: `Gesetzliche Pflichtversicherung. AN-Anteil ${JW.JAHR}: ${pct(JW.KV_AN, 2)} (Basisbeitrag ${pct(JW.KV_BASISSATZ, 1)} + Ø Zusatzbeitrag ${pct(JW.KV_ZUSATZBEITRAG_AN, 2)}) des Bruttolohns bis BBG. Rentnerbeitrag: ${pct(JW.KV_RENTNER, 1)} der Bruttorente (${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} voller Zusatzbeitrag, kein AG-Anteil).`,
   },
   {
     type: 'term', term: 'Leibrente (AVD)',
@@ -304,15 +322,15 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Nettorendite',
-    definition: 'Tatsächliche Rendite nach Abzug aller Kosten (TER, Transaktionskosten) und Steuern. Bei einem Aktien-ETF: Nominalrendite − TER − KESt (18,46 % effektiv auf Kursgewinne). Beispiel: 7 % − 0,2 % TER − ~1 % Steuereffekt ≈ 5,8 % Nettorendite.',
+    definition: `Tatsächliche Rendite nach Abzug aller Kosten (TER, Transaktionskosten) und Steuern. Bei einem Aktien-ETF: Nominalrendite − TER − KESt (${pct(JW.KEST_ETF_EFFEKTIV, 2)} effektiv auf Kursgewinne). Beispiel: 7 % − 0,2 % TER − ~1 % Steuereffekt ≈ 5,8 % Nettorendite.`,
   },
   {
     type: 'term', term: 'Nettorente',
-    definition: 'Gesetzliche Rente nach Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie nach Einkommensteuer. Berechnung in dieser App: Bruttorente × (1 − KV-Beitrag 7,3 % − PV-Beitrag 1,8 %) = Nettorente (ohne Steuern, da GRV-Rente oft unter Grundfreibetrag).',
+    definition: `Gesetzliche Rente nach Abzug von Kranken- und Pflegeversicherungsbeiträgen sowie nach Einkommensteuer. Berechnung in dieser App: Bruttorente × (1 − KV ${pct(JW.KV_RENTNER, 1)} − PV ${pct(JW.PV_RENTNER_ELTERNTEIL, 1)}) = Nettorente (ohne Steuern, da GRV-Rente oft unter Grundfreibetrag). KV umfasst ${pct(JW.KV_BASISSATZ, 1)} Basissatz + ${pct(JW.KV_ZUSATZBEITRAG_GESAMT, 1)} vollen Zusatzbeitrag.`,
   },
   {
     type: 'term', term: 'Pflegeversicherung (PV)',
-    definition: 'Gesetzliche Pflichtversicherung. AN-Anteil 2024: 1,8 % des Bruttolohns bis BBG. Rentnerbeitrag: 1,8 % der Bruttorente.',
+    definition: `Gesetzliche Pflichtversicherung. AN-Anteil ${JW.JAHR - 1}/${JW.JAHR}: ${pct(JW.PV_AN_ELTERNTEIL, 1)} (Elternteil) / ${pct(JW.PV_AN_KINDERLOS, 1)} (kinderlos) des Bruttolohns bis BBG. Rentner zahlen den vollen Beitragssatz allein: ${pct(JW.PV_RENTNER_ELTERNTEIL, 1)} (Elternteil) / ${pct(JW.PV_RENTNER_KINDERLOS, 1)} (kinderlos) der Bruttorente.`,
   },
   {
     type: 'term', term: 'Risikoprofil (Renditepreset)',
@@ -324,7 +342,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Rentenformel',
-    definition: 'Berechnung der monatlichen GRV-Rente: Monatsrente = Entgeltpunkte × Zugangsfaktor × Rentenartfaktor × aktueller Rentenwert. Vereinfacht (Altersrente mit Zugangsfaktor = 1): Monatsrente = EP × Rentenwert (39,32 €, 2024).',
+    definition: `Berechnung der monatlichen GRV-Rente: Monatsrente = Entgeltpunkte × Zugangsfaktor × Rentenartfaktor × aktueller Rentenwert. Vereinfacht (Altersrente mit Zugangsfaktor = 1): Monatsrente = EP × Rentenwert (${de(JW.RENTENWERT, 2)} €, ${JW.JAHR - 1}/${JW.JAHR}).`,
     link: { text: 'Deutsche Rentenversicherung (drv.de)', url: 'https://www.deutsche-rentenversicherung.de' },
   },
   {
@@ -333,11 +351,11 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Rentenversicherung (RV)',
-    definition: 'Gesetzliche Pflichtversicherung für Arbeitnehmer. Beitragssatz 2024: 18,6 % (je 9,3 % AN und AG). Finanzierungsprinzip: Umlageverfahren. Leistungen: Altersrente, Erwerbsminderungsrente, Hinterbliebenenrente.',
+    definition: `Gesetzliche Pflichtversicherung für Arbeitnehmer. Beitragssatz ${JW.JAHR}: ${pct(JW.RV_AN * 2, 1)} (je ${pct(JW.RV_AN, 1)} AN und AG). Finanzierungsprinzip: Umlageverfahren. Leistungen: Altersrente, Erwerbsminderungsrente, Hinterbliebenenrente.`,
   },
   {
     type: 'term', term: 'Rentenwert',
-    definition: 'Aktueller Rentenwert (aRW): monatlicher Eurobetrag für einen Entgeltpunkt. 2024: 39,32 €/Monat/EP. Wird jährlich durch die Rentenanpassungsformel fortgeschrieben (Orientierung an Lohnentwicklung und Nachhaltigkeitsfaktor).',
+    definition: `Aktueller Rentenwert (aRW): monatlicher Eurobetrag für einen Entgeltpunkt. ${JW.JAHR - 1}/${JW.JAHR}: ${de(JW.RENTENWERT, 2)} €/Monat/EP. Wird jährlich durch die Rentenanpassungsformel fortgeschrieben (Orientierung an Lohnentwicklung und Nachhaltigkeitsfaktor).`,
   },
   {
     type: 'term', term: 'Solidaritätszuschlag (Soli)',
@@ -350,15 +368,15 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Sozialversicherungsbeiträge',
-    definition: 'Pflichtbeiträge zur gesetzlichen Sozialversicherung. AN-Anteile 2024 (bis BBG 90.600 €/Jahr):',
+    definition: `Pflichtbeiträge zur gesetzlichen Sozialversicherung. AN-Anteile ${JW.JAHR} (bis BBG ${de(JW.BBG)} €/Jahr):`,
     table: {
-      headers: ['Versicherung', 'AN-Anteil 2024'],
+      headers: ['Versicherung', `AN-Anteil ${JW.JAHR}`],
       rows: [
-        ['Krankenversicherung (KV)', '8,15 %'],
-        ['Pflegeversicherung (PV)', '1,80 %'],
-        ['Rentenversicherung (RV)', '9,30 %'],
-        ['Arbeitslosenversicherung (AV)', '1,30 %'],
-        ['Gesamt AN', '20,55 %'],
+        ['Krankenversicherung (KV)', pct(JW.KV_AN, 2)],
+        ['Pflegeversicherung (PV)', `${pct(JW.PV_AN_ELTERNTEIL, 2)} (Elternteil)`],
+        ['Rentenversicherung (RV)', pct(JW.RV_AN, 2)],
+        ['Arbeitslosenversicherung (AV)', pct(JW.AV_AN, 2)],
+        ['Gesamt AN', pct(JW.KV_AN + JW.PV_AN_ELTERNTEIL + JW.RV_AN + JW.AV_AN, 2)],
       ],
     },
   },
@@ -372,7 +390,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Teilfreistellung (ETF)',
-    definition: 'Steuerliche Begünstigung für Investmentfonds-Erträge. Bei Aktien-ETF mit ≥ 51 % Aktienquote: 30 % der Erträge sind steuerfrei (§ 20 Abs. 1 InvStG 2018). Effektiver Steuersatz auf Kursgewinne/Ausschüttungen: 26,375 % × (1 − 30 %) = 18,4625 %.',
+    definition: `Steuerliche Begünstigung für Investmentfonds-Erträge. Bei Aktien-ETF mit ≥ 51 % Aktienquote: ${pct(JW.TEILFREISTELLUNG_ETF, 0)} der Erträge sind steuerfrei (§ 20 Abs. 1 InvStG 2018). Effektiver Steuersatz auf Kursgewinne/Ausschüttungen: ${pct(JW.KEST_SOLI, 3)} × (1 − ${pct(JW.TEILFREISTELLUNG_ETF, 0)}) = ${pct(JW.KEST_ETF_EFFEKTIV, 4)}.`,
   },
   {
     type: 'term', term: 'Umlageverfahren',
@@ -384,7 +402,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Werbungskostenpauschbetrag',
-    definition: 'Pauschaler Abzug für beruflich bedingte Aufwendungen. 2024: 1.230 €/Jahr für Arbeitnehmer (§9a EStG). Für Rentner: 102 €/Jahr (§9a S. 1 Nr. 3 EStG). Wird bei der ZvE-Berechnung vor Anwendung des Steuertarifs abgezogen.',
+    definition: `Pauschaler Abzug für beruflich bedingte Aufwendungen. ${JW.JAHR}: ${de(JW.WERBUNGSKOSTEN_AN)} €/Jahr für Arbeitnehmer (§9a EStG). Für Rentner: ${JW.WERBUNGSKOSTEN_RENTNER} €/Jahr (§9a S. 1 Nr. 3 EStG). Wird bei der ZvE-Berechnung vor Anwendung des Steuertarifs abgezogen.`,
   },
   {
     type: 'term', term: 'Zinseszins',
@@ -392,7 +410,7 @@ const ENTRIES: GlossarEntry[] = [
   },
   {
     type: 'term', term: 'Zu versteuerndes Einkommen (ZvE)',
-    definition: 'Bemessungsgrundlage der Einkommensteuer nach allen zulässigen Abzügen. Vereinfachte Berechnung in dieser App: ZvE = Bruttolohn − Sozialversicherungsbeiträge (AN) − Werbungskostenpauschbetrag (1.230 €) − Sonderausgabenpauschbetrag (36 €).',
+    definition: `Bemessungsgrundlage der Einkommensteuer nach allen zulässigen Abzügen. Vereinfachte Berechnung in dieser App: ZvE = Bruttolohn − Sozialversicherungsbeiträge (AN) − Werbungskostenpauschbetrag (${de(JW.WERBUNGSKOSTEN_AN)} €) − Sonderausgabenpauschbetrag (${JW.SONDERAUSGABEN_PAUSCHBETRAG} €).`,
   },
   {
     type: 'term', term: 'Zulage (AVD)',

@@ -272,7 +272,7 @@
 
       <p class="spar__disclaimer">
         Brutto-Rendite vor Steuern. Auf realisierte Gewinne fallen KESt 25 % + Soli 5,5 % an
-        (mit 30 % Teilfreistellung bei Aktien-ETF effektiv ca. 18,46 %). Die tatsächliche Nettorendite
+        (mit {{ jw.TEILFREISTELLUNG_ETF * 100 | number:'1.0-0' }} % Teilfreistellung bei Aktien-ETF effektiv ca. {{ jw.KEST_ETF_EFFEKTIV * 100 | number:'1.2-2' }} %). Die tatsächliche Nettorendite
         liegt entsprechend niedriger.
       </p>
     </div>
@@ -283,7 +283,7 @@
         <div class="spar__avd-header">
           <h2 class="spar__avd-title">Optimierung mit Altersvorsorgedepot</h2>
           <p class="spar__avd-subtitle">
-            Das staatlich geförderte Altersvorsorgedepot (ab 2027) kann deine Sparrate senken oder deine Rente erhöhen — je nachdem, wie du dein Budget aufteilst.
+            Das staatlich geförderte Altersvorsorgedepot (ab {{ jw.AVD_STARTJAHR }}) kann deine Sparrate senken oder deine Rente erhöhen — je nachdem, wie du dein Budget aufteilst.
           </p>
         </div>
 
@@ -301,18 +301,18 @@
             <tbody>
               <tr>
                 <td class="spar__compare-td spar__compare-td--feature">Staatszulage</td>
-                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Ja — bis 540 €/Jahr + 300 €/Kind</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Ja — bis {{ avdConst.MAX_GRUNDZULAGE_YEAR }} €/Jahr + {{ avdConst.MAX_KINDERZULAGE_MONTH * 12 }} €/Kind</td>
                 <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Nein</td>
               </tr>
               <tr>
                 <td class="spar__compare-td spar__compare-td--feature">Steuer: Ansparphase</td>
                 <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">Steuerfrei (Kursgewinne, Dividenden)</td>
-                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">KESt 26,375 % auf Ausschüttungen &amp; Verkäufe</td>
+                <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">KESt {{ jw.KEST_SOLI * 100 | number:'1.3-3' }} % auf Ausschüttungen &amp; Verkäufe</td>
               </tr>
               <tr>
                 <td class="spar__compare-td spar__compare-td--feature">Steuer: Entnahme</td>
                 <td class="spar__compare-td spar__compare-td--etf spar__compare-td--no">Einkommensteuer (als Rente versteuert)</td>
-                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">KESt 18,46 % effektiv (Teilfreistellung)</td>
+                <td class="spar__compare-td spar__compare-td--avd spar__compare-td--yes">KESt {{ jw.KEST_ETF_EFFEKTIV * 100 | number:'1.2-2' }} % effektiv ({{ jw.TEILFREISTELLUNG_ETF * 100 | number:'1.0-0' }} % Teilfreistellung)</td>
               </tr>
               <tr>
                 <td class="spar__compare-td spar__compare-td--feature">Produktfreiheit</td>
@@ -410,7 +410,7 @@
                 <i class="info-tip__icon">i</i>
                 <span class="info-tip__content">
                   Kinder, für die du Kindergeld beziehst (i.d.R. bis Vollendung des 18. Lebensjahres).
-                  Jedes Kind bringt 1 € Kinderzulage je eingezahltem € Eigenanteil – maximal 30 €/Monat je Kind (gilt nur bei mind. 10 €/Monat Eigenanteil).
+                  Jedes Kind bringt 1 € Kinderzulage je eingezahltem € Eigenanteil – maximal {{ avdConst.MAX_KINDERZULAGE_MONTH }} €/Monat je Kind (gilt nur bei mind. {{ avdConst.MIN_OWN_MONTH }} €/Monat Eigenanteil).
                 </span>
               </span>
             </label>
@@ -566,10 +566,10 @@
                   Grenzsteuersatz bei geschätztem ZvE aus GRV-Rente (§22 EStG).<br>
                   Renteneintrittsjahr: {{ avd.avdRetirementYear }}<br>
                   Besteuerungsanteil der GRV: {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} %<br>
-                  Analytisch aus §32a EStG 2024 – kein Soli, keine KiSt.
+                  Analytisch aus §32a EStG {{ jw.JAHR }} – kein Soli, keine KiSt.
                 </span>
               </span>.
-              ETF-Kapital via 4 %-Regel (18,46 % KESt effektiv).
+              ETF-Kapital via 4 %-Regel (KESt {{ jw.KEST_ETF_EFFEKTIV * 100 | number:'1.4-4' }} % effektiv, Sparerpauschbetrag {{ jw.SPARERPAUSCHBETRAG | number:'1.0-0' }} €/Jahr).
             </p>
           </div>
 
@@ -931,7 +931,6 @@
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
                         Brutto-Monatseinkommen aus ETF vor KESt<br>
-                        = ETF-Rate × {{ avd.kEtf / (1 - 0.184625) | number:'1.4-4' }}<br>
                         (ETF-Rendite {{ etfRealReturn() | number:'1.2-2' }} % p.a., 4 %-Regel)
                       </span>
                     </span>
@@ -941,9 +940,10 @@
                     <span class="info-tip">
                       <i class="info-tip__icon">i</i>
                       <span class="info-tip__content">
-                        KESt 25 % + Soli 5,5 % = 26,375 %<br>
-                        mit 30 % Teilfreistellung (Aktien-ETF)<br>
-                        effektiv 18,4625 % auf Kapitalerträge
+                        KESt 25 % + Soli 5,5 % = {{ jw.KEST_SOLI * 100 | number:'1.3-3' }} %<br>
+                        mit {{ jw.TEILFREISTELLUNG_ETF * 100 | number:'1.0-0' }} % Teilfreistellung (Aktien-ETF)<br>
+                        effektiv {{ jw.KEST_ETF_EFFEKTIV * 100 | number:'1.4-4' }} % auf steuerpflichtige Kapitalerträge<br>
+                        (Sparerpauschbetrag {{ jw.SPARERPAUSCHBETRAG | number:'1.0-0' }} €/Jahr steuerfreigestellt)
                       </span>
                     </span>
                   </th>
@@ -954,7 +954,8 @@
                       <span class="info-tip__content">
                         ETF-Rate × {{ avd.kEtf | number:'1.4-4' }}<br>
                         (ETF-Rendite {{ etfRealReturn() | number:'1.2-2' }} % p.a.)<br>
-                        Nach KESt 18,46 % (inkl. 30 % Teilfreistellung)
+                        Nach KESt {{ jw.KEST_ETF_EFFEKTIV * 100 | number:'1.4-4' }} % ({{ jw.TEILFREISTELLUNG_ETF * 100 | number:'1.0-0' }} % Teilfreistellung,<br>
+                        Sparerpauschbetrag {{ jw.SPARERPAUSCHBETRAG | number:'1.0-0' }} €/Jahr)
                       </span>
                     </span>
                   </th>
@@ -965,7 +966,7 @@
                         <i class="info-tip__icon">i</i>
                         <span class="info-tip__content">
                           Monatlicher Rentenbonus aus der reinvestierten Günstigerprüfungs-Erstattung.<br><br>
-                          Berechnung: Jährl. Erstattung × ETF-FV-Faktor × 4 %-Regel ÷ 12 × (1 − 18,46 % KeSt)
+                          Berechnung: Jährl. Erstattung × ETF-FV-Faktor × 4 %-Regel ÷ 12 × (1 − {{ jw.KEST_ETF_EFFEKTIV * 100 | number:'1.2-2' }} % KeSt)
                         </span>
                       </span>
                     </th>
@@ -999,7 +1000,7 @@
                     <td class="spar__avd-table__taxcol spar__avd-table__tax">
                       @if (pt.etfTax > 0) {
                         −{{ pt.etfTax | number:'1.2-2' }} €
-                        <span class="spar__avd-table__tax-rate spar__avd-table__tax-rate--bold">18,46 %</span>
+                        <span class="spar__avd-table__tax-rate spar__avd-table__tax-rate--bold">{{ (pt.etfTax / pt.etfGrossIncome * 100) | number:'1.1-1' }} %</span>
                       } @else { — }
                     </td>
                     <td class="spar__avd-table__etfincome spar__avd-table__netto-part">{{ pt.etfIncome | number:'1.2-2' }} €</td>
@@ -1103,14 +1104,14 @@
         }
 
         <p class="spar__avd-disclaimer">
-          Modellrechnung — keine Anlageberatung. AVD ab 01.01.2027 geplant.
+          Modellrechnung — keine Anlageberatung. AVD ab 01.01.{{ jw.AVD_STARTJAHR }} geplant.
           <span class="info-tip">
             <i class="info-tip__icon">i</i>
             <span class="info-tip__content">
               AVD-Rendite {{ avdRealReturn() | number:'1.2-2' }} % p.a. ({{ grossMarketReturn() | number:'1.0-0' }} % Markt − 2 % Inflation − {{ avdCost() | number:'1.2-2' }} % Kosten).
               ETF-Rendite {{ etfRealReturn() | number:'1.2-2' }} % p.a. ({{ grossMarketReturn() | number:'1.0-0' }} % Markt − 2 % Inflation − {{ etfTer() | number:'1.2-2' }} % TER).
               Mindesteinzahlung {{ avdConst.MIN_OWN_MONTH }} €/Mon.; volle Grundzulage ab {{ avdConst.MAX_ZULAGE_MONTH }} €/Mon.; gesetzl. Max. {{ avdConst.MAX_OWN_MONTH }} €/Mon.
-              Grenzsteuersatz {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % (§32a EStG 2024, Renteneintrittsjahr {{ avd.avdRetirementYear }}, Besteuerungsanteil {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} %).
+              Grenzsteuersatz {{ avd.avdEffTaxRate * 100 | number:'1.1-1' }} % (§32a EStG {{ jw.JAHR }}, Renteneintrittsjahr {{ avd.avdRetirementYear }}, Besteuerungsanteil {{ avd.avdBesteuerungsanteil * 100 | number:'1.1-1' }} %).
             </span>
           </span>
         </p>
@@ -1194,7 +1195,7 @@
 
       <p class="spar__disclaimer">
         Brutto-Rendite vor Steuern. Auf realisierte Gewinne fallen KESt 25 % + Soli 5,5 % an
-        (mit 30 % Teilfreistellung bei Aktien-ETF effektiv ca. 18,46 %). Die tatsächliche Nettorendite
+        (mit {{ jw.TEILFREISTELLUNG_ETF * 100 | number:'1.0-0' }} % Teilfreistellung bei Aktien-ETF effektiv ca. {{ jw.KEST_ETF_EFFEKTIV * 100 | number:'1.2-2' }} %). Die tatsächliche Nettorendite
         liegt entsprechend niedriger.
       </p>
     </div>

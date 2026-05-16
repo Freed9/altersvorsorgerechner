@@ -123,9 +123,9 @@
               <span class="info-tip">
                 <i class="info-tip__icon">i</i>
                 <span class="info-tip__content">
-                  <strong>PMT_brutto = Lücke_netto / (1 − Steuersatz_eff)</strong><br>
-                  Renditeanteil = {{ ep.gainFraction | number:'1.2-2' }}<br>
-                  Effektiver Steuersatz = Renditeanteil × {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }} %
+                  <strong>PMT_brutto = (Lücke − SPB/12 × KESt) / (1 − g × KESt_eff)</strong><br>
+                  Renditeanteil g = {{ ep.gainFraction | number:'1.2-2' }}<br>
+                  KESt_eff = g × {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }} % · SPB {{ constants.SPARERPAUSCHBETRAG | number:'1.0-0' }} €/Jahr mit KESt {{ constants.KEST_SOLI_RATE * 100 | number:'1.3-3' }} %
                 </span>
               </span>
             </span>
@@ -137,8 +137,9 @@
               <span class="info-tip">
                 <i class="info-tip__icon">i</i>
                 <span class="info-tip__content">
-                  <strong>Steuer = PMT_brutto × Renditeanteil × KESt_eff</strong><br>
-                  KESt_eff = {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }} % (mit 30 % Teilfreistellung)<br>
+                  <strong>Steuer = PMT_brutto × g × KESt_eff − SPB/12 × KESt</strong><br>
+                  KESt_eff = {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }} % (g × KeSt mit 30 % Teilfreistellung)<br>
+                  KeSt = {{ constants.KEST_SOLI_RATE * 100 | number:'1.3-3' }} % (Vollanwendung auf Sparerpauschbetrag)<br>
                   Steuerbetrag sinkt mit abnehmendem Kapital – hier Durchschnitt
                 </span>
               </span>
@@ -178,6 +179,7 @@
           <div class="variant-card__info variant-card__info--blue">
             4 % p.a. Brutto-Rendite. Steuer nur auf Renditeanteil mit 30&nbsp;% Teilfreistellung
             (effektiv {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }}&nbsp;%).
+            Sparerpauschbetrag {{ constants.SPARERPAUSCHBETRAG | number:'1.0-0' }}&nbsp;€/Jahr steuerfreigestellt — KESt nur auf den Überschuss.
             Steuerbetrag sinkt mit abnehmendem Kapital — hier als Durchschnitt angegeben.
             Nach 28 Jahren ist das Kapital vollständig verbraucht.
           </div>
@@ -275,7 +277,7 @@
           <div class="variant-card__info variant-card__info--green">
             4 % des Kapitals werden jährlich entnommen. Gesamte Entnahme gilt als Kapitalertrag —
             Teilfreistellung 30&nbsp;% greift voll: effektiv {{ constants.KEST_SOLI_RATE * (1 - constants.TEILFREISTELLUNG_ETF) * 100 | number:'1.2-2' }}&nbsp;%.
-            Sparerpauschbetrag (1.000&nbsp;€/Jahr) nicht eingerechnet. Kapital bleibt dauerhaft erhalten.
+            Sparerpauschbetrag {{ constants.SPARERPAUSCHBETRAG | number:'1.0-0' }}&nbsp;€/Jahr steuerfreigestellt — KESt nur auf den Überschuss. Kapital bleibt dauerhaft erhalten.
           </div>
 
           @if ((form.get('existingCapital')?.value ?? 0) > 0) {

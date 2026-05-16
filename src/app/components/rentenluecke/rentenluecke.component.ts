@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { RentenCalculatorService, RentenResult, RENTEN_CONSTANTS } from '../../services/renten-calculator.service';
+import { JAHRESWERTE } from '../../constants/jahreswerte';
 import { AppStateService } from '../../services/app-state.service';
 import { InfoTipDirective } from '../../directives/info-tip.directive';
 
@@ -20,6 +21,7 @@ export class RentenlueckeComponent {
   private appState = inject(AppStateService);
 
   readonly constants = RENTEN_CONSTANTS;
+  readonly jw = JAHRESWERTE;
 
   mode = signal<Mode>('simple');
   result = signal<RentenResult | null>(null);
